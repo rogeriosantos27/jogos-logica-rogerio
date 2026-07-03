@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enigma das Apresentações - Jogo 2</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>🎭 O Grande Festival de Dança</h1>
+        <p>Descubra a ordem correta das apresentações associando cada aluna ao seu professor, estilo de dança, idade e figurino!</p>
+    </header>
+
+    <div class="container">
+        <div class="pistas-container">
+            <h2>🔍 Pistas do Festival</h2>
+            <ul>
+                <li id="pista-1">1. A apresentação de Junina acontece exatamente entre a garota de 12 anos e a coreografia de Frevo, nessa ordem.</li>
+                <li id="pista-2">2. A coreografia de Funk acontece imediatamente após a apresentação de Pau de Fita.</li>
+                <li id="pista-3">3. A coreografia de Samba é apresentada imediatamente antes da vez de Camilly.</li>
+                <li id="pista-4">4. O professor Anderson lidera a coreografia de Funk, e sua aluna não se chama Julia.</li>
+                <li id="pista-5">5. A professora Hariane fica em uma das apresentações das extremidades (primeira ou última), logo ao lado do professor Anderson.</li>
+                <li id="pista-6">6. As alunas Ketlein e Clarice vão se apresentar uma logo após a outra.</li>
+                <li id="pista-7">7. O figurino Azul é usado imediatamente após a apresentação com o figurino Vermelho.</li>
+                <li id="pista-8">8. A aluna Kauanny se apresenta imediatamente antes da menina de 10 anos.</li>
+                <li id="pista-9">9. O professor Vitor escolheu o figurino Vermelho e sua aluna é a Clarice.</li>
+                <li id="pista-10">10. Quem dança Frevo tem menos de 10 anos.</li>
+                <li id="pista-11">11. O figurino Verde pertence a quem ensaia com a professora Hariane.</li>
+                <li id="pista-12">12. O figurino Amarelo foi o escolhido para a apresentação da aluna Ketlein.</li>
+                <li id="pista-13">13. A aluna que veste Verde se apresenta ao lado da aluna que vai dançar Funk.</li>
+                <li id="pista-14">14. A apresentação com o figurino Vermelho ocorre em algum momento antes da garota de 9 anos.</li>
+                <li id="pista-15">15. A aluna Julia se apresenta em algum momento após a apresentação do figurino Azul.</li>
+            </ul>
+        </div>
+
+        <div class="tabuleiro-container">
+            <table id="tabuleiro">
+                <thead>
+                    <tr>
+                        <th>Categoria</th>
+                        <th>Primeira</th>
+                        <th>Segunda</th>
+                        <th>Terceira</th>
+                        <th>Quarta</th>
+                        <th>Quinta</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr data-categoria="Professor"><td class="categoria-header">Professor</td></tr>
+                    <tr data-categoria="Nome"><td class="categoria-header">Aluna</td></tr>
+                    <tr data-categoria="Coreografia"><td class="categoria-header">Coreografia</td></tr>
+                    <tr data-categoria="Idade"><td class="categoria-header">Idade</td></tr>
+                    <tr data-categoria="Cor"><td class="categoria-header">Figurino</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="acoes">
+            <button id="btn-verificar">Verificar Respostas</button>
+            <div id="mensagem-resultado"></div>
+        </div>
+    </div>
+
+    <script src="script2.js"></script>
+</body>
+</html>
