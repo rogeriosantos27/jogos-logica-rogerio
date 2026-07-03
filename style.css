@@ -1,0 +1,223 @@
+:root {
+    --primary: #4a5568;
+    --accent: #3182ce;
+    --success: #38a169;
+    --error: #e53e3e;
+    --bg: #f7fafc;
+    --text: #2d3748;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    
+    /* Configuração da Imagem de Fundo Local */
+    background-image: url('fundo.jpg'); 
+    background-size: cover;             
+    background-position: center;         
+    background-repeat: no-repeat;        
+    background-attachment: fixed;        
+    
+    color: var(--text);
+    margin: 0;
+    padding: 20px;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+/* Título com fundo protetor */
+header h1 {
+    display: inline-block; /* Faz o fundo envolver apenas o texto */
+    background: rgba(255, 255, 255, 0.85);
+    padding: 15px 30px;
+    border-radius: 12px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin-bottom: 15px;
+    color: #1a202c;
+    font-size: 2.5rem;
+}
+
+/* Subtítulo com fundo protetor */
+header p {
+    display: block;
+    max-width: fit-content;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 10px 20px;
+    border-radius: 8px;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    font-weight: 500;
+}
+
+.container {
+    display: block;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+/* Container de Pistas sem fundo (Livre para ver a foto) */
+.pistas-container {
+    background: none;
+    padding: 0;
+    box-shadow: none;
+    margin-bottom: 35px;
+}
+
+/* Título das pistas com fundo leve */
+.pistas-container h2 {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 5px 20px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.pistas-container ul {
+    padding-left: 0;
+    list-style-type: none;
+    line-height: 1.8;
+}
+
+/* Frases individuais com tarja de fundo */
+.pistas-container li {
+    margin-bottom: 8px;
+    padding: 10px 18px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.85); 
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    display: block; /* Ocupa a largura disponível */
+    width: 100%; 
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+    border-left: 5px solid var(--accent); /* Detalhe lateral para elegância */
+}
+
+/* Pista errada (Grifado vermelho) */
+.pistas-container li.pista-errada {
+    color: var(--error) !important;
+    background-color: rgba(255, 235, 235, 0.95) !important;
+    text-decoration: line-through underline !important;
+    font-weight: bold !important;
+    border-left-color: var(--error) !important;
+}
+
+/* Pista certa (Grifado cinza) */
+.pistas-container li.pista-certa {
+    color: #a0aec0 !important;
+    background-color: rgba(247, 250, 252, 0.6) !important;
+    text-decoration: line-through !important;
+    font-weight: normal !important;
+    border-left-color: #cbd5e0 !important;
+}
+
+.tabuleiro-container {
+    background: none;
+    padding: 0;
+    box-shadow: none;
+    margin-bottom: 25px;
+}
+
+/* Tabela transparente com efeito de vidro nas células */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: none; 
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+th, td {
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 12px;
+    text-align: center;
+}
+
+th {
+    background-color: rgba(74, 85, 104, 0.9); 
+    color: white;
+}
+
+td {
+    background-color: rgba(255, 255, 255, 0.15); /* Células bem transparentes */
+    backdrop-filter: blur(4px);
+}
+
+.categoria-header {
+    font-weight: bold;
+    background-color: rgba(237, 242, 247, 0.85) !important;
+    text-align: left;
+    color: var(--text);
+}
+
+/* MENUS DE SELEÇÃO: BLOQUEADOS PARA NÃO EXIBIREM BORDAS VERDES OU VERMELHAS */
+#tabuleiro select {
+    width: 100%;
+    padding: 8px;
+    
+    /* Define uma borda fixa e neutra impedindo alterações externas */
+    border: 1px solid rgba(226, 232, 240, 0.8) !important; 
+    
+    border-radius: 6px;
+    background-color: rgba(255, 255, 255, 0.9);
+    color: var(--text);
+    font-weight: 600;
+    cursor: pointer;
+    outline: none !important;
+    box-shadow: none !important;
+    transition: background-color 0.3s ease;
+}
+
+#tabuleiro select:focus {
+    outline: none !important;
+    
+    /* Mantém rigorosamente a mesma cor de borda quando clicado */
+    border: 1px solid rgba(226, 232, 240, 0.8) !important; 
+    
+    background-color: #ffffff;
+    box-shadow: none !important;
+}
+
+.acoes {
+    margin-top: 30px;
+    text-align: center;
+}
+
+button {
+    background-color: var(--accent);
+    color: white;
+    border: none;
+    padding: 15px 40px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+button:hover {
+    background-color: #2b6cb0;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+}
+
+#mensagem-resultado {
+    margin-top: 20px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    background: rgba(255, 255, 255, 0.8);
+    display: inline-block;
+    padding: 10px 25px;
+    border-radius: 8px;
+}
+
+.correto { color: var(--success); }
+.incorreto { color: var(--error); }
