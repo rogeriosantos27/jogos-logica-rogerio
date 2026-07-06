@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo de Lógica - Amigas na Dança</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<a href="index.html" class="btn-voltar-topo">⬅ Voltar ao Menu</a>
+    <header>
+        <h1>Desafio de Lógica: As 5 Amigas</h1>
+        <p>Use as pistas abaixo para preencher a tabela corretamente!</p>
+    </header>
+
+    <main class="container">
+        <section class="pistas-container">
+            <h2>🔍 Pistas</h2>
+            <ul id="lista-pistas">
+                <li id="pista-1">1. A garota que veste <strong>Verde</strong> está na primeira posição.</li>
+                <li id="pista-2">2. <strong>Julia</strong> está sentada exatamente à esquerda de <strong>Isabelly</strong>.</li>
+                <li id="pista-3">3. A aluna da <strong>INT-5</strong> está exatamente no meio.</li>
+                <li id="pista-4">4. A menina de <strong>Amarelo</strong> está sentada exatamente à direita da que bebe suco de <strong>Goiaba</strong>.</li>
+                <li id="pista-5">5. A garota que dança <strong>Jazz</strong> veste <strong>Rosa</strong>.</li>
+                <li id="pista-6">6. <strong>Ana Clara</strong> está ao lado da garota da turma <strong>INT-2</strong>.</li>
+                <li id="pista-7">7. A menina que bebe suco de <strong>Uva</strong> estuda na <strong>INT-4</strong>.</li>
+                <li id="pista-8">8. Quem gosta de <strong>Força</strong> está em algum lugar à esquerda de quem gosta de <strong>Flex</strong>.</li>
+                <li id="pista-9">9. <strong>Cecilia</strong> bebe suco de <strong>Maracujá</strong>.</li>
+                <li id="pista-10">10. A garota de <strong>Azul</strong> treina dança <strong>Classico</strong>.</li>
+                <li id="pista-11">11. A menina que estuda na <strong>INT-1</strong> bebe suco de <strong>Laranja</strong>.</li>
+                <li id="pista-12">12. A aluna de <strong>Vermelho</strong> gosta de <strong>Coreografia</strong>.</li>
+                <li id="pista-13">13. <strong>Raquele</strong> está ao lado da menina que dança <strong>Flex</strong>.</li>
+                <li id="pista-14">14. A aluna da turma <strong>INT-3</strong> está na última posição.</li>
+                <li id="pista-15">15. A menina que bebe suco de <strong>Laranja</strong> está sentada em algum lugar entre a de <strong>Verde</strong> e a de <strong>Rosa</strong>, exatamente nessa ordem.</li>
+            </ul>
+        </section>
+
+        <section class="tabuleiro-container">
+            <table id="tabuleiro">
+                <thead>
+                    <tr>
+                        <th>Categoria</th>
+                        <th>Posição 1</th>
+                        <th>Posição 2</th>
+                        <th>Posição 3</th>
+                        <th>Posição 4</th>
+                        <th>Posição 5</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr data-categoria="Nome">
+                        <td class="categoria-header">Nome</td>
+                    </tr>
+                    <tr data-categoria="Turma">
+                        <td class="categoria-header">Turma</td>
+                    </tr>
+                    <tr data-categoria="Suco">
+                        <td class="categoria-header">Suco</td>
+                    </tr>
+                    <tr data-categoria="Cor">
+                        <td class="categoria-header">Cor</td>
+                    </tr>
+                    <tr data-categoria="Danca">
+                        <td class="categoria-header">Dança</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="acoes">
+                <button id="btn-verificar">Verificar Respostas</button>
+                <p id="mensagem-resultado"></p>
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

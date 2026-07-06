@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enigma 4: Show de Talentos</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            background-image: url('fundo.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            color: white;
+        }
+        .wrapper-jogo {
+            background-color: rgba(44, 62, 80, 0.85);
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        th, td {
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #2c3e50;
+            color: #f1c40f;
+            font-size: 1.1rem;
+        }
+        .categoria-header {
+            font-weight: bold;
+            background-color: rgba(0, 0, 0, 0.5);
+            text-align: left;
+            color: #f39c12;
+        }
+        select {
+            padding: 8px;
+            border-radius: 4px;
+            width: 95%;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        /* Cores bem vivas e visíveis */
+        select option {
+            font-weight: bold;
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper-jogo">
+        <header>
+            <a href="index.html" class="btn-voltar-topo" style="display: inline-block; background-color: #e74c3c; color: white; text-decoration: none; padding: 10px 15px; border-radius: 6px; font-weight: bold; margin-bottom: 15px;">⬅ Voltar ao Menu</a>
+            <h1>🎤 Enigma 4: Show de Talentos</h1>
+            <p>Descubra a ordem das candidatas associando corretamente suas camisas, nomes, talentos, idades, frutas e pratos favoritos!</p>
+        </header>
+
+        <div class="container">
+            <div class="pistas-container" style="background: rgba(0,0,0,0.5); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                <h2>🔍 Pistas do Show de Talentos</h2>
+                <ul style="line-height: 1.6;">
+                    <li id="pista-1">1. A candidata que gosta de Lasanha está em algum lugar entre quem tem 22 anos e quem gosta de Almôndega, nessa ordem.</li>
+                    <li id="pista-2">2. Na quarta posição está quem gosta de Lasanha.</li>
+                    <li id="pista-3">3. A candidata que gosta de Macarronada está na segunda posição.</li>
+                    <li id="pista-4">4. Ruth está exatamente à esquerda de quem gosta de Pratinho.</li>
+                    <li id="pista-5">5. Quem gosta de Uva gosta de Almôndega.</li>
+                    <li id="pista-6">6. Ruth está exatamente à esquerda da candidata que gosta de Maçã.</li>
+                    <li id="pista-7">7. As candidatas que gostam de Morango e Abacaxi estão lado a lado.</li>
+                    <li id="pista-8">8. A candidata de Branco está ao lado da candidata que gosta de Morango.</li>
+                    <li id="pista-9">9. Quem está de camisa Roxa está ao lado da candidata mais velha (30 anos).</li>
+                    <li id="pista-10">10. A candidata de Marrom está em algum lugar à esquerda da candidata de 24 anos.</li>
+                    <li id="pista-11">11. Na segunda posição está a candidata de 27 anos.</li>
+                    <li id="pista-12">12. Quem tem 22 anos está exatamente à esquerda de Ruth.</li>
+                    <li id="pista-13">13. A Cantora está exatamente à direita de Mary.</li>
+                    <li id="pista-14">14. A Malabarista está exatamente à esquerda da Cantora.</li>
+                    <li id="pista-15">15. Quem gosta de Macarronada está exatamente à direita de quem faz Imitação.</li>
+                    <li id="pista-16">16. A Cantora está em uma das pontas.</li>
+                    <li id="pista-17">17. Kamila está em algum lugar à direita da candidata de Marrom.</li>
+                    <li id="pista-18">18. Ludmyla está exatamente à esquerda da candidata de 27 anos.</li>
+                    <li id="pista-19">19. Mary está com a camisa Azul.</li>
+                    <li id="pista-20">20. A candidata que gosta de Abacaxi está exatamente à direita de quem gosta de Feijoada.</li>
+                    <li id="pista-21">21. O Músico (A Música) está de Marrom.</li>
+                </ul>
+            </div>
+
+            <div class="tabuleiro-container">
+                <table id="tabuleiro">
+                    <thead>
+                        <tr>
+                            <th>Categoria</th>
+                            <th>1ª Posição</th>
+                            <th>2ª Posição</th>
+                            <th>3ª Posição</th>
+                            <th>4ª Posição</th>
+                            <th>5ª Posição</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-categoria="Camisa"><td class="categoria-header">Camisa</td></tr>
+                        <tr data-categoria="Nome"><td class="categoria-header">Nome</td></tr>
+                        <tr data-categoria="Talento"><td class="categoria-header">Talento</td></tr>
+                        <tr data-categoria="Idade"><td class="categoria-header">Idade</td></tr>
+                        <tr data-categoria="Fruta"><td class="categoria-header">Fruta</td></tr>
+                        <tr data-categoria="Prato"><td class="categoria-header">Prato</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="acoes" style="margin-top: 20px;">
+                <button id="btn-verificar" style="padding: 12px 24px; font-size: 1.1rem; font-weight: bold; cursor: pointer; background-color: #2ecc71; color: white; border: none; border-radius: 5px;">Verificar Respostas</button>
+                <div id="mensagem-resultado" style="font-size: 1.3rem; font-weight: bold; margin-top: 15px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script4.js"></script>
+</body>
+</html>
