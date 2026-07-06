@@ -7,30 +7,6 @@ const opcoes = {
     Prato: ["", "Lasanha", "Almôndega", "Macarronada", "Pratinho", "Feijoada"]
 };
 
-const textosPistas = {
-    1: "1. A candidata que gosta de Lasanha está em algum lugar entre quem tem 22 anos e quem gosta de Almôndega, nessa ordem.",
-    2: "2. Na quarta posição está quem gosta de Lasanha.",
-    3: "3. A candidata que gosta de Macarronada está na segunda posição.",
-    4: "4. Ruth está exatamente à esquerda de quem gosta de Pratinho.",
-    5: "5. Quem gosta de Uva gosta de Almôndega.",
-    6: "6. Ruth está exatamente à esquerda da candidata que gosta de Maçã.",
-    7: "7. As candidatas que gostam de Morango e Abacaxi estão lado a lado.",
-    8: "8. A candidata de Branco está ao lado da candidata que gosta de Morango.",
-    9: "9. Quem está de camisa Roxa está ao lado da candidata mais velha (30 anos).",
-    10: "10. A candidata de Marrom está em algum lugar à esquerda da candidata de 24 anos.",
-    11: "11. Na segunda posição está a candidata de 27 anos.",
-    12: "12. Quem tem 22 anos está exatamente à esquerda de Ruth.",
-    13: "13. A Cantora está exatamente à direita de Mary.",
-    14: "14. A Malabarista está exatamente à esquerda da Cantora.",
-    15: "15. Quem gosta de Macarronada está exatamente à direita de quem faz Imitação.",
-    16: "16. A Cantora está em uma das pontas.",
-    17: "17. Kamila está em algum lugar à direita da candidata de Marrom.",
-    18: "18. Ludmyla está exatamente à esquerda da candidata de 27 anos.",
-    19: "19. Mary está com a camisa Azul.",
-    20: "20. A candidata que gosta de Abacaxi está exatamente à direita de quem gosta de Feijoada.",
-    21: "21. A Música está de Marrom."
-};
-
 const gabarito = {
     1: { Camisa: "Rosa", Nome: "Ludmyla", Talento: "Imitação", Idade: "22", Fruta: "Morango", Prato: "Feijoada" },
     2: { Camisa: "Branco", Nome: "Ruth", Talento: "Dança", Idade: "27", Fruta: "Abacaxi", Prato: "Macarronada" },
@@ -41,7 +17,6 @@ const gabarito = {
 
 document.addEventListener("DOMContentLoaded", () => {
     gerarTabuleiro();
-    configurarBotoesPistas();
     document.getElementById("btn-verificar").addEventListener("click", verificarFimDeJogo);
 });
 
@@ -91,16 +66,6 @@ function colorirColuna(event) {
     });
 }
 
-function configurarBotoesPistas() {
-    const botoes = document.querySelectorAll(".btn-pista");
-    botoes.forEach(btn => {
-        btn.addEventListener("click", () => {
-            const numPista = btn.getAttribute("data-pista");
-            document.getElementById("pista-texto").textContent = textosPistas[numPista];
-        });
-    });
-}
-
 function processarMudanca() {
     const estado = obterEstadoAtual();
     validarPistas(estado);
@@ -142,11 +107,11 @@ function validarPistas(estado) {
         else statusPistas[1] = 'erro';
     }
 
-    // 2. 4ª posição é Lasanha
+    // 2. Na quarta posição está Lasanha
     if (estado[4]["Prato"] === "Lasanha") statusPistas[2] = 'sucesso';
     else if (contradiz(4, "Prato", "Lasanha")) statusPistas[2] = 'erro';
 
-    // 3. Macarronada na 2ª posição
+    // 3. Macarronada na segunda posição
     if (estado[2]["Prato"] === "Macarronada") statusPistas[3] = 'sucesso';
     else if (contradiz(2, "Prato", "Macarronada")) statusPistas[3] = 'erro';
 
@@ -199,7 +164,7 @@ function validarPistas(estado) {
         else statusPistas[10] = 'erro';
     }
 
-    // 11. 2ª posição tem 27 anos
+    // 11. Segunda posição tem 27 anos
     if (estado[2]["Idade"] === "27") statusPistas[11] = 'sucesso';
     else if (contradiz(2, "Idade", "27")) statusPistas[11] = 'erro';
 
@@ -225,7 +190,8 @@ function validarPistas(estado) {
 
     // 15. Macarronada exatamente à direita de Imitação
     let pImi = encontrarPos("Talento", "Imitação");
-    if (pImi && pMacarr = encontrarPos("Prato", "Macarronada")) {
+    let pMacarr = encontrarPos("Prato", "Macarronada");
+    if (pImi && pMacarr) {
         if (pImi + 1 === pMacarr) statusPistas[15] = 'sucesso';
         else statusPistas[15] = 'erro';
     }
@@ -271,13 +237,13 @@ function validarPistas(estado) {
         else statusPistas[21] = 'erro';
     }
 
-    // Pinta os botões de pista de verde ou vermelho em tempo real
+    // Atualiza o estado visual das caixas de pista tradicionais
     for (let i = 1; i <= 21; i++) {
-        const btn = document.querySelector(`.btn-pista[data-pista='${i}']`);
-        if(btn) {
-            btn.classList.remove("pista-errada", "pista-certa");
-            if (statusPistas[i] === 'erro') btn.classList.add("pista-errada");
-            else if (statusPistas[i] === 'sucesso') btn.classList.add("pista-certa");
+        const item = document.getElementById(`pista-${i}`);
+        if(item) {
+            item.classList.remove("pista-errada", "pista-certa");
+            if (statusPistas[i] === 'erro') item.classList.add("pista-errada");
+            else if (statusPistas[i] === 'sucesso') item.classList.add("pista-certa");
         }
     }
 }
@@ -302,7 +268,7 @@ function verificarFimDeJogo() {
         msg.textContent = "🏆 Sensacional! Você desvendou o Show de Talentos perfeitamente!";
         msg.style.color = "#2ecc71";
     } else {
-        msg.textContent = "❌ Algumas conexões ainda estão incorretas. Confira as pistas vermelhas!";
+        msg.textContent = "❌ Algumas conexões ainda estão incorretas. Confira as pistas coloridas!";
         msg.style.color = "#e74c3c";
     }
 }

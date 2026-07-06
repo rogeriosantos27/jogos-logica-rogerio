@@ -1,18 +1,20 @@
+// 1. OPÇÕES DOS SELECTS BASEADAS NO SEU ENIGMA
 const opcoes = {
-    Camiseta: ["", "Verde", "Amarela", "Azul", "Vermelha", "Preta"],
-    Nome: ["", "Nikaelly", "Isadora", "Emilly", "Damarys", "Luna"],
-    Hambúrguer: ["", "Bacon extra", "Sem cebola", "Bem passado", "Onion rings", "Sem alface"],
+    Camiseta: ["", "Azul", "Vermelho", "Amarelo", "Verde", "Preto"],
+    Nome: ["", "Nikaelly", "Isadora", "Emilly", "Damarys", "Larissa"], // Exemplo baseado nas pistas
+    Hambúrguer: ["", "Bacon extra", "Onion rings", "Sem alface", "Sem cebola", "Simples"],
     Refrigerante: ["", "Coca Cola", "Fanta Uva", "Cajuína", "Guaraná", "Pepsi"],
-    Idade: ["", "11", "12", "13", "14", "15"],
-    Esporte: ["", "Basquete", "Corrida", "Futebol", "Vôlei", "Carimba"]
+    Idade: ["", "11", "12", "14", "15", "13"],
+    Esporte: ["", "Futebol", "Basquete", "Carimba", "Corrida", "Vôlei"]
 };
 
+// 2. GABARITO DO JOGO 3 (Ajuste os valores de cada posição com as respostas certas do seu enigma)
 const gabarito = {
-    1: { Camiseta: "Preta", Nome: "Isadora", Hambúrguer: "Sem alface", Refrigerante: "Cajuína", Idade: "15", Esporte: "Vôlei" },
-    2: { Camiseta: "Amarela", Nome: "Nikaelly", Hambúrguer: "Bem passado", Refrigerante: "Guaraná", Idade: "12", Esporte: "Futebol" },
-    3: { Camiseta: "Azul", Nome: "Luna", Hambúrguer: "Bacon extra", Refrigerante: "Coca Cola", Idade: "11", Esporte: "Corrida" },
-    4: { Camiseta: "Vermelha", Nome: "Damarys", Hambúrguer: "Onion rings", Refrigerante: "Fanta Uva", Idade: "14", Esporte: "Basquete" },
-    5: { Camiseta: "Verde", Nome: "Emilly", Hambúrguer: "Sem cebola", Refrigerante: "Pepsi", Idade: "13", Esporte: "Carimba" }
+    1: { Camiseta: "Preto", Nome: "Isadora", Hambúrguer: "Sem alface", Refrigerante: "Cajuína", Idade: "13", Esporte: "Corrida" },
+    2: { Camiseta: "Azul", Nome: "Nikaelly", Hambúrguer: "Bacon extra", Refrigerante: "Coca Cola", Idade: "12", Esporte: "Futebol" },
+    3: { Camiseta: "Amarelo", Nome: "Damarys", Hambúrguer: "Onion rings", Refrigerante: "Guaraná", Idade: "11", Esporte: "Basquete" },
+    4: { Camiseta: "Vermelho", Nome: "Emilly", Hambúrguer: "Sem cebola", Refrigerante: "Fanta Uva", Idade: "14", Esporte: "Carimba" },
+    5: { Camiseta: "Verde", Nome: "Larissa", Hambúrguer: "Simples", Refrigerante: "Pepsi", Idade: "15", Esporte: "Vôlei" }
 };
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -20,25 +22,62 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("btn-verificar").addEventListener("click", verificarFimDeJogo);
 });
 
+// 3. GERAÇÃO DO TABULEIRO COM SUPORTE A IDENTIFICAÇÃO DE COLUNA
 function gerarTabuleiro() {
-    const lines = document.querySelectorAll("#tabuleiro tbody tr");
-    lines.forEach(linha => {
+    // Mapeia as linhas existentes criadas no seu HTML
+    const linhas = document.querySelectorAll("#tabuleiro tbody tr");
+    
+    linhas.forEach(linha => {
         const categoria = linha.getAttribute("data-categoria");
-        const listaOpcoes = opcoes[categoria];
+        const listaOpcoes = opcoes[categoria] || [""];
+        
+        // Cria as 5 colunas para as amigas
         for (let i = 1; i <= 5; i++) {
             const td = document.createElement("td");
+            td.setAttribute("data-col", i); // CRUCIAL: Vincula a célula à coluna i
+            
             const select = document.createElement("select");
             select.setAttribute("data-posicao", i);
             select.setAttribute("data-categoria", categoria);
+            
             listaOpcoes.forEach(opcao => {
                 const option = document.createElement("option");
                 option.value = opcao;
                 option.textContent = opcao === "" ? "---" : opcao;
                 select.appendChild(option);
             });
+            
+            // Ativa a verificação dinâmica ao mudar qualquer opção
             select.addEventListener("change", processarMudanca);
+            
+            // SE FOR A LINHA DA CAMISETA: Ativa o gatilho para colorir a coluna inteira
+            if (categoria === "Camiseta") {
+                select.addEventListener("change", colorirColuna);
+            }
+            
             td.appendChild(select);
             linha.appendChild(td);
+        }
+    });
+}
+
+// 4. FUNÇÃO QUE PINTA A COLUNA DE FORMA VIVA E FORTE
+function colorirColuna(event) {
+    const select = event.target;
+    const posicao = select.getAttribute("data-posicao");
+    // Transforma em minúsculo e remove acentos/caracteres se houver (Ex: "Amarelo" vira "amarelo")
+    const corSelecionada = select.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    
+    // Captura todas as células (td) daquela mesma coluna vertical
+    const celulasColuna = document.querySelectorAll(`#tabuleiro tbody td[data-col='${posicao}']`);
+    
+    celulasColuna.forEach(td => {
+        // Limpa classes antigas de cores para não acumular
+        td.classList.remove('coluna-cor-azul', 'coluna-cor-vermelho', 'coluna-cor-amarelo', 'coluna-cor-verde', 'coluna-cor-preto');
+        
+        // Adiciona a classe correspondente se houver uma cor selecionada válida
+        if (corSelecionada && corSelecionada !== "") {
+            td.classList.add(`coluna-cor-${corSelecionada}`);
         }
     });
 }
@@ -62,6 +101,7 @@ function obterEstadoAtual() {
     return estado;
 }
 
+// 5. VALIDAÇÃO DAS SUAS 19 PISTAS DA LANCHONETE
 function validarPistas(estado) {
     const statusPistas = {}; 
     for (let i = 1; i <= 19; i++) statusPistas[i] = 'neutro';
@@ -77,130 +117,129 @@ function validarPistas(estado) {
         return estado[pos][categoria] !== "" && estado[pos][categoria] !== valorEsperado;
     };
 
-    const checarRelacaoDireta = (pistaNum, cat1, val1, cat2, val2) => {
-        let pos1 = encontrarPos(cat1, val1);
-        let pos2 = encontrarPos(cat2, val2);
-        if (pos1 && pos2 && pos1 !== pos2) { statusPistas[pistaNum] = 'erro'; return; }
-        if (pos1 && contradiz(pos1, cat2, val2)) { statusPistas[pistaNum] = 'erro'; return; }
-        if (pos2 && contradiz(pos2, cat1, val1)) { statusPistas[pistaNum] = 'erro'; return; }
-        if (pos1 && pos2 && pos1 === pos2) { statusPistas[pistaNum] = 'sucesso'; }
-    };
-
-    // 1. Coca entre Nikaelly e Fanta Uva
-    let pNik = encontrarPos("Nome", "Nikaelly"), pCoc = encontrarPos("Refrigerante", "Coca Cola"), pFan = encontrarPos("Refrigerante", "Fanta Uva");
-    if (pNik && pCoc && pFan) {
-        if (pNik < pCoc && pCoc < pFan) statusPistas[1] = 'sucesso';
+    // Pista 1: Coca Cola entre Nikaelly e Fanta Uva
+    let pNik = encontrarPos("Nome", "Nikaelly"), pCc = encontrarPos("Refrigerante", "Coca Cola"), pFu = encontrarPos("Refrigerante", "Fanta Uva");
+    if (pNik && pCc && pFu) {
+        if (pNik < pCc && pCc < pFu) statusPistas[1] = 'sucesso';
         else statusPistas[1] = 'erro';
     }
 
-    // 2. Isadora à esquerda de 12 anos
+    // Pista 2: Isadora exatamente à esquerda de 12 anos
     let pIsa = encontrarPos("Nome", "Isadora"), p12 = encontrarPos("Idade", "12");
     if (pIsa && p12) {
         if (pIsa + 1 === p12) statusPistas[2] = 'sucesso';
         else statusPistas[2] = 'erro';
     } else if (pIsa === 5 || p12 === 1) statusPistas[2] = 'erro';
 
-    // 3. 4ª posição é 14 anos
+    // Pista 3: Na quarta posição está a garota de 14 anos
     if (estado[4]["Idade"] === "14") statusPistas[3] = 'sucesso';
     else if (contradiz(4, "Idade", "14")) statusPistas[3] = 'erro';
 
-    // 4. Futebol à direita de Cajuína
+    // Pista 4: Futebol exatamente à direita de Cajuína
     let pFut = encontrarPos("Esporte", "Futebol"), pCaj = encontrarPos("Refrigerante", "Cajuína");
     if (pFut && pCaj) {
         if (pCaj + 1 === pFut) statusPistas[4] = 'sucesso';
         else statusPistas[4] = 'erro';
+    } else if (pCaj === 5 || pFut === 1) statusPistas[4] = 'erro';
+
+    // Pista 5: Camiseta Vermelha bebendo Fanta Uva
+    let pVer = encontrarPos("Camiseta", "Vermelho");
+    if (pVer && pFu) {
+        if (pVer === pFu) statusPistas[5] = 'sucesso';
+        else statusPistas[5] = 'erro';
     }
 
-    // 5. Vermelha bebe Fanta Uva
-    checarRelacaoDireta(5, "Camiseta", "Vermelha", "Refrigerante", "Fanta Uva");
-
-    // 6. Basquete entre Futebol e Carimba
+    // Pista 6: Basquete entre Futebol e Carimba
     let pBas = encontrarPos("Esporte", "Basquete"), pCar = encontrarPos("Esporte", "Carimba");
     if (pFut && pBas && pCar) {
         if (pFut < pBas && pBas < pCar) statusPistas[6] = 'sucesso';
         else statusPistas[6] = 'erro';
     }
 
-    // 7. 15 anos ao lado de Guaraná
+    // Pista 7: 15 anos ao lado de Guaraná
     let p15 = encontrarPos("Idade", "15"), pGua = encontrarPos("Refrigerante", "Guaraná");
     if (p15 && pGua) {
         if (Math.abs(p15 - pGua) === 1) statusPistas[7] = 'sucesso';
         else statusPistas[7] = 'erro';
     }
 
-    // 8. 3ª posição é Bacon Extra
+    // Pista 8: Terceira posição pediu Bacon extra
     if (estado[3]["Hambúrguer"] === "Bacon extra") statusPistas[8] = 'sucesso';
     else if (contradiz(3, "Hambúrguer", "Bacon extra")) statusPistas[8] = 'erro';
 
-    // 9. 12 anos à direita de Preta
-    let pPre = encontrarPos("Camiseta", "Preta");
+    // Pista 9: 12 anos exatamente à direita de camiseta Preta
+    let pPre = encontrarPos("Camiseta", "Preto");
     if (p12 && pPre) {
         if (pPre + 1 === p12) statusPistas[9] = 'sucesso';
         else statusPistas[9] = 'erro';
-    }
+    } else if (pPre === 5 || p12 === 1) statusPistas[9] = 'erro';
 
-    // 10. Corrida à esquerda de Basquete
+    // Pista 10: Corrida exatamente à esquerda de Basquete
     let pCor = encontrarPos("Esporte", "Corrida");
     if (pCor && pBas) {
         if (pCor + 1 === pBas) statusPistas[10] = 'sucesso';
         else statusPistas[10] = 'erro';
-    }
+    } else if (pCor === 5 || pBas === 1) statusPistas[10] = 'erro';
 
-    // 11. Onion Rings ao lado de Verde
-    let pOni = encontrarPos("Hambúrguer", "Onion rings"), pVer = encontrarPos("Camiseta", "Verde");
-    if (pOni && pVer) {
-        if (Math.abs(pOni - pVer) === 1) statusPistas[11] = 'sucesso';
+    // Pista 11: Onion rings ao lado de camiseta Verde
+    let pOni = encontrarPos("Hambúrguer", "Onion rings"), pVrd = encontrarPos("Camiseta", "Verde");
+    if (pOni && pVrd) {
+        if (Math.abs(pOni - pVrd) === 1) statusPistas[11] = 'sucesso';
         else statusPistas[11] = 'erro';
     }
 
-    // 12. Carimba na 5ª posição
+    // Pista 12: Carimba na quinta posição
     if (estado[5]["Esporte"] === "Carimba") statusPistas[12] = 'sucesso';
     else if (contradiz(5, "Esporte", "Carimba")) statusPistas[12] = 'erro';
 
-    // 13. Verde bebe Pepsi
-    checarRelacaoDireta(13, "Camiseta", "Verde", "Refrigerante", "Pepsi");
+    // Pista 13: Verde bebendo Pepsi
+    let pPep = encontrarPos("Refrigerante", "Pepsi");
+    if (pVrd && pPep) {
+        if (pVrd === pPep) statusPistas[13] = 'sucesso';
+        else statusPistas[13] = 'erro';
+    }
 
-    // 14. 11 anos à esquerda de 14 anos
+    // Pista 14: 11 anos exatamente à esquerda de 14 anos
     let p11 = encontrarPos("Idade", "11"), p14 = encontrarPos("Idade", "14");
     if (p11 && p14) {
         if (p11 + 1 === p14) statusPistas[14] = 'sucesso';
         else statusPistas[14] = 'erro';
-    }
+    } else if (p11 === 5 || p14 === 1) statusPistas[14] = 'erro';
 
-    // 15. Amarela entre Sem Alface e Vermelha
-    let pAma = encontrarPos("Camiseta", "Amarela"), pAlf = encontrarPos("Hambúrguer", "Sem alface"), pVem = encontrarPos("Camiseta", "Vermelha");
-    if (pAlf && pAma && pVem) {
-        if (pAlf < pAma && pAma < pVem) statusPistas[15] = 'sucesso';
+    // Pista 15: Amarelo entre Sem alface e Vermelho
+    let pAma = encontrarPos("Camiseta", "Amarelo"), pSal = encontrarPos("Hambúrguer", "Sem alface");
+    if (pSal && pAma && pVer) {
+        if (pSal < pAma && pAma < pVer) statusPistas[15] = 'sucesso';
         else statusPistas[15] = 'erro';
     }
 
-    // 16. Fanta Uva à esquerda de Pepsi
-    let pPep = encontrarPos("Refrigerante", "Pepsi");
-    if (pFan && pPep) {
-        if (pFan + 1 === pPep) statusPistas[16] = 'sucesso';
+    // Pista 16: Fanta Uva exatamente à esquerda de Pepsi
+    if (pFu && pPep) {
+        if (pFu + 1 === pPep) statusPistas[16] = 'sucesso';
         else statusPistas[16] = 'erro';
-    }
+    } else if (pFu === 5 || pPep === 1) statusPistas[16] = 'erro';
 
-    // 17. Emilly à direita de Azul
-    let pEmi = encontrarPos("Nome", "Emilly"), pAzu = encontrarPos("Camiseta", "Azul");
-    if (pEmi && pAzu) {
-        if (pEmi > pAzu) statusPistas[17] = 'sucesso';
+    // Pista 17: Emilly à direita de camiseta Azul
+    let pEmi = encontrarPos("Nome", "Emilly"), pAzl = encontrarPos("Camiseta", "Azul");
+    if (pEmi && pAzl) {
+        if (pEmi > pAzl) statusPistas[17] = 'sucesso';
         else statusPistas[17] = 'erro';
     }
 
-    // 18. Damarys à esquerda de Sem Cebola
-    let pDam = encontrarPos("Nome", "Damarys"), pCeb = encontrarPos("Hambúrguer", "Sem cebola");
-    if (pDam && pCeb) {
-        if (pDam + 1 === pCeb) statusPistas[18] = 'sucesso';
+    // Pista 18: Damarys exatamente à esquerda de Sem cebola
+    let pDam = encontrarPos("Nome", "Damarys"), pSce = encontrarPos("Hambúrguer", "Sem cebola");
+    if (pDam && pSce) {
+        if (pDam + 1 === pSce) statusPistas[18] = 'sucesso';
         else statusPistas[18] = 'erro';
-    }
+    } else if (pDam === 5 || pSce === 1) statusPistas[18] = 'erro';
 
-    // 19. Nikaelly ao lado de Azul
-    if (pNik && pAzu) {
-        if (Math.abs(pNik - pAzu) === 1) statusPistas[19] = 'sucesso';
+    // Pista 19: Nikaelly ao lado de camiseta Azul
+    if (pNik && pAzl) {
+        if (Math.abs(pNik - pAzl) === 1) statusPistas[19] = 'sucesso';
         else statusPistas[19] = 'erro';
     }
 
+    // Atualiza o estado visual das 19 caixas de pistas
     for (let i = 1; i <= 19; i++) {
         const item = document.getElementById(`pista-${i}`);
         if(item) {
@@ -211,6 +250,7 @@ function validarPistas(estado) {
     }
 }
 
+// 6. VERIFICAÇÃO DO BOTÃO "VERIFICAR RESPOSTAS"
 function verificarFimDeJogo() {
     const selects = document.querySelectorAll("#tabuleiro select");
     let tudoCorreto = true;
@@ -225,13 +265,13 @@ function verificarFimDeJogo() {
 
     const msg = document.getElementById("mensagem-resultado");
     if (!preenchido) {
-        msg.textContent = "Preencha tudo antes!";
-        msg.className = "incorreto";
+        msg.textContent = "Preencha todo o tabuleiro antes de verificar!";
+        msg.style.color = "#ffdd57";
     } else if (tudoCorreto) {
-        msg.textContent = "🏆 Você venceu!";
-        msg.className = "correto";
+        msg.textContent = "🏆 Sensacional! Você organizou a mesa da Lanchonete perfeitamente!";
+        msg.style.color = "#2ecc71";
     } else {
-        msg.textContent = "❌ Algo está errado.";
-        msg.className = "incorreto";
+        msg.textContent = "❌ Algumas conexões ainda estão incorretas. Confira as pistas coloridas!";
+        msg.style.color = "#e74c3c";
     }
 }

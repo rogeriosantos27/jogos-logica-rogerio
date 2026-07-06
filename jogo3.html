@@ -5,66 +5,190 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Enigma 3: Amigas na Lanchonete</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            /* 1. CONFIGURAÇÃO DA IMAGEM DE FUNDO EXCLUSIVA DO JOGO 3 */
+            background-image: url('fundo-enigma3.jpg'); /* Altere a extensão para .png se necessário */
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            color: white;
+        }
+
+        .wrapper-jogo {
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* Mantém o estilo elegante das pistas igual ao Jogo 2 e Jogo 4 */
+        .pistas-container {
+            margin-bottom: 30px;
+        }
+
+        .pistas-container h2 {
+            display: inline-block;
+            background: white;
+            color: #2c3e50;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+        }
+
+        .pistas-container ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .pistas-container li {
+            background-color: rgba(255, 255, 255, 0.85);
+            color: #333;
+            padding: 15px 20px;
+            border-radius: 8px;
+            font-size: 1.05rem;
+            font-weight: 500;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .pistas-container li.pista-certa {
+            background-color: rgba(46, 204, 113, 0.2) !important;
+            color: #27ae60 !important;
+            text-decoration: line-through;
+            opacity: 0.7;
+            border-left: 5px solid #2ecc71;
+        }
+
+        .pistas-container li.pista-errada {
+            background-color: rgba(231, 76, 60, 0.15) !important;
+            color: #c0392b !important;
+            font-weight: bold;
+            border-left: 5px solid #e74c3c;
+        }
+
+        /* Estrutura da Tabela */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        th, td {
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 10px;
+            text-align: center;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        th {
+            background-color: #2c3e50;
+            color: #f1c40f;
+        }
+
+        .categoria-header {
+            font-weight: bold;
+            background-color: rgba(0, 0, 0, 0.4);
+            text-align: left;
+        }
+
+        select {
+            padding: 6px;
+            border-radius: 4px;
+            width: 95%;
+            font-weight: bold;
+        }
+
+        /* 2. CLASSES DE CORES FORTES E VIVAS ADAPTADAS PARA O JOGO 3 */
+        .coluna-cor-azul { background-color: #0042da !important; color: white !important; }
+        .coluna-cor-vermelho { background-color: #ff003c !important; color: white !important; }
+        .coluna-cor-amarelo { background-color: #ffcc00 !important; color: black !important; }
+        .coluna-cor-verde { background-color: #00cc44 !important; color: white !important; }
+        .coluna-cor-preto { background-color: #111111 !important; color: white !important; }
+
+        /* Ajuste visual dos selects sobre o fundo colorido */
+        .coluna-cor-azul select, .coluna-cor-vermelho select, .coluna-cor-verde select, .coluna-cor-preto select {
+            color: white;
+            background-color: rgba(0, 0, 0, 0.3);
+        }
+        .coluna-cor-amarelo select {
+            color: black;
+            background-color: rgba(255, 255, 255, 0.5);
+        }
+
+        option { color: #000 !important; background-color: #fff !important; }
+    </style>
 </head>
 <body>
-    <header>
-        <a href="index.html" class="btn-voltar-topo">⬅ Voltar ao Menu</a>
-        <h1>🍔 Enigma 3: Amigas na Lanchonete</h1>
-        <p>Combine corretamente as camisetas, nomes, pedidos e idades das amigas!</p>
-    </header>
+    
+    <div class="wrapper-jogo">
+        <header>
+            <a href="index.html" class="btn-voltar-topo">⬅ Voltar ao Menu</a>
+            <h1>🍔 Enigma 3: Amigas na Lanchonete</h1>
+            <p>Combine corretamente as camisetas, nomes, pedidos e idades das amigas!</p>
+        </header>
 
-    <div class="container">
-        <div class="pistas-container">
-            <h2>🔍 Pistas da Lanchonete</h2>
-            <ul>
-                <li id="pista-1">1. Quem está bebendo Coca Cola está em algum lugar entre Nikaelly e quem está bebendo Fanta Uva, nessa ordem.</li>
-                <li id="pista-2">2. Isadora está exatamente à esquerda da garota de 12 anos.</li>
-                <li id="pista-3">3. Na quarta posição está a garota de 14 anos.</li>
-                <li id="pista-4">4. A garota que gosta de Futebol está exatamente à direita de quem está bebendo Cajuína.</li>
-                <li id="pista-5">5. A garota de camiseta Vermelha está bebendo Fanta Uva.</li>
-                <li id="pista-6">6. Quem gosta de Basquete está em algum lugar entre quem gosta de Futebol e quem gosta de Carimba, nessa ordem.</li>
-                <li id="pista-7">7. A garota mais velha (15 anos) está ao lado de quem está bebendo Guaraná.</li>
-                <li id="pista-8">8. Na terceira posição está quem pediu um hambúrguer com Bacon extra.</li>
-                <li id="pista-9">9. A garota de 12 anos está exatamente à direita de quem está com a camiseta Preta.</li>
-                <li id="pista-10">10. Quem gosta de Corrida está exatamente à esquerda de quem gosta de Basquete.</li>
-                <li id="pista-11">11. Quem pediu um hambúrguer com Onion rings está ao lado de quem está com a camiseta Verde.</li>
-                <li id="pista-12">12. Quem gosta de Carimba está na quinta posição.</li>
-                <li id="pista-13">13. Quem está de Verde está bebendo Pepsi.</li>
-                <li id="pista-14">14. A garota mais nova (11 anos) está exatamente à esquerda da garota de 14 anos.</li>
-                <li id="pista-15">15. Quem está de Amarelo está em algum lugar entre quem pediu um hambúrguer Sem alface e quem está de Vermelho, nessa ordem.</li>
-                <li id="pista-16">16. Quem está bebendo Fanta Uva está exatamente à esquerda de quem está bebendo Pepsi.</li>
-                <li id="pista-17">17. Emilly está em algum lugar à direita de quem está com a camiseta Azul.</li>
-                <li id="pista-18">18. Damarys está exatamente à esquerda de quem pediu um hambúrguer Sem cebola.</li>
-                <li id="pista-19">19. Nikaelly está ao lado de quem está com a camiseta Azul.</li>
-            </ul>
-        </div>
+        <div class="container">
+            <div class="pistas-container">
+                <h2>🔍 Pistas da Lanchonete</h2>
+                <ul>
+                    <li id="pista-1">1. Quem está bebendo Coca Cola está em algum lugar entre Nikaelly e quem está bebendo Fanta Uva, nessa ordem.</li>
+                    <li id="pista-2">2. Isadora está exatamente à esquerda da garota de 12 anos.</li>
+                    <li id="pista-3">3. Na quarta posição está a garota de 14 anos.</li>
+                    <li id="pista-4">4. A garota que gosta de Futebol está exatamente à direita de quem está bebendo Cajuína.</li>
+                    <li id="pista-5">5. A garota de camiseta Vermelha está bebendo Fanta Uva.</li>
+                    <li id="pista-6">6. Quem gosta de Basquete está em algum lugar entre quem gosta de Futebol e quem gosta de Carimba, nessa ordem.</li>
+                    <li id="pista-7">7. A garota mais velha (15 anos) está ao lado de quem está bebendo Guaraná.</li>
+                    <li id="pista-8">8. Na terceira posição está quem pediu um hambúrguer com Bacon extra.</li>
+                    <li id="pista-9">9. A garota de 12 anos está exatamente à direita de quem está com a camiseta Preta.</li>
+                    <li id="pista-10">10. Quem gosta de Corrida está exatamente à esquerda de quem gosta de Basquete.</li>
+                    <li id="pista-11">11. Quem pediu um hambúrguer com Onion rings está ao lado de quem está com a camiseta Verde.</li>
+                    <li id="pista-12">12. Quem gosta de Carimba está na quinta posição.</li>
+                    <li id="pista-13">13. Quem está de Verde está bebendo Pepsi.</li>
+                    <li id="pista-14">14. A garota mais nova (11 anos) está exatamente à esquerda da garota de 14 anos.</li>
+                    <li id="pista-15">15. Quem está de Amarelo está em algum lugar entre quem pediu um hambúrguer Sem alface e quem está de Vermelho, nessa ordem.</li>
+                    <li id="pista-16">16. Quem está bebendo Fanta Uva está exatamente à esquerda de quem está bebendo Pepsi.</li>
+                    <li id="pista-17">17. Emilly está em algum lugar à direita de quem está com a camiseta Azul.</li>
+                    <li id="pista-18">18. Damarys está exatamente à esquerda de quem pediu um hambúrguer Sem cebola.</li>
+                    <li id="pista-19">19. Nikaelly está ao lado de quem está com a camiseta Azul.</li>
+                </ul>
+            </div>
 
-        <div class="tabuleiro-container">
-            <table id="tabuleiro">
-                <thead>
-                    <tr>
-                        <th>Categoria</th>
-                        <th>1ª Amiga</th>
-                        <th>2ª Amiga</th>
-                        <th>3ª Amiga</th>
-                        <th>4ª Amiga</th>
-                        <th>5ª Amiga</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr data-categoria="Camiseta"><td class="categoria-header">Camiseta</td></tr>
-                    <tr data-categoria="Nome"><td class="categoria-header">Nome</td></tr>
-                    <tr data-categoria="Hambúrguer"><td class="categoria-header">Hambúrguer</td></tr>
-                    <tr data-categoria="Refrigerante"><td class="categoria-header">Refrigerante</td></tr>
-                    <tr data-categoria="Idade"><td class="categoria-header">Idade</td></tr>
-                    <tr data-categoria="Esporte"><td class="categoria-header">Esporte</td></tr>
-                </tbody>
-            </table>
-        </div>
+            <div class="tabuleiro-container">
+                <table id="tabuleiro">
+                    <thead>
+                        <tr>
+                            <th>Categoria</th>
+                            <th>1ª Amiga</th>
+                            <th>2ª Amiga</th>
+                            <th>3ª Amiga</th>
+                            <th>4ª Amiga</th>
+                            <th>5ª Amiga</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-categoria="Camiseta"><td class="categoria-header">Camiseta</td></tr>
+                        <tr data-categoria="Nome"><td class="categoria-header">Nome</td></tr>
+                        <tr data-categoria="Hambúrguer"><td class="categoria-header">Hambúrguer</td></tr>
+                        <tr data-categoria="Refrigerante"><td class="categoria-header">Refrigerante</td></tr>
+                        <tr data-categoria="Idade"><td class="categoria-header">Idade</td></tr>
+                        <tr data-categoria="Esporte"><td class="categoria-header">Esporte</td></tr>
+                    </tbody>
+                </table>
+            </div>
 
-        <div class="acoes">
-            <button id="btn-verificar">Verificar Respostas</button>
-            <div id="mensagem-resultado"></div>
+            <div class="acoes">
+                <button id="btn-verificar">Verificar Respostas</button>
+                <div id="mensagem-resultado"></div>
+            </div>
         </div>
     </div>
 

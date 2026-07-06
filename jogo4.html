@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="style.css">
     <style>
         body {
-            background-image: url('fundo.jpg');
+            background-image: url('fundo-enigma4.jpg');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -17,57 +17,61 @@
         }
 
         .wrapper-jogo {
-            background-color: rgba(44, 62, 80, 0.85);
             min-height: 100vh;
             padding: 20px;
             box-sizing: border-box;
         }
 
-        /* Estilo dos botões de pistas idêntico aos outros jogos */
-        .pistas-container-botoes {
-            background: rgba(0, 0, 0, 0.5);
-            padding: 20px;
+        /* Ajuste do container de pistas igual ao do Jogo 2 */
+        .pistas-container {
+            margin-bottom: 30px;
+        }
+
+        .pistas-container h2 {
+            display: inline-block;
+            background: white;
+            color: #2c3e50;
+            padding: 8px 20px;
             border-radius: 8px;
-            margin-bottom: 25px;
-            text-align: center;
+            font-size: 1.4rem;
+            margin-bottom: 15px;
         }
 
-        .botoes-grid {
+        .pistas-container ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
             display: flex;
-            flex-wrap: wrap;
+            flex-direction: column;
             gap: 10px;
-            justify-content: center;
-            margin-top: 15px;
         }
 
-        .btn-pista {
-            background-color: #34495e;
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 10px 15px;
-            font-size: 0.95rem;
+        /* Linhas de pista estilizadas como caixas/blocos individuais do Jogo 2 */
+        .pistas-container li {
+            background-color: rgba(255, 255, 255, 0.85);
+            color: #333;
+            padding: 15px 20px;
+            border-radius: 8px;
+            font-size: 1.05rem;
+            font-weight: 500;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        /* Estilos de validação mantendo a estrutura do bloco */
+        .pistas-container li.pista-certa {
+            background-color: rgba(46, 204, 113, 0.2) !important;
+            color: #27ae60 !important;
+            text-decoration: line-through;
+            opacity: 0.7;
+            border-left: 5px solid #2ecc71;
+        }
+
+        .pistas-container li.pista-errada {
+            background-color: rgba(231, 76, 60, 0.15) !important;
+            color: #c0392b !important;
             font-weight: bold;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: 0.2s;
-            min-width: 100px;
-        }
-
-        .btn-pista:hover {
-            background-color: #4e6a85;
-        }
-
-        /* Cores de validação dos botões de pista */
-        .pista-certa {
-            background-color: #2ecc71 !important;
-            border-color: #27ae60 !important;
-            color: white !important;
-        }
-
-        .pista-errada {
-            background-color: #e74c3c !important;
-            border-color: #c0392b !important;
-            color: white !important;
+            border-left: 5px solid #e74c3c;
         }
 
         /* Estrutura da Tabela */
@@ -88,94 +92,77 @@
         th {
             background-color: #2c3e50;
             color: #f1c40f;
-            font-size: 1.1rem;
         }
 
         .categoria-header {
             font-weight: bold;
-            background-color: rgba(0, 0, 0, 0.6);
+            background-color: rgba(0, 0, 0, 0.4);
             text-align: left;
-            color: #f39c12;
-            width: 15%;
         }
 
         select {
-            padding: 8px;
+            padding: 6px;
             border-radius: 4px;
             width: 95%;
             font-weight: bold;
-            cursor: pointer;
-            border: 1px solid #ccc;
         }
 
-        /* CLASSES COM CORES VIVAS E FORTES PARA A COLUNA INTEIRA */
+        /* CLASSES COM CORES BEM VIVAS E FORTES PARA A COLUNA INTEIRA */
         .coluna-cor-roxo { background-color: #8e44ad !important; color: white !important; }
         .coluna-cor-marrom { background-color: #8b4513 !important; color: white !important; }
         .coluna-cor-azul { background-color: #2980b9 !important; color: white !important; }
         .coluna-cor-rosa { background-color: #ff69b4 !important; color: white !important; }
         .coluna-cor-branco { background-color: #ffffff !important; color: black !important; }
 
-        /* Ajuste dos selects dentro das colunas coloridas */
+        /* Estilo dos selects dependendo da cor da coluna */
         .coluna-cor-roxo select, .coluna-cor-marrom select, .coluna-cor-azul select, .coluna-cor-rosa select {
             color: white;
             background-color: rgba(0, 0, 0, 0.2);
-            border-color: rgba(255, 255, 255, 0.4);
         }
         .coluna-cor-branco select {
             color: black;
             background-color: rgba(0, 0, 0, 0.05);
-            border-color: #ccc;
         }
 
         option { color: #000 !important; background-color: #fff !important; }
-
-        .texto-pista-exibida {
-            margin-top: 15px;
-            padding: 12px;
-            background: rgba(255, 255, 255, 0.1);
-            border-left: 4px solid #f1c40f;
-            border-radius: 4px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            min-height: 24px;
-        }
     </style>
 </head>
 <body>
+
+    <a href="index.html" class="btn-voltar-topo">⬅ Voltar ao Menu</a>
+    
     <div class="wrapper-jogo">
         <header>
-            <a href="index.html" class="btn-voltar-topo" style="display: inline-block; background-color: #e74c3c; color: white; text-decoration: none; padding: 10px 15px; border-radius: 6px; font-weight: bold; margin-bottom: 15px;">⬅ Voltar ao Menu</a>
             <h1>🎤 Enigma 4: Show de Talentos</h1>
-            <p>Descubra a ordem das candidatas associando corretamente suas camisas, nomes, talentos, idades, frutas e pratos favoritos!</p>
+            <p>Descubra a ordem correta das candidatas associando cada uma à sua camisa, nome, talento, idade, fruta e prato favoritos!</p>
         </header>
 
         <div class="container">
-            <div class="pistas-container-botoes">
-                <h2>🔍 Clique nos botões para ler as pistas</h2>
-                <div class="botoes-grid">
-                    <button class="btn-pista" data-pista="1">Pista 1</button>
-                    <button class="btn-pista" data-pista="2">Pista 2</button>
-                    <button class="btn-pista" data-pista="3">Pista 3</button>
-                    <button class="btn-pista" data-pista="4">Pista 4</button>
-                    <button class="btn-pista" data-pista="5">Pista 5</button>
-                    <button class="btn-pista" data-pista="6">Pista 6</button>
-                    <button class="btn-pista" data-pista="7">Pista 7</button>
-                    <button class="btn-pista" data-pista="8">Pista 8</button>
-                    <button class="btn-pista" data-pista="9">Pista 9</button>
-                    <button class="btn-pista" data-pista="10">Pista 10</button>
-                    <button class="btn-pista" data-pista="11">Pista 11</button>
-                    <button class="btn-pista" data-pista="12">Pista 12</button>
-                    <button class="btn-pista" data-pista="13">Pista 13</button>
-                    <button class="btn-pista" data-pista="14">Pista 14</button>
-                    <button class="btn-pista" data-pista="15">Pista 15</button>
-                    <button class="btn-pista" data-pista="16">Pista 16</button>
-                    <button class="btn-pista" data-pista="17">Pista 17</button>
-                    <button class="btn-pista" data-pista="18">Pista 18</button>
-                    <button class="btn-pista" data-pista="19">Pista 19</button>
-                    <button class="btn-pista" data-pista="20">Pista 20</button>
-                    <button class="btn-pista" data-pista="21">Pista 21</button>
-                </div>
-                <div class="texto-pista-exibida" id="pista-texto">Clique em qualquer pista acima para começar.</div>
+            <div class="pistas-container">
+                <h2>🔍 Pistas do Show de Talentos</h2>
+                <ul>
+                    <li id="pista-1">1. A candidata que gosta de Lasanha está em algum lugar entre quem tem 22 anos e quem gosta de Almôndega, nessa ordem.</li>
+                    <li id="pista-2">2. Na quarta posição está quem gosta de Lasanha.</li>
+                    <li id="pista-3">3. A candidata que gosta de Macarronada está na segunda posição.</li>
+                    <li id="pista-4">4. Ruth está exatamente à esquerda de quem gosta de Pratinho.</li>
+                    <li id="pista-5">5. Quem gosta de Uva gosta de Almôndega.</li>
+                    <li id="pista-6">6. Ruth está exatamente à esquerda da candidata que gosta de Maçã.</li>
+                    <li id="pista-7">7. As candidatas que gostam de Morango e Abacaxi estão lado a lado.</li>
+                    <li id="pista-8">8. A candidata de Branco está ao lado da candidata que gosta de Morango.</li>
+                    <li id="pista-9">9. Quem está de camisa Roxa está ao lado da candidata mais velha (30 anos).</li>
+                    <li id="pista-10">10. A candidata de Marrom está em algum lugar à esquerda da candidata de 24 anos.</li>
+                    <li id="pista-11">11. Na segunda posição está a candidata de 27 anos.</li>
+                    <li id="pista-12">12. Quem tem 22 anos está exatamente à esquerda de Ruth.</li>
+                    <li id="pista-13">13. A Cantora está exatamente à direita de Mary.</li>
+                    <li id="pista-14">14. A Malabarista está exatamente à esquerda da Cantora.</li>
+                    <li id="pista-15">15. Quem gosta de Macarronada está exatamente à direita de quem faz Imitação.</li>
+                    <li id="pista-16">16. A Cantora está em uma das pontas.</li>
+                    <li id="pista-17">17. Kamila está em algum lugar à direita da candidata de Marrom.</li>
+                    <li id="pista-18">18. Ludmyla está exatamente à esquerda da candidata de 27 anos.</li>
+                    <li id="pista-19">19. Mary está com a camisa Azul.</li>
+                    <li id="pista-20">20. A candidata que gosta de Abacaxi está exatamente à direita de quem gosta de Feijoada.</li>
+                    <li id="pista-21">21. A Música está de Marrom.</li>
+                </ul>
             </div>
 
             <div class="tabuleiro-container">
@@ -183,11 +170,11 @@
                     <thead>
                         <tr>
                             <th>Categoria</th>
-                            <th>1ª Candidata</th>
-                            <th>2ª Candidata</th>
-                            <th>3ª Candidata</th>
-                            <th>4ª Candidata</th>
-                            <th>5ª Candidata</th>
+                            <th>1ª Posição</th>
+                            <th>2ª Posição</th>
+                            <th>3ª Posição</th>
+                            <th>4ª Posição</th>
+                            <th>5ª Posição</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -201,9 +188,9 @@
                 </table>
             </div>
 
-            <div class="acoes" style="margin-top: 25px; text-align: center;">
-                <button id="btn-verificar" style="padding: 14px 28px; font-size: 1.2rem; font-weight: bold; cursor: pointer; background-color: #2ecc71; color: white; border: none; border-radius: 6px; transition: 0.2s;">Verificar Respostas</button>
-                <div id="mensagem-resultado" style="font-size: 1.4rem; font-weight: bold; margin-top: 20px;"></div>
+            <div class="acoes">
+                <button id="btn-verificar">Verificar Respostas</button>
+                <div id="mensagem-resultado"></div>
             </div>
         </div>
     </div>
