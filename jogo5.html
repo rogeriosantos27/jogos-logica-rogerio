@@ -1,219 +1,379 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quiz Mostra Coreografica</title>
-    <link rel="stylesheet" href="style.css">
     <style>
-        body {
+        /* Reset básico */
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: Arial, sans-serif;
-            color: white;
-            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body, html {
+            height: 100%;
+            overflow: hidden;
+            background-color: #000;
+        }
+
+        /* Container Principal com Imagem de Fundo Dinâmica */
+        #quiz-container {
+            width: 100%;
+            height: 100%;
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
+            position: relative;
+            transition: background-image 0.5s ease-in-out;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Camada escura de transparência para dar contraste ao texto */
+        #overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.55);
+            z-index: 1;
+        }
+
+        /* Moldura tracejada idêntica ao layout */
+        #inner-frame {
+            position: absolute;
+            top: 5%;
+            left: 5%;
+            width: 90%;
+            height: 90%;
+            border: 2px dashed rgba(255, 255, 255, 0.7);
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            text-align: center;
+        }
+
+        /* Caixa de conteúdo do Quiz */
+        #content-box {
+            max-width: 900px;
+            width: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            position: relative;
-            overflow-x: hidden;
         }
 
-        /* Imagem fixa cobrindo toda a tela */
-        .bg-fixo-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: -2;
-            overflow: hidden;
+        /* Texto da Pergunta */
+        #question-text {
+            color: #ffffff;
+            font-size: 2rem;
+            font-weight: 700;
+            line-height: 1.4;
+            margin-bottom: 50px;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
         }
 
-        .bg-fixo-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: center;
-        }
-
-        /* Opção de voltar ao menu sempre visível */
-        .btn-voltar-topo {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            color: white;
-            text-decoration: none;
-            font-weight: bold;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
-            z-index: 10;
-            font-size: 1.1rem;
-            transition: transform 0.2s;
-        }
-
-        .btn-voltar-topo:hover {
-            transform: scale(1.05);
-        }
-
-        /* Caixa translúcida que permite visualizar o fundo, mas mantém legibilidade */
-        .wrapper-quiz {
-            width: 90%;
-            max-width: 700px;
-            background-color: rgba(0, 0, 0, 0.75); /* Vidro fumê escuro para alto contraste */
-            backdrop-filter: blur(10px); /* Efeito blur no fundo */
-            -webkit-backdrop-filter: blur(10px);
-            padding: 40px 30px;
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            text-align: center;
-            box-sizing: border-box;
-            z-index: 2;
-        }
-
-        header h1 {
-            color: #f1c40f;
-            font-size: 2.2rem;
-            margin-top: 0;
-            margin-bottom: 25px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
-        }
-
-        .texto-pergunta {
-            font-size: 1.35rem;
-            line-height: 1.6;
-            margin-bottom: 35px;
-            font-weight: bold;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
-        }
-
-        /* Alinhamento horizontal das alternativas */
-        .alternativas-container {
+        /* Container das alternativas */
+        #alternatives-container {
             display: flex;
             flex-direction: row;
-            justify-content: space-between;
-            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
             width: 100%;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
         }
 
-        .btn-alternativa {
-            flex: 1;
-            background-color: rgba(255, 255, 255, 0.08);
-            color: white;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            padding: 18px 10px;
-            font-size: 1.4rem;
-            font-weight: bold;
-            border-radius: 8px;
+        /* Estilo Ghost Button para as respostas */
+        .alternative-btn {
+            background-color: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 4px;
+            color: #ffffff;
+            font-size: 1.2rem;
+            font-weight: 600;
+            padding: 15px 30px;
             cursor: pointer;
-            transition: all 0.25s ease;
-            outline: none;
-        }
-
-        .btn-alternativa:not(:disabled):hover {
-            background-color: rgba(255, 255, 255, 0.2);
-            border-color: #f1c40f;
-            transform: translateY(-2px);
-        }
-
-        /* Bloqueio visual pós-seleção */
-        .btn-alternativa:disabled {
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-
-        /* Feedback visual forte de certo/errado */
-        .btn-alternativa.correta {
-            background-color: #2ecc71 !important;
-            border-color: #27ae60 !important;
-            color: white !important;
-            opacity: 1 !important;
-        }
-
-        .btn-alternativa.errada {
-            background-color: #e74c3c !important;
-            border-color: #c0392b !important;
-            color: white !important;
-            opacity: 1 !important;
-        }
-
-        #mensagem-feedback {
-            font-size: 1.25rem;
-            font-weight: bold;
-            margin-top: 15px;
-            min-height: 30px;
-        }
-
-        /* Botão para ir à próxima pergunta (oculto por padrão) */
-        #btn-proxima {
-            display: none; 
-            background-color: #f1c40f;
-            color: #111;
-            border: none;
-            padding: 14px 40px;
-            font-size: 1.15rem;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-top: 25px;
             transition: all 0.2s ease;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 160px;
         }
 
-        #btn-proxima:hover {
-            background-color: #f39c12;
-            transform: scale(1.03);
+        .alternative-btn:hover:not(.disabled) {
+            background-color: rgba(255, 255, 255, 0.15);
+            border-color: #ffffff;
+            transform: scale(1.02);
         }
 
-        /* Responsividade para celular */
-        @media (max-width: 600px) {
-            .alternativas-container {
-                flex-direction: column;
-                gap: 12px;
-            }
-            .btn-alternativa {
-                padding: 15px;
-                font-size: 1.2rem;
-            }
-            header h1 {
-                font-size: 1.8rem;
-            }
-            .texto-pergunta {
-                font-size: 1.15rem;
-            }
+        /* Ícones de feedback visual (Check/Xis) */
+        .feedback-icon {
+            margin-right: 10px;
+            font-weight: bold;
+            font-size: 1.3rem;
+        }
+
+        /* Estados de resposta */
+        .correct {
+            background-color: rgba(46, 204, 113, 0.3) !important;
+            border-color: #2ecc71 !important;
+            color: #2ecc71 !important;
+        }
+
+        .incorrect {
+            background-color: rgba(231, 76, 60, 0.3) !important;
+            border-color: #e74c3c !important;
+            color: #e74c3c !important;
+        }
+
+        .disabled {
+            cursor: not-allowed;
+            opacity: 0.8;
+            pointer-events: none; /* Bloqueia segundo clique completamente */
+        }
+
+        /* Botão de Avançar Pergunta (Escondido inicialmente) */
+        #next-btn {
+            display: none;
+            background-color: #ffffff;
+            color: #000000;
+            border: none;
+            border-radius: 4px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            padding: 12px 30px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        #next-btn:hover {
+            background-color: #dddddd;
+        }
+
+        /* Tela de encerramento */
+        #final-title {
+            color: #ffffff;
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.9);
+            text-align: center;
+            letter-spacing: 2px;
+        }
+
+        #final-message {
+            color: #ffffff;
+            font-size: 1.8rem;
+            font-weight: 600;
+            line-height: 1.6;
+            max-width: 750px;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+            text-align: center;
+        }
+
+        /* Responsividade para telas menores */
+        @media (max-width: 768px) {
+            #question-text { font-size: 1.4rem; margin-bottom: 30px; }
+            #alternatives-container { flex-direction: column; width: 100%; }
+            .alternative-btn { width: 100%; padding: 12px; font-size: 1rem; }
+            #inner-frame { padding: 15px; }
+            #final-title { font-size: 2.5rem; }
+            #final-message { font-size: 1.3rem; }
         }
     </style>
 </head>
 <body>
 
-    <div class="bg-fixo-container">
-        <img src="maracatu.jpg" alt="Fundo Maracatu">
-    </div>
-
-    <a href="index.html" class="btn-voltar-topo">⬅ Voltar ao Menu</a>
-
-    <div class="wrapper-quiz">
-        <header>
-            <h1>⚡ Enigma 5: Desafio de Lógica</h1>
-        </header>
-
-        <main id="conteudo-quiz">
-            <p id="pergunta-campo" class="texto-pergunta"></p>
-
-            <div id="container-opcoes" class="alternativas-container">
-                <button class="btn-alternativa" data-index="0"></button>
-                <button class="btn-alternativa" data-index="1"></button>
-                <button class="btn-alternativa" data-index="2"></button>
+    <div id="quiz-container">
+        <div id="overlay"></div>
+        <div id="inner-frame">
+            <div id="content-box">
+                <div id="question-text">Carregando pergunta...</div>
+                <div id="alternatives-container"></div>
+                <button id="next-btn">Próxima Pergunta</button>
             </div>
-
-            <div id="mensagem-feedback"></div>
-            
-            <button id="btn-proxima">Avançar ➡️</button>
-        </main>
+        </div>
     </div>
 
-    <script src="script5.js"></script>
+    <script>
+        const quizData = [
+            {
+                question: "Na apresentação de abertura, as crianças usam sombrinhas de Frevo organizadas em um padrão de cores: 🔴 Vermelha, 🔵 Azul, 🔴 Vermelha, 🟡 Amarela, 🔴 Vermelha, 🔵 Azul, 🔴 Vermelha, 🟡 Amarela... Seguindo estritamente essa sequência lógica, qual será a cor da 13ª sombrinha do Frevo?",
+                answers: ["Vermelha", "Azul", "Amarela", "Verde"],
+                correct: "Vermelha"
+            },
+            {
+                question: "Na festa junina, as barracas de pamonha de três turmas (A, B e C) competiram para ver quem vendia mais. A Barraca A vendeu mais que a Barraca B. A Barraca B não vendeu menos que a Barraca C. Organize as barracas da que vendeu MENOS para a que vendeu MAIS.",
+                answers: ["Barraca A, Barraca B, Barraca C", "Barraca C, Barraca B, Barraca A", "Barraca B, Barraca C, Barraca A", "Barraca C, Barraca A, Barraca B"],
+                correct: "Barraca C, Barraca B, Barraca A"
+            },
+            {
+                question: "Durante a apresentação de Ciranda, Helen afirmou: 'Formamos uma roda perfeita com 16 crianças. Isso significa que cada um de nós está dando a mão para 16 colegas diferentes ao mesmo tempo!'. Essa afirmação de Helen é:",
+                answers: ["Verdadeira", "Falsa"],
+                correct: "Falsa"
+            },
+            {
+                question: "Para a dança da Quadrilha, Tio Anderson organizou as crianças em 4 filas, cada uma com exatamente 6 crianças. Depois, ele mudou a estratégia e reorganizou os mesmos alunos em 3 filas com 8 crianças cada. Ele afirmou que todos continuaram dançando e não sobrou ninguém de fora. A afirmação do Tio Anderson é:",
+                answers: ["Verdadeira", "Falsa"],
+                correct: "Verdadeira"
+            },
+            {
+                question: "No Festival de Parintins, três crianças fizeram afirmações sobre as cores dos bois Garantido e Caprichoso. Kauanny disse: 'Um deles é vermelho e o outro é azul'. Ketlein disse: 'Os dois são vermelhos'. Erislayne disse: 'Os dois são azuis'. Sabendo que apenas UMA criança está certa, quem acertou?",
+                answers: ["Kauanny", "Ketlein", "Erislayne"],
+                correct: "Kauanny"
+            },
+            {
+                question: "Na dança do Pau de Fita, a cada volta completa em torno do mastro, o número de cruzamentos das fitas dobra e depois soma 1. Observe a sequência, e diga qual será o próximo número: 1 → 3 → 7 → 15 → 31 → ?",
+                answers: ["60", "61", "62", "63"],
+                correct: "63"
+            },
+            {
+                question: "No dia da mostra, cada turma recebe um número de identificação com 3 algarismos. Tio Jessy deu a seguinte dica: A soma dos três algarismos do número do grupo é 20. Qual dos números abaixo NÃO pode ser o número do grupo?",
+                answers: ["866", "867", "587", "956"],
+                correct: "867"
+            },
+            {
+                question: "Na coreografia de funk, com cinco bailarinas (Camilly, Clarice, Izabelly, Julia e Beatriz), temos as seguintes informações: 1) Clarice dançou antes de Julia. 2) Izabelly não foi a última. 3) Camilly dançou entre Clarice e Beatriz. Quem foi a última a dançar?",
+                answers: ["Clarice", "Beatriz", "Julia"],
+                correct: "Beatriz"
+            },
+            {
+                question: "Cinco turmas se apresentaram na mostra coreográfica: Samba, Maracatu, Frevo, Quadrilha Junina e Carimbó. A ordem das apresentações seguiu estas regras: 1) O Samba se apresentou antes do Frevo. 2) O Frevo se apresentou imediatamente antes do Carimbó. 3) A Quadrilha Junina não ficou entre as 3 últimas apresentações. 4) O Maracatu se apresentou antes do Samba. Quais foram as duas primeiras apresentações da mostra?",
+                answers: ["A) Maracatu e Samba", "B) Quadrilha Junina e Maracatu", "C) Carimbó e Quadrilha Junina", "D) Quadrilha Junina e Samba"],
+                correct: "B) Quadrilha Junina e Maracatu"
+            },
+            {
+                question: "Na coreografia de Maracatu, as bailarinas precisam formar um círculo. Tio Jessy explicou que cada bailarina deve ficar exatamente entre duas colegas. Se há 12 bailarinas na roda, quantas bailarinas cada bailarina consegue ter ao seu lado?",
+                answers: ["2", "3", "4"],
+                correct: "2"
+            },
+            {
+                question: "Na quadrilha, quatro casais ficaram enfileirados nesta ordem: 🟦 Casal A → 🟥 Casal B → 🟩 Casal C → 🟨 Casal D. Quando o marcador gritou \"Anarriê!\", aconteceu o seguinte: O primeiro casal foi para o último lugar. Todos os outros avançaram uma posição. Quem ficou em segundo lugar?",
+                answers: ["Casal A", "Casal B", "Casal C", "Casal D"],
+                correct: "Casal C"
+            },
+            {
+                question: "Durante uma coreografia de Frevo, quatro crianças estavam segurando sombrinhas: 🟥 Esther: sombrinha vermelha; 🟦 Sophya: sombrinha azul; 🟨 Ana Sophia : sombrinha amarela; 🟩 Agatha: sombrinha verde. Tia Adrielly fez a seguinte afirmação: \"Se Esther trocar a sombrinha com Sophya e, depois, Sophya trocar a sombrinha com Agatha, então Sophya terminará segurando a sombrinha vermelha.\" Essa afirmação é:",
+                answers: ["Verdadeira", "Falsa"],
+                correct: "Falsa"
+            },
+            {
+                question: "No grupo de Carimbó, as bailarinas usam saias para entrar na apresentação. Tio Vitor organizou as saias seguindo esta regra: 🔴 Vermelho → 🔵 Azul → 🟢 Verde → 🟡 Amarelo. Ele repetiu essa sequência até distribuir 20 saias. Que cor recebeu a 18ª bailarina?",
+                answers: ["🔴 Vermelho", "🔵 Azul", "🟢 Verde", "🟡 Amarelo"],
+                correct: "🔵 Azul"
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let hasAnswered = false; // Trava contra cliques duplos/segunda chance
+        
+        const container = document.getElementById('quiz-container');
+        const questionText = document.getElementById('question-text');
+        const alternativesContainer = document.getElementById('alternatives-container');
+        const nextBtn = document.getElementById('next-btn');
+
+        // Avança de tela quando clica no botão
+        nextBtn.addEventListener('click', () => {
+            currentQuestionIndex++;
+            loadQuestion();
+        });
+
+        function loadQuestion() {
+            if (currentQuestionIndex >= quizData.length) {
+                showFinalScreen();
+                return;
+            }
+
+            hasAnswered = false; // Libera o clique para a nova pergunta
+            nextBtn.style.display = 'none'; // Esconde o botão de avançar
+
+            const currentData = quizData[currentQuestionIndex];
+            
+            // Puxa a imagem sequencial (imagem1.jpg, imagem2.jpg, etc.)
+            const questionNumber = currentQuestionIndex + 1;
+            container.style.backgroundImage = `url('imagem${questionNumber}.jpg')`;
+
+            questionText.innerHTML = currentData.question;
+            alternativesContainer.innerHTML = '';
+
+            // Cria os botões de resposta
+            currentData.answers.forEach(answer => {
+                const button = document.createElement('button');
+                button.classList.add('alternative-btn');
+                button.innerText = answer;
+                button.addEventListener('click', () => checkAnswer(button, answer, currentData.correct));
+                alternativesContainer.appendChild(button);
+            });
+        }
+
+        function checkAnswer(selectedButton, selectedAnswer, correctAnswer) {
+            // Se já respondeu, não faz mais nada (sem segunda chance)
+            if (hasAnswered) return;
+            hasAnswered = true; 
+
+            const buttons = document.querySelectorAll('.alternative-btn');
+            
+            // Desativa todos os botões garantindo que o jogador não clique novamente
+            buttons.forEach(btn => {
+                btn.classList.add('disabled');
+            });
+
+            if (selectedAnswer === correctAnswer) {
+                selectedButton.classList.add('correct');
+                selectedButton.innerHTML = `<span class="feedback-icon">✓</span> ${selectedAnswer}`;
+            } else {
+                selectedButton.classList.add('incorrect');
+                selectedButton.innerHTML = `<span class="feedback-icon">✕</span> ${selectedAnswer}`;
+                
+                // Mostra a resposta certa
+                buttons.forEach(btn => {
+                    if (btn.innerText === correctAnswer) {
+                        btn.classList.add('correct');
+                        btn.innerHTML = `<span class="feedback-icon">✓</span> ${correctAnswer}`;
+                    }
+                });
+            }
+
+            // Exibe o botão para avançar só depois de responder
+            nextBtn.style.display = 'block';
+        }
+
+        function showFinalScreen() {
+            // Puxa a imagem final conforme solicitado (imagem14.jpg)
+            container.style.backgroundImage = "url('imagem14.jpg')";
+            
+            // Limpa os elementos da pergunta
+            alternativesContainer.innerHTML = '';
+            questionText.style.display = 'none';
+            nextBtn.style.display = 'none';
+
+            // Cria o título gigante
+            const finalTitle = document.createElement('div');
+            finalTitle.id = 'final-title';
+            finalTitle.innerText = "QUIZ COMPLETO!";
+            
+            // Cria a mensagem personalizada
+            const finalMessage = document.createElement('div');
+            finalMessage.id = 'final-message';
+            finalMessage.innerText = "Cada passo de dança conta uma história, e cada desafio resolvido mostra o quanto você aprendeu. Continue valorizando a cultura brasileira e nunca deixe de aprender com alegria e criatividade. Parabéns!";
+            
+            const contentBox = document.getElementById('content-box');
+            contentBox.appendChild(finalTitle);
+            contentBox.appendChild(finalMessage);
+        }
+
+        // Inicia o quiz
+        window.onload = loadQuestion;
+    </script>
 </body>
 </html>
