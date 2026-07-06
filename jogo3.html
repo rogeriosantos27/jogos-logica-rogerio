@@ -7,302 +7,63 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="header">
-        <h1>🧠 Enigma 3: Amigas na Lanchonete</h1>
-        <p>Use a lógica para descobrir a combinação correta de cada posição!</p>
-        <a href="index.html" class="btn-voltar">⬅ Voltar ao Menu</a>
-    </div>
+    <header>
+        <a href="index.html" class="btn-voltar-topo">⬅ Voltar ao Menu</a>
+        <h1>🍔 Enigma 3: Amigas na Lanchonete</h1>
+        <p>Combine corretamente as camisetas, nomes, pedidos e idades das amigas!</p>
+    </header>
 
     <div class="container">
         <div class="pistas-container">
-            <h2>🔍 Pistas</h2>
+            <h2>🔍 Pistas da Lanchonete</h2>
             <ul>
-                <li><strong>1.</strong> Quem está bebendo <strong>Coca Cola</strong> está em algum lugar entre <strong>Nikaelly</strong> e quem está bebendo <strong>Fanta Uva</strong>, nessa ordem.</li>
-                <li><strong>2.</strong> <strong>Isadora</strong> está exatamente à esquerda da garota de <strong>12 anos</strong>.</li>
-                <li><strong>3.</strong> Na <strong>quarta posição</strong> está a garota de <strong>14 anos</strong>.</li>
-                <li><strong>4.</strong> A garota que gosta de <strong>Futebol</strong> está exatamente à direita de quem está bebendo <strong>Cajuína</strong>.</li>
-                <li><strong>5.</strong> A garota de camiseta <strong>Vermelha</strong> está bebendo <strong>Fanta Uva</strong>.</li>
-                <li><strong>6.</strong> Quem gosta de <strong>Basquete</strong> está em algum lugar entre quem gosta de <strong>Futebol</strong> e quem gosta de <strong>Carimba</strong>, nessa ordem.</li>
-                <li><strong>7.</strong> A garota mais velha (<strong>15 anos</strong>) está ao lado de quem está bebendo <strong>Guaraná</strong>.</li>
-                <li><strong>8.</strong> Na <strong>terceira posição</strong> está quem pediu um hambúrguer com <strong>Bacon extra</strong>.</li>
-                <li><strong>9.</strong> A garota de <strong>12 anos</strong> está exatamente à direita de quem está com a camiseta <strong>Preta</strong>.</li>
-                <li><strong>10.</strong> Quem gosta de <strong>Corrida</strong> está exatamente à esquerda de quem gosta de <strong>Basquete</strong>.</li>
-                <li><strong>11.</strong> Quem pediu um hambúrguer com <strong>Onion rings</strong> está ao lado de quem está com a camiseta <strong>Verde</strong>.</li>
-                <li><strong>12.</strong> Quem gosta de <strong>Carimba</strong> está na <strong>quinta posição</strong>.</li>
-                <li><strong>13.</strong> Quem está de <strong>Verde</strong> está bebendo <strong>Pepsi</strong>.</li>
-                <li><strong>14.</strong> A garota mais nova (<strong>11 anos</strong>) está exatamente à esquerda da garota de <strong>14 anos</strong>.</li>
-                <li><strong>15.</strong> Quem está de <strong>Amarelo</strong> está em algum lugar entre quem pediu um hambúrguer <strong>Sem alface</strong> e quem está de <strong>Vermelho</strong>, nessa ordem.</li>
-                <li><strong>16.</strong> Quem está bebendo <strong>Fanta Uva</strong> está exatamente à esquerda de quem está bebendo <strong>Pepsi</strong>.</li>
-                <li><strong>17.</strong> <strong>Emilly</strong> está em algum lugar à direita de quem está com a camiseta <strong>Azul</strong>.</li>
-                <li><strong>18.</strong> <strong>Damarys</strong> está exatamente à esquerda de quem pediu um hambúrguer <strong>Sem cebola</strong>.</li>
-                <li><strong>19.</strong> <strong>Nikaelly</strong> está ao lado de quem está com a camiseta <strong>Azul</strong>.</li>
+                <li id="pista-1">1. Quem está bebendo Coca Cola está em algum lugar entre Nikaelly e quem está bebendo Fanta Uva, nessa ordem.</li>
+                <li id="pista-2">2. Isadora está exatamente à esquerda da garota de 12 anos.</li>
+                <li id="pista-3">3. Na quarta posição está a garota de 14 anos.</li>
+                <li id="pista-4">4. A garota que gosta de Futebol está exatamente à direita de quem está bebendo Cajuína.</li>
+                <li id="pista-5">5. A garota de camiseta Vermelha está bebendo Fanta Uva.</li>
+                <li id="pista-6">6. Quem gosta de Basquete está em algum lugar entre quem gosta de Futebol e quem gosta de Carimba, nessa ordem.</li>
+                <li id="pista-7">7. A garota mais velha (15 anos) está ao lado de quem está bebendo Guaraná.</li>
+                <li id="pista-8">8. Na terceira posição está quem pediu um hambúrguer com Bacon extra.</li>
+                <li id="pista-9">9. A garota de 12 anos está exatamente à direita de quem está com a camiseta Preta.</li>
+                <li id="pista-10">10. Quem gosta de Corrida está exatamente à esquerda de quem gosta de Basquete.</li>
+                <li id="pista-11">11. Quem pediu um hambúrguer com Onion rings está ao lado de quem está com a camiseta Verde.</li>
+                <li id="pista-12">12. Quem gosta de Carimba está na quinta posição.</li>
+                <li id="pista-13">13. Quem está de Verde está bebendo Pepsi.</li>
+                <li id="pista-14">14. A garota mais nova (11 anos) está exatamente à esquerda da garota de 14 anos.</li>
+                <li id="pista-15">15. Quem está de Amarelo está em algum lugar entre quem pediu um hambúrguer Sem alface e quem está de Vermelho, nessa ordem.</li>
+                <li id="pista-16">16. Quem está bebendo Fanta Uva está exatamente à esquerda de quem está bebendo Pepsi.</li>
+                <li id="pista-17">17. Emilly está em algum lugar à direita de quem está com a camiseta Azul.</li>
+                <li id="pista-18">18. Damarys está exatamente à esquerda de quem pediu um hambúrguer Sem cebola.</li>
+                <li id="pista-19">19. Nikaelly está ao lado de quem está com a camiseta Azul.</li>
             </ul>
         </div>
 
-        <div class="tabuleiro">
-            <div class="colunas-container">
-                <div class="coluna" data-pos="1">
-                    <div class="titulo-coluna">1ª Posição</div>
-                    <select class="select-enigma" data-categoria="camiseta">
-                        <option value="">-- Camiseta --</option>
-                        <option value="Verde">Verde</option>
-                        <option value="Amarela">Amarela</option>
-                        <option value="Azul">Azul</option>
-                        <option value="Vermelha">Vermelha</option>
-                        <option value="Preta">Preta</option>
-                    </select>
-                    <select class="select-enigma" data-categoria="nome">
-                        <option value="">-- Nome --</option>
-                        <option value="Nikaelly">Nikaelly</option>
-                        <option value="Isadora">Isadora</option>
-                        <option value="Emilly">Emilly</option>
-                        <option value="Damarys">Damarys</option>
-                        <option value="Luna">Luna</option>
-                    </select>
-                    <select class="select-enigma" data-categoria="hamburguer">
-                        <option value="">-- Hambúrguer --</option>
-                        <option value="Bacon extra">Bacon extra</option>
-                        <option value="Sem cebola">Sem cebola</option>
-                        <option value="Bem passado">Bem passado</option>
-                        <option value="Onion rings">Onion rings</option>
-                        <option value="Sem alface">Sem alface</option>
-                    </select>
-                    <select class="select-enigma" data-categoria="refrigerante">
-                        <option value="">-- Refrigerante --</option>
-                        <option value="Coca Cola">Coca Cola</option>
-                        <option value="Fanta Uva">Fanta Uva</option>
-                        <option value="Cajuína">Cajuína</option>
-                        <option value="Guaraná">Guaraná</option>
-                        <option value="Pepsi">Pepsi</option>
-                    </select>
-                    <select class="select-enigma" data-categoria="idade">
-                        <option value="">-- Idade --</option>
-                        <option value="11">11 anos</option>
-                        <option value="12">12 anos</option>
-                        <option value="13">13 anos</option>
-                        <option value="14">14 anos</option>
-                        <option value="15">15 anos</option>
-                    </select>
-                    <select class="select-enigma" data-categoria="esporte">
-                        <option value="">-- Esporte --</option>
-                        <option value="Basquete">Basquete</option>
-                        <option value="Corrida">Corrida</option>
-                        <option value="Futebol">Futebol</option>
-                        <option value="Vôlei">Vôlei</option>
-                        <option value="Carimba">Carimba</option>
-                    </select>
-                </div>
+        <div class="tabuleiro-container">
+            <table id="tabuleiro">
+                <thead>
+                    <tr>
+                        <th>Categoria</th>
+                        <th>1ª Amiga</th>
+                        <th>2ª Amiga</th>
+                        <th>3ª Amiga</th>
+                        <th>4ª Amiga</th>
+                        <th>5ª Amiga</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr data-categoria="Camiseta"><td class="categoria-header">Camiseta</td></tr>
+                    <tr data-categoria="Nome"><td class="categoria-header">Nome</td></tr>
+                    <tr data-categoria="Hambúrguer"><td class="categoria-header">Hambúrguer</td></tr>
+                    <tr data-categoria="Refrigerante"><td class="categoria-header">Refrigerante</td></tr>
+                    <tr data-categoria="Idade"><td class="categoria-header">Idade</td></tr>
+                    <tr data-categoria="Esporte"><td class="categoria-header">Esporte</td></tr>
+                </tbody>
+            </table>
+        </div>
 
-                <div class="coluna" data-pos="2">
-                    <div class="titulo-coluna">2ª Posição</div>
-                    <select class="select-enigma" data-categoria="camiseta">
-                        <option value="">-- Camiseta --</option>
-                        <option value="Verde">Verde</option>
-                        <option value="Amarela">Amarela</option>
-                        <option value="Azul">Azul</option>
-                        <option value="Vermelha">Vermelha</option>
-                        <option value="Preta">Preta</option>
-                    </select>
-                    <select class="select-enigma" data-categoria="nome">
-                        <option value="">-- Nome --</option>
-                        <option value="Nikaelly">Nikaelly</option>
-                        <option value="Isadora">Isadora</option>
-                        <option value="Emilly">Emilly</option>
-                        <option value="Damarys">Damarys</option>
-                        <option value="Luna">Luna</option>
-                    </select>
-                    <select class="select-enigma" data-categoria="hamburguer">
-                        <option value="">-- Hambúrguer --</option>
-                        <option value="Bacon extra">Bacon extra</option>
-                        <option value="Sem cebola">Sem cebola</option>
-                        <option value="Bem passado">Bem passado</option>
-                        <option value="Onion rings">Onion rings</option>
-                        <option value="Sem alface">Sem alface</option>
-                    </select>
-                    <select class="select-enigma" data-categoria="refrigerante">
-                        <option value="">-- Refrigerante --</option>
-                        <option value="Coca Cola">Coca Cola</option>
-                        <option value="Fanta Uva">Fanta Uva</option>
-                        <option value="Cajuína">Cajuína</option>
-                        <option value="Guaraná">Guaraná</option>
-                        <option value="Pepsi">Pepsi</option>
-                    </select>
-                    <select class="select-enigma" data-categoria="idade">
-                        <option value="">-- Idade --</option>
-                        <option value="11">11 anos</option>
-                        <option value="12">12 anos</option>
-                        <option value="13">13 anos</option>
-                        <option value="14">14 anos</option>
-                        <option value="15">15 anos</option>
-                    </select>
-                    <select class="select-enigma" data-categoria="esporte">
-                        <option value="">-- Esporte --</option>
-                        <option value="Basquete">Basquete</option>
-                        <option value="Corrida">Corrida</option>
-                        <option value="Futebol">Futebol</option>
-                        <option value="Vôlei">Vôlei</option>
-                        <option value="Carimba">Carimba</option>
-                    </select>
-                </div>
-
-                <div class="coluna" data-pos="3">
-                    <div class="titulo-coluna">3ª Posição</div>
-                    <select class="select-enigma" data-categoria="camiseta">
-                        <option value="">-- Camiseta --</option>
-                        <option value="Verde">Verde</option>
-                        <option value="Amarela">Amarela</option>
-                        <option value="Azul">Azul</option>
-                        <option value="Vermelha">Vermelha</option>
-                        <option value="Preta">Preta</option>
-                    </select>
-                    <select class="select-enigma" data-categoria="nome">
-                        <option value="">-- Nome --</option>
-                        <option value="Nikaelly">Nikaelly</option>
-                        <option value="Isadora">Isadora</option>
-                        <option value="Emilly">Emilly</option>
-                        <option value="Damarys">Damarys</option>
-                        <option value="Luna">Luna</option>
-                    </select>
-                    <select class="select-enigma" data-categoria="hamburguer">
-                        <option value="">-- Hambúrguer --</option>
-                        <option value="Bacon extra">Bacon extra</option>
-                        <option value="Sem cebola">Sem cebola</option>
-                        <option value="Bem passado">Bem passado</option>
-                        <option value="Onion rings">Onion rings</option>
-                        <option value="Sem alface">Sem alface</option>
-                    </select>
-                    <select class="select-enigma" data-categoria="refrigerante">
-                        <option value="">-- Refrigerante --</option>
-                        <option value="Coca Cola">Coca Cola</option>
-                        <option value="Fanta Uva">Fanta Uva</option>
-                        <option value="Cajuína">Cajuína</option>
-                        <option value="Guaraná">Guaraná</option>
-                        <option value="Pepsi">Pepsi</option>
-                    </select>
-                    <select class="select-enigma" data-categoria="idade">
-                        <option value="">-- Idade --</option>
-                        <option value="11">11 anos</option>
-                        <option value="12">12 anos</option>
-                        <option value="13">13 anos</option>
-                        <option value="14">14 anos</option>
-                        <option value="15">15 anos</option>
-                    </select>
-                    <select class="select-enigma" data-categoria="esporte">
-                        <option value="">-- Esporte --</option>
-                        <option value="Basquete">Basquete</option>
-                        <option value="Corrida">Corrida</option>
-                        <option value="Futebol">Futebol</option>
-                        <option value="Vôlei">Vôlei</option>
-                        <option value="Carimba">Carimba</option>
-                    </select>
-                </div>
-
-                <div class="coluna" data-pos="4">
-                    <div class="titulo-coluna">4ª Posição</div>
-                    <select class="select-enigma" data-categoria="camiseta">
-                        <option value="">-- Camiseta --</option>
-                        <option value="Verde">Verde</option>
-                        <option value="Amarela">Amarela</option>
-                        <option value="Azul">Azul</option>
-                        <option value="Vermelha">Vermelha</option>
-                        <option value="Preta">Preta</option>
-                    </select>
-                    <select class="select-enigma" data-categoria="nome">
-                        <option value="">-- Nome --</option>
-                        <option value="Nikaelly">Nikaelly</option>
-                        <option value="Isadora">Isadora</option>
-                        <option value="Emilly">Emilly</option>
-                        <option value="Damarys">Damarys</option>
-                        <option value="Luna">Luna</option>
-                    </select>
-                    <select class="select-enigma" data-categoria="hamburguer">
-                        <option value="">-- Hambúrguer --</option>
-                        <option value="Bacon extra">Bacon extra</option>
-                        <option value="Sem cebola">Sem cebola</option>
-                        <option value="Bem passado">Bem passado</option>
-                        <option value="Onion rings">Onion rings</option>
-                        <option value="Sem alface">Sem alface</option>
-                    </select>
-                    <select class="select-enigma" data-categoria="refrigerante">
-                        <option value="">-- Refrigerante --</option>
-                        <option value="Coca Cola">Coca Cola</option>
-                        <option value="Fanta Uva">Fanta Uva</option>
-                        <option value="Cajuína">Cajuína</option>
-                        <option value="Guaraná">Guaraná</option>
-                        <option value="Pepsi">Pepsi</option>
-                    </select>
-                    <select class="select-enigma" data-categoria="idade">
-                        <option value="">-- Idade --</option>
-                        <option value="11">11 anos</option>
-                        <option value="12">12 anos</option>
-                        <option value="13">13 anos</option>
-                        <option value="14">14 anos</option>
-                        <option value="15">15 anos</option>
-                    </select>
-                    <select class="select-enigma" data-categoria="esporte">
-                        <option value="">-- Esporte --</option>
-                        <option value="Basquete">Basquete</option>
-                        <option value="Corrida">Corrida</option>
-                        <option value="Futebol">Futebol</option>
-                        <option value="Vôlei">Vôlei</option>
-                        <option value="Carimba">Carimba</option>
-                    </select>
-                </div>
-
-                <div class="coluna" data-pos="5">
-                    <div class="titulo-coluna">5ª Posição</div>
-                    <select class="select-enigma" data-categoria="camiseta">
-                        <option value="">-- Camiseta --</option>
-                        <option value="Verde">Verde</option>
-                        <option value="Amarela">Amarela</option>
-                        <option value="Azul">Azul</option>
-                        <option value="Vermelha">Vermelha</option>
-                        <option value="Preta">Preta</option>
-                    </select>
-                    <select class="select-enigma" data-categoria="nome">
-                        <option value="">-- Nome --</option>
-                        <option value="Nikaelly">Nikaelly</option>
-                        <option value="Isadora">Isadora</option>
-                        <option value="Emilly">Emilly</option>
-                        <option value="Damarys">Damarys</option>
-                        <option value="Luna">Luna</option>
-                    </select>
-                    <select class="select-enigma" data-categoria="hamburguer">
-                        <option value="">-- Hambúrguer --</option>
-                        <option value="Bacon extra">Bacon extra</option>
-                        <option value="Sem cebola">Sem cebola</option>
-                        <option value="Bem passado">Bem passado</option>
-                        <option value="Onion rings">Onion rings</option>
-                        <option value="Sem alface">Sem alface</option>
-                    </select>
-                    <select class="select-enigma" data-categoria="refrigerante">
-                        <option value="">-- Refrigerante --</option>
-                        <option value="Coca Cola">Coca Cola</option>
-                        <option value="Fanta Uva">Fanta Uva</option>
-                        <option value="Cajuína">Cajuína</option>
-                        <option value="Guaraná">Guaraná</option>
-                        <option value="Pepsi">Pepsi</option>
-                    </select>
-                    <select class="select-enigma" data-categoria="idade">
-                        <option value="">-- Idade --</option>
-                        <option value="11">11 anos</option>
-                        <option value="12">12 anos</option>
-                        <option value="13">13 anos</option>
-                        <option value="14">14 anos</option>
-                        <option value="15">15 anos</option>
-                    </select>
-                    <select class="select-enigma" data-categoria="esporte">
-                        <option value="">-- Esporte --</option>
-                        <option value="Basquete">Basquete</option>
-                        <option value="Corrida">Corrida</option>
-                        <option value="Futebol">Futebol</option>
-                        <option value="Vôlei">Vôlei</option>
-                        <option value="Carimba">Carimba</option>
-                    </select>
-                </div>
-            </div>
-
-            <button id="btn-verificar" onclick="verificarRespostas()">Conferir Respostas</button>
+        <div class="acoes">
+            <button id="btn-verificar">Verificar Respostas</button>
             <div id="mensagem-resultado"></div>
         </div>
     </div>

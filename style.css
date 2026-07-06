@@ -221,3 +221,25 @@ button:hover {
 
 .correto { color: var(--success); }
 .incorreto { color: var(--error); }
+
+.btn-voltar-topo {
+    display: inline-block;
+    background-color: #e74c3c;
+    color: white;
+    text-decoration: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    transition: 0.3s;
+}
+
+.btn-voltar-topo:hover {
+    background-color: #c0392b;
+    transform: scale(1.05);
+}
+
+header {
+    text-align: center;
+    padding: 20px;
+}
