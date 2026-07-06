@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enigma 5: Desafio de Maracatu</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            /* 1. IMAGEM DE FUNDO EXCLUSIVA DO JOGO 5 */
+            background-image: url('fundo-enigma5.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .wrapper-quiz {
+            width: 90%;
+            max-width: 800px;
+            background-color: rgba(0, 0, 0, 0.6); /* Camada escura interna para dar destaque */
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        header h1 {
+            color: #f1c40f;
+            font-size: 2rem;
+            margin-top: 0;
+        }
+
+        /* Container da Imagem Ilustrativa */
+        .imagem-pergunta-container {
+            width: 100%;
+            max-height: 350px;
+            overflow: hidden;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .imagem-pergunta-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* Texto da Pergunta */
+        .texto-pergunta {
+            font-size: 1.25rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+
+        /* Grid de Alternativas (Horizontal igual ao Genially) */
+        .alternativas-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            width: 100%;
+        }
+
+        .btn-alternativa {
+            flex: 1;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            padding: 15px 20px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-alternativa:hover {
+            background-color: rgba(255, 255, 255, 0.25);
+            transform: scale(1.02);
+        }
+
+        /* CORES FORTES PARA FEEDBACK VISUAL */
+        .btn-alternativa.correta {
+            background-color: #2ecc71 !important;
+            border-color: #27ae60 !important;
+            color: white !important;
+        }
+
+        .btn-alternativa.errada {
+            background-color: #e74c3c !important;
+            border-color: #c0392b !important;
+            color: white !important;
+        }
+
+        #mensagem-feedback {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            min-height: 30px;
+        }
+    </style>
+</head>
+<body>
+
+    <a href="index.html" class="btn-voltar-topo" style="position: absolute; top: 20px; left: 20px;">⬅ Voltar ao Menu</a>
+
+    <div class="wrapper-quiz">
+        <header>
+            <h1>⚡ Enigma 5: Quiz de Lógica</h1>
+        </header>
+
+        <main>
+            <div class="imagem-pergunta-container">
+                <img id="img-quiz" src="" alt="Ilustração do Enigma">
+            </div>
+
+            <p id="pergunta-campo" class="texto-pergunta"></p>
+
+            <div class="alternativas-container">
+                <button class="btn-alternativa" data-index="0"></button>
+                <button class="btn-alternativa" data-index="1"></button>
+                <button class="btn-alternativa" data-index="2"></button>
+            </div>
+
+            <div id="mensagem-feedback"></div>
+        </main>
+    </div>
+
+    <script src="script5.js"></script>
+</body>
+</html>
