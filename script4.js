@@ -7,7 +7,30 @@ const opcoes = {
     Prato: ["", "Lasanha", "Almôndega", "Macarronada", "Pratinho", "Feijoada"]
 };
 
-// Gabarito validado logicamente através das 21 pistas matematicamente corretas
+const textosPistas = {
+    1: "1. A candidata que gosta de Lasanha está em algum lugar entre quem tem 22 anos e quem gosta de Almôndega, nessa ordem.",
+    2: "2. Na quarta posição está quem gosta de Lasanha.",
+    3: "3. A candidata que gosta de Macarronada está na segunda posição.",
+    4: "4. Ruth está exatamente à esquerda de quem gosta de Pratinho.",
+    5: "5. Quem gosta de Uva gosta de Almôndega.",
+    6: "6. Ruth está exatamente à esquerda da candidata que gosta de Maçã.",
+    7: "7. As candidatas que gostam de Morango e Abacaxi estão lado a lado.",
+    8: "8. A candidata de Branco está ao lado da candidata que gosta de Morango.",
+    9: "9. Quem está de camisa Roxa está ao lado da candidata mais velha (30 anos).",
+    10: "10. A candidata de Marrom está em algum lugar à esquerda da candidata de 24 anos.",
+    11: "11. Na segunda posição está a candidata de 27 anos.",
+    12: "12. Quem tem 22 anos está exatamente à esquerda de Ruth.",
+    13: "13. A Cantora está exatamente à direita de Mary.",
+    14: "14. A Malabarista está exatamente à esquerda da Cantora.",
+    15: "15. Quem gosta de Macarronada está exatamente à direita de quem faz Imitação.",
+    16: "16. A Cantora está em uma das pontas.",
+    17: "17. Kamila está em algum lugar à direita da candidata de Marrom.",
+    18: "18. Ludmyla está exatamente à esquerda da candidata de 27 anos.",
+    19: "19. Mary está com a camisa Azul.",
+    20: "20. A candidata que gosta de Abacaxi está exatamente à direita de quem gosta de Feijoada.",
+    21: "21. A Música está de Marrom."
+};
+
 const gabarito = {
     1: { Camisa: "Rosa", Nome: "Ludmyla", Talento: "Imitação", Idade: "22", Fruta: "Morango", Prato: "Feijoada" },
     2: { Camisa: "Branco", Nome: "Ruth", Talento: "Dança", Idade: "27", Fruta: "Abacaxi", Prato: "Macarronada" },
@@ -18,6 +41,7 @@ const gabarito = {
 
 document.addEventListener("DOMContentLoaded", () => {
     gerarTabuleiro();
+    configurarBotoesPistas();
     document.getElementById("btn-verificar").addEventListener("click", verificarFimDeJogo);
 });
 
@@ -28,6 +52,8 @@ function gerarTabuleiro() {
         const listaOpcoes = opcoes[categoria];
         for (let i = 1; i <= 5; i++) {
             const td = document.createElement("td");
+            td.setAttribute("data-col", i);
+            
             const select = document.createElement("select");
             select.setAttribute("data-posicao", i);
             select.setAttribute("data-categoria", categoria);
@@ -40,9 +66,38 @@ function gerarTabuleiro() {
             });
             
             select.addEventListener("change", processarMudanca);
+            if (categoria === "Camisa") {
+                select.addEventListener("change", colorirColuna);
+            }
+            
             td.appendChild(select);
             linha.appendChild(td);
         }
+    });
+}
+
+function colorirColuna(event) {
+    const select = event.target;
+    const posicao = select.getAttribute("data-posicao");
+    const corSelecionada = select.value.toLowerCase();
+    
+    const celulasColuna = document.querySelectorAll(`#tabuleiro tbody td[data-col='${posicao}']`);
+    
+    celulasColuna.forEach(td => {
+        td.classList.remove('coluna-cor-roxo', 'coluna-cor-marrom', 'coluna-cor-azul', 'coluna-cor-rosa', 'coluna-cor-branco');
+        if (corSelecionada && corSelecionada !== "") {
+            td.classList.add(`coluna-cor-${corSelecionada}`);
+        }
+    });
+}
+
+function configurarBotoesPistas() {
+    const botoes = document.querySelectorAll(".btn-pista");
+    botoes.forEach(btn => {
+        btn.addEventListener("click", () => {
+            const numPista = btn.getAttribute("data-pista");
+            document.getElementById("pista-texto").textContent = textosPistas[numPista];
+        });
     });
 }
 
@@ -87,7 +142,7 @@ function validarPistas(estado) {
         else statusPistas[1] = 'erro';
     }
 
-    // 2. 4ª posição gosta de Lasanha
+    // 2. 4ª posição é Lasanha
     if (estado[4]["Prato"] === "Lasanha") statusPistas[2] = 'sucesso';
     else if (contradiz(4, "Prato", "Lasanha")) statusPistas[2] = 'erro';
 
@@ -100,7 +155,7 @@ function validarPistas(estado) {
     if (pRut && pPra) {
         if (pRut + 1 === pPra) statusPistas[4] = 'sucesso';
         else statusPistas[4] = 'erro';
-    }
+    } else if (pRut === 5 || pPra === 1) statusPistas[4] = 'erro';
 
     // 5. Uva gosta de Almôndega
     let pUva = encontrarPos("Fruta", "Uva");
@@ -114,7 +169,7 @@ function validarPistas(estado) {
     if (pRut && pMac) {
         if (pRut + 1 === pMac) statusPistas[6] = 'sucesso';
         else statusPistas[6] = 'erro';
-    }
+    } else if (pRut === 5 || pMac === 1) statusPistas[6] = 'erro';
 
     // 7. Morango e Abacaxi lado a lado
     let pMor = encontrarPos("Fruta", "Morango"), pAba = encontrarPos("Fruta", "Abacaxi");
@@ -152,26 +207,25 @@ function validarPistas(estado) {
     if (p22 && pRut) {
         if (p22 + 1 === pRut) statusPistas[12] = 'sucesso';
         else statusPistas[12] = 'erro';
-    }
+    } else if (p22 === 5 || pRut === 1) statusPistas[12] = 'erro';
 
     // 13. Canto exatamente à direita de Mary
     let pCan = encontrarPos("Talento", "Canto"), pMry = encontrarPos("Nome", "Mary");
     if (pCan && pMry) {
         if (pMry + 1 === pCan) statusPistas[13] = 'sucesso';
         else statusPistas[13] = 'erro';
-    }
+    } else if (pMry === 5 || pCan === 1) statusPistas[13] = 'erro';
 
     // 14. Malabarismo exatamente à esquerda de Canto
     let pMal = encontrarPos("Talento", "Malabarismo");
     if (pMal && pCan) {
         if (pMal + 1 === pCan) statusPistas[14] = 'sucesso';
         else statusPistas[14] = 'erro';
-    }
+    } else if (pMal === 5 || pCan === 1) statusPistas[14] = 'erro';
 
     // 15. Macarronada exatamente à direita de Imitação
     let pImi = encontrarPos("Talento", "Imitação");
-    let pMacarr = encontrarPos("Prato", "Macarronada");
-    if (pImi && pMacarr) {
+    if (pImi && pMacarr = encontrarPos("Prato", "Macarronada")) {
         if (pImi + 1 === pMacarr) statusPistas[15] = 'sucesso';
         else statusPistas[15] = 'erro';
     }
@@ -190,12 +244,11 @@ function validarPistas(estado) {
     }
 
     // 18. Ludmyla exatamente à esquerda de 27 anos
-    let pLud = encontrarPos("Nome", "Ludmyla");
-    let p27 = encontrarPos("Idade", "27");
+    let pLud = encontrarPos("Nome", "Ludmyla"), p27 = encontrarPos("Idade", "27");
     if (pLud && p27) {
         if (pLud + 1 === p27) statusPistas[18] = 'sucesso';
         else statusPistas[18] = 'erro';
-    }
+    } else if (pLud === 5 || p27 === 1) statusPistas[18] = 'erro';
 
     // 19. Mary está de Azul
     let pAzu = encontrarPos("Camisa", "Azul");
@@ -209,7 +262,7 @@ function validarPistas(estado) {
     if (pAba && pFei) {
         if (pFei + 1 === pAba) statusPistas[20] = 'sucesso';
         else statusPistas[20] = 'erro';
-    }
+    } else if (pFei === 5 || pAba === 1) statusPistas[20] = 'erro';
 
     // 21. Música está de Marrom
     let pMus = encontrarPos("Talento", "Música");
@@ -218,13 +271,13 @@ function validarPistas(estado) {
         else statusPistas[21] = 'erro';
     }
 
-    // Atualização de classes visuais nas pistas
+    // Pinta os botões de pista de verde ou vermelho em tempo real
     for (let i = 1; i <= 21; i++) {
-        const item = document.getElementById(`pista-${i}`);
-        if(item) {
-            item.classList.remove("pista-errada", "pista-certa");
-            if (statusPistas[i] === 'erro') item.classList.add("pista-errada");
-            else if (statusPistas[i] === 'sucesso') item.classList.add("pista-certa");
+        const btn = document.querySelector(`.btn-pista[data-pista='${i}']`);
+        if(btn) {
+            btn.classList.remove("pista-errada", "pista-certa");
+            if (statusPistas[i] === 'erro') btn.classList.add("pista-errada");
+            else if (statusPistas[i] === 'sucesso') btn.classList.add("pista-certa");
         }
     }
 }
@@ -244,12 +297,12 @@ function verificarFimDeJogo() {
     const msg = document.getElementById("mensagem-resultado");
     if (!preenchido) {
         msg.textContent = "Preencha todo o tabuleiro antes de verificar!";
-        msg.className = "incorreto";
+        msg.style.color = "#ffdd57";
     } else if (tudoCorreto) {
         msg.textContent = "🏆 Sensacional! Você desvendou o Show de Talentos perfeitamente!";
-        msg.className = "correto";
+        msg.style.color = "#2ecc71";
     } else {
         msg.textContent = "❌ Algumas conexões ainda estão incorretas. Confira as pistas vermelhas!";
-        msg.className = "incorreto";
+        msg.style.color = "#e74c3c";
     }
 }
