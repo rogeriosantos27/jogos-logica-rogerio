@@ -7,49 +7,49 @@
     <link rel="stylesheet" href="style.css">
 
     <style>
-        /* 1. SEGREDO DO RACHA CUCA: Remove o fundo do body e trata as margens */
+        /* Configurações básicas e zeramento de margens */
         body {
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Fonte mais moderna */
+            font-family: Arial, sans-serif;
             min-height: 100vh;
             position: relative;
-            overflow-x: hidden; /* Impede rolagem horizontal geral */
+            overflow-x: hidden;
         }
 
-        /* 🖼️ DIV DE FUNDO BLINDADA: Imagem fixa e 100% proporcional em PC e Celular */
+        /* 🖼️ MOTOR DE FUNDO ADAPTÁVEL (Preenche sem esticar e sem travar em celulares) */
         .bg-fixo-container {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            z-index: -2; /* Fica atrás de absolutamente tudo */
+            z-index: -2;
             overflow: hidden;
         }
 
         .bg-fixo-container img {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Recorta as bordas se necessário, mas NUNCA estica */
-            object-position: center; /* Mantém o foco no meio da foto */
+            object-fit: cover;
+            object-position: center;
         }
 
-        /* Máscara opcional para dar leitura aos textos */
+        /* Máscara escura sutil sobre o fundo para destacar os blocos brancos */
         .bg-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            background-color: rgba(0, 0, 0, 0.2); /* Deixa o fundo levemente mais escuro */
+            background-color: rgba(0, 0, 0, 0.25);
             z-index: -1;
         }
 
-        /* Estrutura do Conteúdo */
+        /* Container principal */
         .container {
             width: 100%;
-            max-width: 1100px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 20px 15px;
             box-sizing: border-box;
@@ -57,147 +57,150 @@
             z-index: 1;
         }
 
+        /* Alinhamento lado a lado no Computador */
         .main-content {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 25px;
         }
 
-        @media (min-width: 900px) {
+        @media (min-width: 950px) {
             .main-content {
                 flex-direction: row;
                 align-items: flex-start;
             }
             .pistas-container { flex: 1; }
-            .tabuleiro-container { flex: 1.2; }
+            .tabuleiro-container { flex: 1.4; }
         }
 
-        /* 🎨 NOVO ESTILO: Fundo semitransparente igual ao Enigma 2 */
+        /* 🎨 CORREÇÃO: Blocos brancos 100% opacos, exatamente como na sua imagem */
         .pistas-container, .tabuleiro-container {
-            background-color: rgba(255, 255, 255, 0.7); /* Branco com 70% de opacidade */
+            background-color: #ffffff !important; /* Branco sólido, sem transparência */
             padding: 25px;
             border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            color: #2c3e50; /* Azul escuro para o texto */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+            color: #2c3e50;
             box-sizing: border-box;
         }
 
-        /* 📱 ROLAGEM DA TABELA */
+        /* Títulos dos blocos internos */
+        .pistas-container h2, .tabuleiro-container h2 {
+            font-size: 1.6rem;
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* 📱 SUPORTE RESPONSIVO PARA A TABELA */
         .table-wrapper {
             width: 100%;
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
             border-radius: 8px;
-            border: 1px solid #bdc3c7;
-            margin-bottom: 20px;
-            background-color: rgba(255, 255, 255, 0.9); /* Um pouco mais opaco para a tabela */
+            border: 1px solid #e2e8f0;
+            background-color: #ffffff;
         }
 
         #tabuleiro {
             width: 100%;
             border-collapse: collapse;
-            min-width: 650px;
+            min-width: 700px; /* Impede que a tabela esmague e distorça no mobile */
         }
 
         #tabuleiro th, #tabuleiro td {
-            padding: 12px 8px;
+            padding: 14px 10px;
             text-align: center;
-            border: 1px solid #bdc3c7;
+            border: 1px solid #e2e8f0;
             font-size: 0.95rem;
         }
 
+        /* Estilo do Cabeçalho Escuro conforme a imagem */
         th {
-            background-color: #2c3e50; /* Azul escuro para o cabeçalho */
-            color: white;
-            font-weight: 600;
+            background-color: #2c3e50;
+            color: #ffffff;
+            font-weight: bold;
         }
 
+        /* Cabeçalho lateral das categorias */
         .categoria-header {
-            background-color: #f8f9fa;
-            font-weight: 600;
-            color: #34495e;
+            background-color: #f8fafc;
+            font-weight: bold;
+            color: #2c3e50;
+            width: 120px;
         }
 
-        /* Ajuste fino nos menus de opções (Selects) injetados pelo JS */
+        /* Estilização dos menus Select */
         #tabuleiro select {
             width: 100%;
-            padding: 8px 4px;
-            font-size: 0.9rem;
+            padding: 8px;
+            font-size: 0.95rem;
             border-radius: 6px;
-            border: 1px solid #bdc3c7;
+            border: 1px solid #cbd5e1;
             background-color: #ffffff;
             color: #333333;
             box-sizing: border-box;
-            cursor: pointer;
+            outline: none;
         }
 
+        /* Customização dos itens da lista de pistas */
+        #lista-pistas {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        #lista-pistas li {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-left: 4px solid #3498db; /* Detalhe azul lateral charmoso */
+            padding: 12px 15px;
+            margin-bottom: 12px;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #334155;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        /* Área de verificação */
         .acoes {
             text-align: center;
-            margin-top: 20px;
+            margin-top: 25px;
         }
 
         #btn-verificar {
             background-color: #27ae60;
             color: white;
             border: none;
-            padding: 14px 28px;
+            padding: 14px 30px;
             font-size: 1.1rem;
-            font-weight: 600;
+            font-weight: bold;
             border-radius: 8px;
             cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            transition: background-color 0.2s, transform 0.1s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
         }
 
         #btn-verificar:hover {
             background-color: #219653;
-            transform: scale(1.03);
-            box-shadow: 0 6px 8px rgba(0,0,0,0.3);
+            transform: translateY(-1px);
         }
 
-        /* Títulos e Pistas */
-        h1, h2 {
-            font-weight: 700;
-            color: #2c3e50; /* Azul escuro para os títulos */
+        #btn-verificar:active {
+            transform: translateY(1px);
         }
 
-        h2 {
-            font-size: 1.8rem;
-            margin-top: 0;
-            margin-bottom: 15px;
-            border-bottom: 2px solid #2c3e50;
-            padding-bottom: 5px;
-        }
-
-        #lista-pistas {
-            padding-left: 20px;
-            line-height: 1.7;
-        }
-
-        #lista-pistas li {
-            margin-bottom: 10px;
-            font-size: 1rem;
-            color: #34495e; /* Azul um pouco mais claro para as pistas */
-        }
-
-        #lista-pistas strong {
-            color: #2c3e50;
-            font-weight: 700;
-        }
-
-        /* Botão voltar ajustado */
+        /* Botão superior Voltar */
         .btn-voltar-topo {
             display: inline-block;
             margin-bottom: 15px;
             color: white;
             text-decoration: none;
             font-weight: bold;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
-            transition: transform 0.2s;
-        }
-        
-        .btn-voltar-topo:hover {
-            transform: scale(1.05);
+            text-shadow: 1px 1px 4px rgba(0,0,0,0.8);
         }
     </style>
 </head>
@@ -211,9 +214,9 @@
     <div class="container">
         <a href="index.html" class="btn-voltar-topo">⬅ Voltar ao Menu</a>
         
-        <header style="text-align: center; color: white; margin-bottom: 25px; text-shadow: 2px 2px 5px rgba(0,0,0,0.8);">
-            <h1 style="color: #f1c40f; margin-bottom: 5px; font-size: 2.5rem; font-weight: 800;">Desafio de Lógica: As 5 Amigas</h1>
-            <p style="margin: 0; font-size: 1.2rem;">Use as pistas abaixo para preencher a tabela corretamente!</p>
+        <header style="text-align: center; color: white; margin-bottom: 30px; text-shadow: 2px 2px 5px rgba(0,0,0,0.8);">
+            <h1 style="color: #f1c40f; margin-bottom: 5px; font-size: 2.4rem;">Desafio de Lógica: As 5 Amigas</h1>
+            <p style="margin: 0; font-size: 1.15rem; opacity: 0.95;">Use as pistas abaixo para preencher a tabela corretamente!</p>
         </header>
 
         <main class="main-content">
