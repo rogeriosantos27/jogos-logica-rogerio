@@ -7,33 +7,53 @@
     <link rel="stylesheet" href="style.css">
 
     <style>
+        /* 1. SEGREDO DO RACHA CUCA: Remove o fundo do body e trata as margens */
         body {
-            /* 🏞️ O SEGREDO DO FUNDO ADAPTÁVEL: Perfeito em PC e Celular */
-            background-image: url('fundo-enigma1.jpg'); 
-            background-size: cover;             /* Cobre a tela inteira sem distorcer */
-            background-position: center center; /* Mantém o centro da imagem sempre visível */
-            background-attachment: fixed;       /* Deixa o fundo fixo ao rolar a página */
-            background-repeat: no-repeat;
             margin: 0;
+            padding: 0;
             font-family: Arial, sans-serif;
+            min-height: 100vh;
+            position: relative;
         }
 
-        /* Garante que NENHUMA imagem dentro do jogo fique esticada */
-        img {
-            max-width: 100%;
-            height: auto;
-            object-fit: contain; 
+        /* 🖼️ DIV DE FUNDO BLINDADA: Imagem fixa e 100% proporcional em PC e Celular */
+        .bg-fixo-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -2; /* Fica atrás de absolutamente tudo */
+            overflow: hidden;
         }
 
+        .bg-fixo-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Recorta as bordas se necessário, mas NUNCA estica */
+            object-position: center; /* Mantém o foco no meio da foto */
+        }
+
+        /* Máscara opcional para dar leitura aos textos */
+        .bg-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.2); /* Deixa o fundo levemente mais escuro */
+            z-index: -1;
+        }
+
+        /* Estrutura do Conteúdo */
         .container {
             width: 100%;
             max-width: 1100px;
             margin: 0 auto;
-            padding: 15px;
+            padding: 20px 15px;
             box-sizing: border-box;
         }
 
-        /* Layout em duas colunas no PC, vira uma coluna no Celular */
         .main-content {
             display: flex;
             flex-direction: column;
@@ -42,16 +62,15 @@
 
         @media (min-width: 900px) {
             .main-content {
-                flex-direction: row; /* Lado a lado no computador */
+                flex-direction: row;
                 align-items: flex-start;
             }
             .pistas-container { flex: 1; }
             .tabuleiro-container { flex: 1.2; }
         }
 
-        /* Estilização dos blocos (Pistas e Tabuleiro) */
         .pistas-container, .tabuleiro-container {
-            background-color: rgba(255, 255, 255, 0.95);
+            background-color: rgba(255, 255, 255, 0.96);
             padding: 20px;
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
@@ -59,11 +78,11 @@
             box-sizing: border-box;
         }
 
-        /* 📱 ROLAGEM DA TABELA IGUAL AO RACHA CUCA */
+        /* 📱 ROLAGEM DA TABELA */
         .table-wrapper {
             width: 100%;
-            overflow-x: auto;                  /* Ativa o scroll se a tela for pequena */
-            -webkit-overflow-scrolling: touch; /* Rolagem lisa no celular */
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
             border-radius: 8px;
             border: 1px solid #bdc3c7;
             margin-bottom: 20px;
@@ -72,7 +91,7 @@
         #tabuleiro {
             width: 100%;
             border-collapse: collapse;
-            min-width: 650px; /* Garante que a tabela não esmague no mobile */
+            min-width: 650px;
         }
 
         #tabuleiro th, #tabuleiro td {
@@ -92,7 +111,6 @@
             font-weight: bold;
         }
 
-        /* Ajuste dos menus de opções (Selects) */
         #tabuleiro select {
             width: 100%;
             padding: 6px;
@@ -100,10 +118,8 @@
             border: 1px solid #bdc3c7;
             background-color: white;
             font-size: 0.9rem;
-            color: #333;
         }
 
-        /* Botões e Ações */
         .acoes {
             text-align: center;
             margin-top: 15px;
@@ -126,7 +142,6 @@
             transform: scale(1.03);
         }
 
-        /* Lista de Pistas */
         #lista-pistas {
             padding-left: 20px;
             line-height: 1.6;
@@ -140,11 +155,16 @@
 </head>
 <body>
 
+    <div class="bg-fixo-container">
+        <img src="fundo-enigma1.jpg" alt="Fundo Festival de Dança">
+    </div>
+    <div class="bg-overlay"></div>
+
     <div class="container">
-        <a href="index.html" class="btn-voltar-topo" style="display: inline-block; margin-bottom: 15px; color: white; text-decoration: none; font-weight: bold;">⬅ Voltar ao Menu</a>
+        <a href="index.html" class="btn-voltar-topo" style="display: inline-block; margin-bottom: 15px; color: white; text-decoration: none; font-weight: bold; text-shadow: 1px 1px 3px rgba(0,0,0,0.8);">⬅ Voltar ao Menu</a>
         
-        <header style="text-align: center; color: white; margin-bottom: 25px; text-shadow: 2px 2px 4px rgba(0,0,0,0.6);">
-            <h1 style="color: #f1c40f; margin-bottom: 5px;">Desafio de Lógica: As 5 Amigas</h1>
+        <header style="text-align: center; color: white; margin-bottom: 25px; text-shadow: 2px 2px 5px rgba(0,0,0,0.8);">
+            <h1 style="color: #f1c40f; margin-bottom: 5px; font-size: 2.2rem;">Desafio de Lógica: As 5 Amigas</h1>
             <p style="margin: 0; font-size: 1.1rem;">Use as pistas abaixo para preencher a tabela corretamente!</p>
         </header>
 
