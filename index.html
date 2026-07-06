@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal de Enigmas de Lógica</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            
+            /* 1. CONFIGURAÇÃO DA FOTO DE FUNDO */
+            background-image: url('fundo-menu.jpg'); /* Nome exato do seu arquivo de imagem novo do menu */
+            background-size: cover;             /* Faz a imagem cobrir a tela toda */
+            background-position: center;        /* Centraliza a imagem */
+            background-repeat: no-repeat;       /* Impede que a imagem fique se repetindo */
+            background-attachment: fixed;       /* Deixa o fundo fixo ao rolar a página */
+            
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;                  /* CORRIGIDO: Altura mínima em vez de altura travada */
+            margin: 0;
+            padding: 40px 20px;                 /* ADICIONADO: Margem de respira para o conteúdo não colar no topo/fundo do celular */
+            text-align: center;
+            position: relative;
+        }
+
+        /* 2. CAMADA ESCURA POR CIMA DA IMAGEM */
+        /* Garante que os fundos das fotos não misturem com as letras brancas */
+        body::before {
+            content: "";
+            position: fixed;                    /* CORRIGIDO: fixed garante que a camada cubra tudo mesmo ao rolar */
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(44, 62, 80, 0.75); /* Tom escuro com 75% de transparência */
+            z-index: 1;
+        }
+
+        /* Garante que os textos e botões fiquem na frente da camada escura */
+        h1, p, .menu-container {
+            position: relative;
+            z-index: 2;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #f1c40f;
+        }
+        p {
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+            max-width: 600px;                   /* ADICIONADO: Evita que o texto fique muito esticado em telas grandes */
+        }
+        .menu-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;                        /* ALTERADO: Ocupa o limite disponível */
+            max-width: 400px;                   /* Mantém o limite bonito e centralizado */
+        }
+        .btn-menu {
+            color: white;
+            text-decoration: none;
+            font-size: 1.3rem;
+            font-weight: bold;
+            padding: 15px 20px;
+            border-radius: 8px;
+            transition: 0.3s;
+            display: block;
+        }
+        .btn-menu:hover {
+            transform: scale(1.03);
+        }
+        
+        /* Cores customizadas para cada botão de jogo */
+        .btn-jogo1 {
+            background-color: #e74c3c;
+            border: 2px solid #c0392b;
+        }
+        .btn-jogo1:hover {
+            background-color: #c0392b;
+        }
+
+        .btn-jogo2 {
+            background-color: #2980b9;
+            border: 2px solid #1c5981;
+        }
+        .btn-jogo2:hover {
+            background-color: #1c5981;
+        }
+
+        .btn-jogo3 {
+            background-color: #2ecc71;
+            border: 2px solid #27ae60;
+        }
+        .btn-jogo3:hover {
+            background-color: #27ae60;
+        }
+
+        .btn-jogo4 {
+            background-color: #9b59b6;
+            border: 2px solid #8e44ad;
+        }
+        .btn-jogo4:hover {
+            background-color: #8e44ad;
+        }   
+
+        /* NOVO BOTÃO: ESTILO DO ENIGMA 5 */
+        .btn-jogo5 {
+            background-color: #e67e22;
+            border: 2px solid #d35400;
+        }
+        .btn-jogo5:hover {
+            background-color: #d35400;
+        }
+
+        /* ADICIONADO: AJUSTES EXCLUSIVOS PARA TELAS DE CELULAR */
+        @media (max-width: 480px) {
+            body {
+                padding: 30px 15px;
+            }
+            h1 {
+                font-size: 1.8rem;             /* Diminui o título para não quebrar feio no celular */
+            }
+            p {
+                font-size: 1rem;               /* Ajusta o texto de subtítulo */
+                margin-bottom: 25px;
+            }
+            .btn-menu {
+                font-size: 1.1rem;             /* Deixa o texto do botão confortável para telas menores */
+                padding: 12px 15px;            /* Diminui levemente o enchimento interno */
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>🧠 Portal de Enigmas</h1>
+    <p>Escolha o seu desafio abaixo e teste o seu raciocínio lógico!</p>
+    
+    <div class="menu-container">
+        <a href="jogo1.html" class="btn-menu btn-jogo1">🧩 Enigma 1: O Mistério das Alunas</a>
+        <a href="jogo2.html" class="btn-menu btn-jogo2">🎭 Enigma 2: Mostra Coreográfica</a>
+        <a href="jogo3.html" class="btn-menu btn-jogo3">🍔 Enigma 3: Amigas na Lanchonete</a>
+        <a href="jogo4.html" class="btn-menu btn-jogo4">🎤 Enigma 4: Show de Talentos</a>
+        <a href="jogo5.html" class="btn-menu btn-jogo5">⚡ Enigma 5: Quiz de Maracatu</a>
+    </div>
+</body>
+</html>
