@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EDISCA: O Coração da Cozinha</title>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF7043; /* Laranja vibrante */
+            --secondary: #42A5F5; /* Azul amigável */
+            --success: #66BB6A; /* Verde sucesso */
+            --warning: #FFA726; /* Amarelo alerta */
+            --dark: #37474F;
+            --light: #F4F7F6;
+            --white: #FFFFFF;
+            --shadow-soft: 0 8px 24px rgba(0,0,0,0.08);
+            --shadow-hard: 0 12px 32px rgba(0,0,0,0.15);
+            --radius-lg: 32px;
+            --radius-md: 20px;
+            --font-title: 'Baloo 2', cursive;
+            --font-text: 'Nunito', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+
+        body {
+            background: linear-gradient(135deg, #E0F7FA 0%, #E8F5E9 100%);
+            font-family: var(--font-text); color: var(--dark);
+            min-height: 100vh; width: 100vw;
+            display: flex; justify-content: center; align-items: flex-start;
+            padding: 10px; overflow-x: hidden;
+        }
+
+        /* Efeito de partículas ao fundo */
+        .bg-particles {
+            position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: 0;
+            background-image: radial-gradient(#B2EBF2 20%, transparent 20%), radial-gradient(#C8E6C9 20%, transparent 20%);
+            background-size: 60px 60px; background-position: 0 0, 30px 30px; opacity: 0.4;
+            pointer-events: none;
+        }
+
+        #app-container {
+            width: 100%; max-width: 1200px; min-height: 90vh;
+            background: var(--light); position: relative; z-index: 10;
+            display: flex; flex-direction: column; 
+            box-shadow: var(--shadow-hard); border-radius: var(--radius-lg);
+            margin: auto; overflow: hidden;
+        }
+
+        /* HEADER DE PROGRESSO (HUD) */
+        .hud {
+            min-height: 70px; background: var(--white); display: flex;
+            justify-content: space-between; align-items: center; padding: 10px 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); z-index: 50; flex-wrap: wrap; gap: 10px;
+        }
+        .hud-profile { display: flex; align-items: center; gap: 15px; }
+        .hud-avatar { width: 50px; height: 50px; background: #FFCC80; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.8rem; border: 3px solid var(--white); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .hud-stats { display: flex; flex-direction: column; }
+        
+        /* Nome e Botão de Editar Profissional */
+        .hud-name-container { display: flex; align-items: center; gap: 8px; }
+        .hud-name-text { font-family: var(--font-title); font-size: 1.25rem; font-weight: 800; color: var(--primary); line-height: 1.2; }
+        .btn-edit-name { background: #ECEFF1; border: none; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; font-size: 0.85rem; color: #546E7A; transition: 0.2s; }
+        .btn-edit-name:hover { background: #CFD8DC; color: var(--dark); }
+        
+        .hud-level { font-size: 0.85rem; font-weight: 700; color: #78909C; }
+        .xp-bar-container { width: 150px; height: 10px; background: #ECEFF1; border-radius: 10px; margin-top: 4px; overflow: hidden; }
+        .xp-bar-fill { height: 100%; background: var(--secondary); width: 0%; transition: width 0.5s ease-out; }
+        
+        .hud-right-actions { display: flex; align-items: center; gap: 15px; }
+        .hud-currency { font-family: var(--font-title); font-size: 1.4rem; font-weight: 800; color: var(--warning); display: flex; align-items: center; gap: 6px; }
+        
+        /* Botão de Voltar ao Menu */
+        .btn-back-menu {
+            background: #F4F7F6; color: #546E7A; padding: 8px 16px; border-radius: 20px;
+            font-size: 0.9rem; font-weight: 700; text-decoration: none; border: 2px solid #CFD8DC;
+            transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px;
+        }
+        .btn-back-menu:hover { background: #E8F5E9; border-color: var(--success); color: var(--success); }
+
+        /* TELAS GERAIS */
+        .screen { width: 100%; min-height: 70vh; display: flex; flex-direction: column; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 20; background: var(--light); padding-bottom: 40px; }
+        .screen.hidden { display: none !important; opacity: 0; pointer-events: none; }
+
+        /* TELA DE SPLASH */
+        .splash { background: linear-gradient(135deg, var(--primary), #FF5722); justify-content: center; align-items: center; color: var(--white); text-align: center; padding: 30px 20px; border-radius: var(--radius-lg); }
+        .splash-logo { font-size: 6rem; margin-bottom: 20px; animation: float 3s ease-in-out infinite; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.2)); }
+        .splash h1 { font-family: var(--font-title); font-size: 3rem; line-height: 1.1; margin-bottom: 20px; text-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .splash p { font-size: 1.15rem; max-width: 600px; margin-bottom: 40px; opacity: 0.9; line-height: 1.5; }
+
+        /* BOTÕES */
+        .btn {
+            padding: 14px 35px; font-family: var(--font-title); font-size: 1.3rem; font-weight: 800;
+            border: none; border-radius: 50px; cursor: pointer; transition: all 0.2s;
+            display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+            text-decoration: none;
+        }
+        .btn-main { background: var(--white); color: var(--primary); box-shadow: 0 8px 0 #FFCCBC; }
+        .btn-main:active { transform: translateY(8px); box-shadow: 0 0 0 #FFCCBC; }
+        .btn-action { background: var(--secondary); color: var(--white); box-shadow: 0 6px 0 #1E88E5; padding: 12px 30px; font-size: 1.2rem; }
+        .btn-action:active { transform: translateY(6px); box-shadow: 0 0 0 #1E88E5; }
+
+        /* TELA DE MAPA (SAGA) */
+        .map-screen { background: #E8F5E9; padding: 20px 10px; position: relative; }
+        .map-path { position: absolute; width: 8px; background: #C8E6C9; left: 50%; transform: translateX(-50%); top: 120px; bottom: 100px; z-index: 1; border-radius: 10px; }
+        .map-nodes { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 40px; padding: 20px 0 60px 0; width: 100%; }
+        .node {
+            display: flex; align-items: center; gap: 20px; width: 100%; max-width: 500px;
+            background: var(--white); padding: 15px 20px; border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-soft); cursor: pointer; transition: all 0.3s;
+            border: 4px solid transparent; position: relative;
+        }
+        .node.locked { opacity: 0.6; filter: grayscale(1); cursor: not-allowed; }
+        .node.active { border-color: var(--primary); transform: scale(1.02); box-shadow: var(--shadow-hard); }
+        .node.completed { border-color: var(--success); }
+        .node:nth-child(even) { flex-direction: row-reverse; text-align: right; }
+        .node-icon { font-size: 2.5rem; background: #F5F5F5; width: 70px; height: 70px; display: flex; justify-content: center; align-items: center; border-radius: 50%; box-shadow: inset 0 4px 8px rgba(0,0,0,0.05); flex-shrink: 0; }
+        .node-info { flex-grow: 1; }
+        .node-title { font-family: var(--font-title); font-size: 1.3rem; color: var(--dark); line-height: 1.2; font-weight: 800; }
+        .node-desc { font-size: 0.85rem; color: #78909C; font-weight: 700; }
+        .node-status { position: absolute; top: -10px; right: -5px; width: 32px; height: 32px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.1rem; background: var(--white); box-shadow: var(--shadow-soft); }
+        .node:nth-child(even) .node-status { right: auto; left: -5px; }
+
+        /* TELA DE JOGO E DIÁLOGOS RPG */
+        .game-screen { display: flex; flex-direction: column; }
+        .game-area { flex-grow: 1; padding: 20px 15px; display: flex; flex-direction: column; align-items: center; width: 100%; }
+        
+        /* DIALOG BOX (ESTILO RPG) */
+        .rpg-dialog {
+            width: 100%; max-width: 800px; background: var(--white); border-radius: var(--radius-md);
+            padding: 20px; display: flex; gap: 20px; box-shadow: var(--shadow-hard);
+            margin-bottom: 25px; border-top: 6px solid var(--primary); position: relative;
+            animation: slideDown 0.5s ease;
+        }
+        .dialog-avatar { width: 80px; height: 80px; border-radius: 50%; border: 4px solid var(--light); box-shadow: var(--shadow-soft); background: #FFCC80; display: flex; justify-content: center; align-items: flex-end; overflow: hidden; flex-shrink: 0; }
+        .dialog-avatar span { font-size: 3.5rem; line-height: 1; }
+        .dialog-content { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; }
+        .dialog-name { font-family: var(--font-title); font-size: 1.2rem; color: var(--primary); font-weight: 800; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
+        .dialog-text { font-size: 1.1rem; font-weight: 700; color: #455A64; line-height: 1.5; min-height: 55px; }
+        .typewriter-cursor { display: inline-block; width: 4px; height: 1.15rem; background: var(--primary); animation: blink 1s infinite; margin-left: 5px; vertical-align: middle; }
+
+        /* CONTAINER DE DESAFIOS */
+        .puzzle-container {
+            width: 100%; max-width: 800px; background: var(--white); border-radius: var(--radius-md);
+            padding: 20px; box-shadow: var(--shadow-soft); display: flex; flex-direction: column; gap: 20px;
+        }
+        .puzzle-question { font-family: var(--font-title); font-size: 1.5rem; color: var(--dark); text-align: center; margin-bottom: 10px; line-height: 1.3; font-weight: 800; }
+
+        /* MECÂNICA 1: MÚLTIPLA ESCOLHA LÓGICA */
+        .mcq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; }
+        .btn-mcq {
+            background: var(--light); border: 3px solid #CFD8DC; padding: 15px; border-radius: 16px;
+            font-size: 1.1rem; font-weight: 700; color: var(--dark); cursor: pointer; transition: all 0.2s;
+            text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+            min-height: 60px;
+        }
+        .btn-mcq:hover { border-color: var(--secondary); background: #E3F2FD; }
+        .btn-mcq.selected { border-color: var(--primary); background: #FFF3E0; color: var(--primary); }
+
+        /* MECÂNICA 2: INPUT MATEMÁTICO */
+        .math-input-container { display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%; }
+        .math-input { font-size: 2.5rem; font-family: var(--font-title); font-weight: 800; text-align: center; width: 160px; padding: 10px; border: 4px solid #CFD8DC; border-radius: 20px; color: var(--primary); outline: none; transition: 0.3s; }
+        .math-input:focus { border-color: var(--secondary); box-shadow: 0 0 0 5px rgba(66, 165, 245, 0.2); }
+
+        /* MECÂNICA 3: SEQUENCIAMENTO */
+        .seq-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; width: 100%; }
+        .seq-item { background: var(--white); border: 3px solid #CFD8DC; border-radius: 16px; padding: 12px 20px; font-size: 1.05rem; font-weight: 700; cursor: pointer; transition: 0.2s; box-shadow: var(--shadow-soft); text-align: center; max-width: 100%; }
+        .seq-item:hover { border-color: var(--secondary); transform: scale(1.02); }
+        .seq-item.clicked { background: var(--secondary); color: var(--white); border-color: #1E88E5; pointer-events: none; opacity: 0.6; }
+        .seq-slots { display: flex; flex-direction: column; gap: 10px; justify-content: center; margin-bottom: 15px; width: 100%; }
+        .seq-slot { width: 100%; min-height: 50px; border: 3px dashed #B0BEC5; border-radius: 12px; display: flex; justify-content: center; align-items: center; font-weight: 800; color: var(--secondary); background: #FAFAFA; text-align: center; padding: 10px; font-size: 1rem; }
+
+        /* OVERLAYS / MODAIS */
+        .overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 100; display: flex; justify-content: center; align-items: center; padding: 15px; opacity: 0; pointer-events: none; transition: 0.3s; backdrop-filter: blur(5px); }
+        .overlay.active { opacity: 1; pointer-events: all; }
+        .trivia-card { background: var(--white); width: 100%; max-width: 600px; border-radius: var(--radius-lg); padding: 30px 20px; text-align: center; box-shadow: var(--shadow-hard); transform: scale(0.8); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); max-height: 90vh; overflow-y: auto; }
+        .overlay.active .trivia-card { transform: scale(1); }
+        .trivia-icon { font-size: 4rem; margin-bottom: 10px; animation: bounce 2s infinite; }
+        .trivia-title { font-family: var(--font-title); font-size: 2rem; color: var(--success); margin-bottom: 15px; line-height: 1.1; font-weight: 800; }
+        .trivia-text { font-size: 1.1rem; color: #546E7A; margin-bottom: 25px; font-weight: 600; line-height: 1.5; background: #F1F8E9; padding: 15px; border-radius: 16px; border-left: 6px solid var(--success); text-align: left; }
+        
+        /* MODAL DE EDIÇÃO DE NOME PROFISSIONAL */
+        .name-modal-card { background: var(--white); width: 100%; max-width: 400px; border-radius: var(--radius-md); padding: 25px; text-align: center; box-shadow: var(--shadow-hard); border-top: 6px solid var(--secondary); }
+        .name-modal-title { font-family: var(--font-title); font-size: 1.5rem; color: var(--dark); margin-bottom: 15px; font-weight: 800; }
+        .name-modal-input { width: 100%; font-size: 1.2rem; padding: 12px 15px; border: 3px solid #CFD8DC; border-radius: 12px; font-family: var(--font-text); text-align: center; color: var(--dark); outline: none; transition: 0.2s; margin-bottom: 20px; font-weight: 700; }
+        .name-modal-input:focus { border-color: var(--secondary); background: #F5F5F5; }
+        .name-modal-actions { display: flex; gap: 10px; justify-content: center; }
+        .btn-modal-save { background: var(--secondary); color: var(--white); font-size: 1rem; padding: 10px 20px; border-radius: 30px; font-weight: 700; border: none; cursor: pointer; }
+        .btn-modal-cancel { background: #ECEFF1; color: #546E7A; font-size: 1rem; padding: 10px 20px; border-radius: 30px; font-weight: 700; border: none; cursor: pointer; }
+
+        /* ANIMAÇÕES */
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes errorShake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+
+        .error-anim { animation: errorShake 0.4s ease; border-color: #EF5350 !important; }
+
+        /* RESPONSIVIDADE MAXIMA (CELULARES) */
+        @media (max-width: 768px) {
+            body { padding: 5px; }
+            #app-container { border-radius: 16px; min-height: 95vh; }
+            .hud { padding: 10px; justify-content: center; gap: 15px; }
+            .hud-right-actions { width: 100%; justify-content: space-between; }
+            .splash h1 { font-size: 2.2rem; }
+            .splash-logo { font-size: 4.5rem; }
+            .rpg-dialog { flex-direction: column; align-items: center; text-align: center; gap: 10px; }
+            .dialog-avatar { width: 70px; height: 70px; }
+            .dialog-avatar span { font-size: 3rem; }
+            .mcq-grid { grid-template-columns: 1fr; gap: 10px; }
+            .node { flex-direction: column !important; text-align: center !important; gap: 10px; border-radius: 20px; padding: 15px; }
+            .node-status { top: -12px; right: 50% !important; left: auto !important; transform: translateX(50%); }
+            .map-path { left: 50%; }
+            .puzzle-container { padding: 15px; }
+            .puzzle-question { font-size: 1.3rem; }
+            .btn { width: 100%; padding: 12px 20px; font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-particles"></div>
+    
+    <div id="app-container">
+        
+        <!-- HUD (CABEÇALHO) COMPACTO E COMPLETO -->
+        <div class="hud" id="hud" style="display: none;">
+            <div class="hud-profile">
+                <div class="hud-avatar">👧</div>
+                <div class="hud-stats">
+                    <!-- Área Nome Da Aluna Profissional com Janela Modal -->
+                    <div class="hud-name-container">
+                        <span class="hud-name-text" id="ui-player-name">Aluna Ajudante</span>
+                        <button class="btn-edit-name" onclick="openNameModal()" title="Editar Nome">✏️</button>
+                    </div>
+                    <span class="hud-level">Nível <span id="ui-level">1</span></span>
+                    <div class="xp-bar-container"><div class="xp-bar-fill" id="ui-xp-bar"></div></div>
+                </div>
+            </div>
+            <div class="hud-right-actions">
+                <div class="hud-currency">⭐ <span id="ui-stars">0</span></div>
+                <!-- Botão de Voltar ao Menu integrado -->
+                <a href="index.html" class="btn-back-menu">⬅️ Menu Principal</a>
+            </div>
+        </div>
+
+        <div id="screen-splash" class="screen splash">
+            <div class="splash-logo">🍲</div>
+            <h1>A Cozinha da EDISCA</h1>
+            <p>Você chegou cedinho na instituição. Hoje é seu dia de ajudar as tias na cozinha! Descubra como funciona a preparação do almoço para centenas de educandos, aprendendo sobre higiene, matemática, tempo e trabalho em equipe.</p>
+            <button class="btn btn-main" onclick="goToMap()">Vestir o Avental 👩‍🍳</button>
+        </div>
+
+        <div id="screen-map" class="screen map-screen hidden">
+            <h2 style="text-align: center; font-family: var(--font-title); font-size: 2rem; color: var(--dark); margin-bottom: 5px; position:relative; z-index: 10; font-weight: 800;">Mapa da Cozinha</h2>
+            <p style="text-align: center; font-weight: 700; color: #546E7A; margin-bottom: 20px; position:relative; z-index: 10; padding: 0 10px; font-size: 0.95rem;">Complete os ambientes em ordem para garantir o almoço!</p>
+            
+            <div class="map-path"></div>
+            <div class="map-nodes" id="map-nodes"></div>
+        </div>
+
+        <div id="screen-game" class="screen game-screen hidden">
+            <div class="game-area">
+                
+                <div class="rpg-dialog">
+                    <div class="dialog-avatar"><span id="dg-avatar-icon">👩‍🍳</span></div>
+                    <div class="dialog-content">
+                        <div class="dialog-name" id="dg-name">Tia Aurea</div>
+                        <div class="dialog-text"><span id="dg-text"></span><span class="typewriter-cursor"></span></div>
+                    </div>
+                </div>
+
+                <div class="puzzle-container" id="puzzle-container">
+                    <div class="puzzle-question" id="pz-question">Pergunta do desafio aqui</div>
+                    <div id="pz-interactive"></div>
+                    
+                    <div style="display:flex; justify-content:flex-end; margin-top: 20px; width: 100%;">
+                        <button class="btn btn-action" id="btn-verify" onclick="verifyAnswer()" style="display:none;">Confirmar Resposta</button>
+                    </div>
+                </div>
+                
+                <button class="btn" style="margin-top: 20px; background: transparent; color: #90A4AE; font-size: 1rem; box-shadow: none;" onclick="goToMap()"> Abandonar tarefa e voltar ao mapa</button>
+            </div>
+        </div>
+
+        <!-- MODAL TRIVIA / FEEDBACK -->
+        <div class="overlay" id="overlay-trivia">
+            <div class="trivia-card">
+                <div class="trivia-icon">🎉</div>
+                <h2 class="trivia-title">Excelente!</h2>
+                <div class="trivia-text" id="trivia-text">Curiosidade sobre a EDISCA...</div>
+                <button class="btn btn-action" onclick="finishChallenge()">Continuar Jornada</button>
+            </div>
+        </div>
+
+        <!-- MODAL DE EDIÇÃO DO NOME (PROFISSIONAL) -->
+        <div class="overlay" id="overlay-name">
+            <div class="name-modal-card">
+                <h3 class="name-modal-title">Como quer ser chamada?</h3>
+                <input type="text" class="name-modal-input" id="modal-name-input" maxlength="20" placeholder="Nome da Aluna">
+                <div class="name-modal-actions">
+                    <button class="btn-modal-cancel" onclick="closeNameModal()">Cancelar</button>
+                    <button class="btn-modal-save" onclick="saveNameModal()">Salvar Nome</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const gameStory = {
+            characters: {
+                aurea: { name: 'Tia Aurea (Chef)', icon: '👩‍🍳', color: '#FF7043' },
+                daiane: { name: 'Tia Daiane (Auxiliar)', icon: '👩‍🌾', color: '#66BB6A' },
+                player: { name: 'Você', icon: '👧', color: '#42A5F5' }
+            },
+            rooms: [
+                { id: 'r1', name: 'Recebimento', desc: 'Conferência de insumos', icon: '📦' },
+                { id: 'r2', name: 'Despensa', desc: 'Organização e Validade', icon: '🥫' },
+                { id: 'r3', name: 'Geladeira', desc: 'Controle de Frio e Resfriados', icon: '❄️' },
+                { id: 'r4', name: 'Hortifruti', desc: 'Seleção e Triagem', icon: '🥬' },
+                { id: 'r5', name: 'Lavagem', desc: 'Higiene de Louças e Panelas', icon: '🧼' },
+                { id: 'r6', name: 'Pré-preparo', desc: 'Cortes e Porções', icon: '🔪' },
+                { id: 'r7', name: 'Fogão', desc: 'Tempo e Cozimento', icon: '🍳' },
+                { id: 'r8', name: 'Montagem dos pratos', desc: 'Porcionamento e Estética', icon: '🍽️' },
+                { id: 'r9', name: 'Refeitório', desc: 'Distribuição e Acolhimento', icon: '🍱' },
+                { id: 'r10', name: 'Limpeza', desc: 'Faxina e Sustentabilidade', icon: '🧹' }
+            ]
+        };
+
+        const gameChallenges = [
+            // CATEGORIA 1: RECEBIMENTO (r1)
+            {
+                roomId: 'r1', type: 'mcq', char: 'daiane',
+                dialogue: "Três entregadores — Carlos, Marcos e Fábio — vieram trazer insumos diferentes (Frango, Arroz e Alface), um de cada vez. O entregador do Arroz não foi o primeiro nem o último a chegar. Carlos entregou a Alface logo após a chegada do entregador do Arroz. Quem entregou o Frango?",
+                question: "Use a eliminação lógica para descobrir quem trouxe o Frango:",
+                options: [
+                    { text: "Fábio", correct: true },
+                    { text: "Carlos", correct: false },
+                    { text: "Marcos", correct: false },
+                    { text: "Nenhum deles", correct: false }
+                ],
+                trivia: "A conferência organizada por ordem de chegada no recebimento garante a rastreabilidade dos alimentos da nossa cozinha."
+            },
+            {
+                roomId: 'r1', type: 'math_input', char: 'daiane',
+                dialogue: "Recebemos potes de polpa de suco concentrado para o lanche. Sabemos que 1 pote de polpa misturado com 4 potes de água rende exatamente 5 litros de suco pronto. Se para o almoço de hoje precisamos de 60 litros de suco...",
+                question: "Quantos potes de polpa concentrada precisamos receber e conferir?",
+                answer: 12,
+                trivia: "Calcular as frações exatas de rendimento evita a falta de suco na hora do serviço e elimina desperdícios desnecessários."
+            },
+            {
+                roomId: 'r1', type: 'sequence', char: 'daiane',
+                dialogue: "Acabou de chegar um caminhão de entregas com lotes de insumos. Precisamos organizar a inspeção imediata sem pular etapas preventivas.",
+                question: "Determine a ordem lógica do procedimento correto de fiscalização sanitária:",
+                sequenceItems: [
+                    { id: 's1', text: 'Conferir a temperatura interna do caminhão refrigerador' },
+                    { id: 's2', text: 'Avaliar as características sensoriais como odor e cor do insumo' },
+                    { id: 's3', text: 'Assinar o canhoto da nota fiscal de recebimento do fornecedor' },
+                    { id: 's4', text: 'Transportar os alimentos imediatamente para as câmaras frias' }
+                ],
+                trivia: "Garantir essa sequência impede a entrada de insumos estragados ou fora dos padrões legais de conservação."
+            },
+            {
+                roomId: 'r1', type: 'math_input', char: 'daiane',
+                dialogue: "Uma balança de recebimento desregulada está marcando sempre 500g a mais do que o peso real dos produtos. Recebemos 5 caixas de cebolas e a balança apontou o peso bruto de exatamente 12,5 kg para cada caixa.",
+                question: "Qual é o peso real total em quilos (kg) de cebolas que foram recebidas?",
+                answer: 60,
+                trivia: "Antes de servir uma refeição, existe muito planejamento, organization e dedicação. Cada etapa é importante para garantir uma alimentação segura e de qualidade."
+            },
+
+            // CATEGORIA 2: DESPENSA (r2)
+            {
+                roomId: 'r2', type: 'mcq', char: 'aurea',
+                dialogue: "Temos três caixas fechadas na despensa etiquetadas incorretamente como: 'Apenas Feijão', 'Apenas Arroz' e 'Feijão + Arroz Misto'. Sabendo que absolutamente TODAS as etiquetas estão erradas, você abre a caixa que diz 'Feijão + Arroz Misto' e encontra apenas pacotes de Arroz. O que está de verdade na caixa rotulada como 'Apenas Feijão'?",
+                question: "Decifre o problem das etiquetas falsas usando dedução e exclusão:",
+                options: [
+                    { text: "A mistura de Feijão + Arroz Misto", correct: true },
+                    { text: "Apenas Arroz", correct: false },
+                    { text: "Apenas Feijão", correct: false },
+                    { text: "A caixa está totalmente vazia", correct: false }
+                ],
+                trivia: "A etiquetagem correta e o monitoramento lógico de estoques evitam erros na hora de separar os ingredientes do dia."
+            },
+            {
+                roomId: 'r2', type: 'math_input', char: 'aurea',
+                dialogue: "O estoque inicial de pacotes de macarrão na despensa era alto. No primeiro turno da semana, usamos 1/3 do estoque total. No segundo turno, usamos exatamente a metade do que tinha sobrado, restando apenas 10 pacotes nas prateleiras.",
+                question: "Quantos pacotes de macarrão tínhamos guardados originalmente?",
+                answer: 30,
+                trivia: "Controlar frações de consumo ajuda a estimar a duração do estoque até a chegada da próxima entrega."
+            },
+            {
+                roomId: 'r2', type: 'math_input', char: 'aurea',
+                dialogue: "Na prateleira de enlatados da despensa, as latas são organizadas seguindo uma sequência lógica de fileiras baseada nas marcas recebidas: a primeira fileira tem 2 latas, a segunda tem 4 latas, a terceira tem 8 latas.",
+                question: "Seguindo rigorosamente este mesmo padrão lógico, quantas latas terá a quarta fileira?",
+                answer: 16,
+                trivia: "Padrões lógicos visuais ajudam a organizar a despensa de maneira rápida e esteticamente limpa para auditorias."
+            },
+            {
+                roomId: 'r2', type: 'math_input', char: 'aurea',
+                dialogue: "Tia Áurea consegue organizar 3 prateleiras da despensa por hora, enquanto Tia Daiane organiza 2 prateleiras por hora. Precisamos organizar a despensa inteira, que possui um total de 15 prateleiras.",
+                question: "Quantas horas as duas levarão para concluir o trabalho juntas?",
+                answer: 3,
+                trivia: "A organização minuciosa da nossa despensa garante que nenhum ingrediente precioso seja desperdiçado, permitindo que as doações alimentem o futuro de centenas de crianças diariamente."
+            },
+
+            // CATEGORIA 3: GELADEIRA (r3)
+            {
+                roomId: 'r3', type: 'mcq', char: 'aurea',
+                dialogue: "Para organizar a geladeira, as tias usam um fluxograma simples: Se o alimento solta líquido cru -> Prateleira Inferior. Se o alimento está pronto para o consumo direto -> Prateleira Superior. Se é um laticínio lacrado -> Prateleira Média. Onde devemos armazenar um pote de doce de leite caseiro finalizado e resfriado?",
+                question: "Identifique o destino correto seguindo o fluxograma de segurança:",
+                options: [
+                    { text: "Prateleira Superior", correct: true },
+                    { text: "Prateleira Média", correct: false },
+                    { text: "Prateleira Inferior", correct: false },
+                    { text: "Na gaveta inferior de hortifrúti", correct: false }
+                ],
+                trivia: "Respeitar o fluxo de posições na refrigeração impede que contaminações invisíveis caiam sobre os doces prontos."
+            },
+            {
+                roomId: 'r3', type: 'math_input', char: 'aurea',
+                dialogue: "O termômetro digital da geladeira marcava a temperatura ideal de 3°C. Durante a manhã, a porta ficou aberta para retirada e a temperatura subiu 4°C. Logo após fechar, ela reduziu 2°C, mas subiu mais 1°C ao guardar os sucos.",
+                question: "Qual é a temperatura final em graus Celsius (°C) indicada no visor agora?",
+                answer: 6,
+                trivia: "Monitorar as oscilações térmicas no refrigerador preserva a estabilidade biológica de leites e derivados."
+            },
+            {
+                roomId: 'r3', type: 'sequence', char: 'daiane',
+                dialogue: "Precisamos coletar e armazenar as amostras diárias de segurança de cada refeição que vai para a geladeira. Não podemos cometer falhas de manuseio.",
+                question: "Ordene as ações para a coleta perfeita das amostras regulamentares:",
+                sequenceItems: [
+                    { id: 's1', text: 'Identificar o pote esterilizado com a etiqueta do nome e data' },
+                    { id: 's2', text: 'Coletar a amostra do alimento quente direto das panelas' },
+                    { id: 's3', text: 'Resfriar o pote lacrado externamente com água corrente' },
+                    { id: 's4', text: 'Armazenar no refrigerador dedicado por 72 horas regulamentares' }
+                ],
+                trivia: "As amostras guardadas são a garantia de segurança jurídica e sanitária da nossa cozinha contra intercorrências."
+            },
+            {
+                roomId: 'r3', type: 'math_input', char: 'aurea',
+                dialogue: "Uma das geladeiras industriais de carnes está operando com exatamente 80% da sua capacidade máxima de armazenamento preenchida. Sabemos que ela comporta no máximo 150 kg de insumos.",
+                question: "Quantos quilos (kg) de carne ainda podemos colocar nela até atingir o limite total?",
+                answer: 30,
+                trivia: "O controle rigoroso do frio na EDISCA mantém as propriedades nutritivas e o frescor dos alimentos intactos, blindando a saúde de toda a nossa comunidade contra contaminações."
+            },
+
+            // CATEGORIA 4: HORTIFRUTI (r4)
+            {
+                roomId: 'r4', type: 'mcq', char: 'daiane',
+                dialogue: "Estamos selecionando os vegetais para a sopa. Sabemos que: a cenoura não é redonda. O chuchu é totalmente verde. A abóbora é bem maior que a cenoura. Se precisamos eliminar os itens até achar um legume alaranjado, rígido e cheio de sementes internas, qual escolhemos?",
+                question: "Aplique a eliminação de características para identificar o legume:",
+                options: [
+                    { text: "Abóbora", correct: true },
+                    { text: "Cenoura", correct: false },
+                    { text: "Chuchu", correct: false },
+                    { text: "Batata", correct: false }
+                ],
+                trivia: "A triagem elimina partes não comestíveis ou machucadas, elevando o padrão estético e nutricional das sopas."
+            },
+            {
+                roomId: 'r4', type: 'math_input', char: 'daiane',
+                dialogue: "Ao inspecionar os lotes de laranjas para o suco, percebemos que o número de unidades inadequadas por caixa segue um padrão de progressão lógica: 1, 3, 7, 15...",
+                question: "Se este mesmo padrão lógico se mantiver, quantas laranjas ruins encontraremos na próxima caixa?",
+                answer: 31,
+                trivia: "Identificar padrões numéricos nas perdas ajuda a avaliar o controle de qualidade dos fornecedores do campo."
+            },
+            {
+                roomId: 'r4', type: 'mcq', char: 'aurea',
+                dialogue: "Quatro frutas estão alinhadas na bancada de lavagem: Banana, Maçã, Mamão e Melancia. A Melancia está logo ao lado do Mamão. A Maçã não está nas extremidades. A Banana está imediatamente à esquerda da Maçã. Qual fruta ocupa a primeira posição da esquerda?",
+                question: "Descubra a fruta da ponta resolvendo o problema de posição espacial:",
+                options: [
+                    { text: "Banana", correct: true },
+                    { text: "Maçã", correct: false },
+                    { text: "Mamão", correct: false },
+                    { text: "Melancia", correct: false }
+                ],
+                trivia: "A organização espacial na bancada acelera o processamento de frutas e mantém o ambiente limpo."
+            },
+            {
+                roomId: 'r4', type: 'math_input', char: 'daiane',
+                dialogue: "Para fazer a salada de frutas da EDISCA, calculamos que cada educando consome uma porção padrão de 150 gramas de mix picado. Hoje temos 180 educandos confirmados para o almoço.",
+                question: "Quantos quilos (kg) de frutas limpas e picadas precisamos preparar no total?",
+                answer: 27,
+                trivia: "Cores vivas no prato significam vitaminas e minerais diversos! A seleção cuidadosa do nosso hortifrúti transforma cada refeição colorida em combustível puro para o aprendizado e a criatividade."
+            },
+
+            // CATEGORIA 5: LAVAGEM (r5)
+            {
+                roomId: 'r5', type: 'mcq', char: 'daiane',
+                dialogue: "Na área de lavagem há três cubas profundas alinhadas na bancada industrial. A cuba de talheres está colada na de pratos. A de caldeirões é a maior de todas e fica posicionada no canto esquerdo. Sabendo que a cuba de pratos não está na outra ponta (direita), onde fica a de talheres?",
+                question: "Determine a localização exata da cuba de talheres por dedução:",
+                options: [
+                    { text: "Na cuba do meio", correct: true },
+                    { text: "Na cuba da esquerda", correct: false },
+                    { text: "Na cuba da direita", correct: false },
+                    { text: "Fora da bancada de lavagem", correct: false }
+                ],
+                trivia: "Conhecer a lógica posicional da linha de lavagem melhora a ergonomia e acelera o trabalho das tias."
+            },
+            {
+                roomId: 'r5', type: 'math_input', char: 'daiane',
+                dialogue: "O processo de lavagem manual consome cerca de 15 litros de água tratada a cada lote de 5 pratos limpos. Os educandos deixaram um total de 120 pratos na janela de devolução do refeitório.",
+                question: "Quantos litros de água serão consumidos se mantivermos essa mesma proporção?",
+                answer: 360,
+                trivia: "Medir o consumo de insumos líquidos nas tarefas de apoio ajuda a planejar metas de economia institucional."
+            },
+            {
+                roomId: 'r5', type: 'sequence', char: 'aurea',
+                dialogue: "Para que a água da cuba não fique engordurada logo no primeiro minuto, existe uma ordem lógica universal de lavagem dos utensílios.",
+                question: "Ordene os utensílios do menos engordurado para o mais engordurado:",
+                sequenceItems: [
+                    { id: 's1', text: 'Lavar primeiro os copos de vidro' },
+                    { id: 's2', text: 'Lavar os talheres e pratos individuais de servir' },
+                    { id: 's3', text: 'Lavar as bacias plásticas grandes de distribuição' },
+                    { id: 's4', text: 'Esfregar os caldeirões industriais e panelas de ferro com graxa' }
+                ],
+                trivia: "Essa ordem inteligente poupa sabão, economiza água e otimiza o tempo de esfregação na pia."
+            },
+            {
+                roomId: 'r5', type: 'math_input', char: 'daiane',
+                dialogue: "Temos um galão com 5000 mL de sanitizante concentrado para louças. Cada ciclo de desinfecção consome exatamente 250 mL de produto. Já realizamos 12 ciclos completos nesta manhã.",
+                question: "Quantos mililitros (mL) de produto ainda restaram dentro do galão?",
+                answer: 2000,
+                trivia: "A lavagem rigorosa e a sanitização eliminam os inimigos invisíveis à saúde. Manter os utensílios brilhando é um ato de profundo respeito e proteção à integridade de cada criança que senta à nossa mesa."
+            },
+
+            // CATEGORIA 6: PRÉ-PREPARO (r6)
+            {
+                roomId: 'r6', type: 'mcq', char: 'daiane',
+                dialogue: "Para evitar riscos à saúde, usamos facas coloridas exclusivas na cozinha da EDISCA: Vermelha para carnes cruas, Verde para vegetais crus, Azul para peixes e Amarela para alimentos cozidos. Se você precisa fatiar abobrinha crua e, depois, picar peito de frango já cozido desfiado, quais cores deve escolher?",
+                question: "Selecione as cores corretas das facas para evitar contaminação cruzada:",
+                options: [
+                    { text: "Verde e Amarela", correct: true },
+                    { text: "Vermelha e Verde", correct: false },
+                    { text: "Azul e Amarela", correct: false },
+                    { text: "Vermelha e Azul", correct: false }
+                ],
+                trivia: "A separação estrita por cores bloqueia a transferência de microrganismos de carnes para as saladas prontas."
+            },
+            {
+                roomId: 'r6', type: 'math_input', char: 'daiane',
+                dialogue: "Para preparar a massa da torta salgada do lanche, a receita padrão da nutrição pede 3 xícaras de farinha para cada 2 ovos utilizados. Se a cozinha precisa expandir a receita e vai usar 12 ovos inteiros...",
+                question: "Quantas xícaras de farinha devem ser adicionadas à batedeira industrial?",
+                answer: 18,
+                trivia: "Manter a proporcionalidade matemática nas receitas grandes assegura a textura ideal e o padrão do sabor."
+            },
+            {
+                roomId: 'r6', type: 'math_input', char: 'aurea',
+                dialogue: "O rendimento no descasque de raízes pelos ajudantes segue um padrão lógico de ritmo de trabalho: o ajudante mais jovem limpou 5 kg, o segundo limpou 10 kg, e o terceiro limpou 20 kg.",
+                question: "Seguindo essa mesma progressão de escala, quantos quilos (kg) o quarto ajudante deve limpar?",
+                answer: 40,
+                trivia: "Estimar o rendimento por pessoa permite organizar as escalas de tarefas sem sobrecarregar ninguém."
+            },
+            {
+                roomId: 'r6', type: 'math_input', char: 'aurea',
+                dialogue: "Um fardo com 48 kg de peito de frango bruto foi entregue na bancada. Sabemos que, após a limpeza e desossa completa no pré-preparo, exatamente 1/4 do peso total corresponde a ossos e cartilagens descartados.",
+                question: "Quantos quilos (kg) de carne limpa e aproveitável restarão para a panela?",
+                answer: 36,
+                trivia: "O pré-preparo é onde a mágica da transformação acontece! Cortar, porcionar e temperar com exatidão garante que o cozimento seja uniforme e o sabor chegue perfeito a cada mordida."
+            },
+
+            // CATEGORIA 7: FOGÃO (r7)
+            {
+                roomId: 'r7', type: 'mcq', char: 'aurea',
+                dialogue: "Temos três preparos fervendo no fogão industrial: o feijão precisa de 40 minutos de fogo, o refogado de legumes leva 15 minutos e o arroz precisa de 20 minutos. Queremos que todos fiquem prontos exatamente ao mesmo tempo, às 11h40, para servir a comida bem quente.",
+                question: "Determine o horário lógico exato para acender o fogo do arroz:",
+                options: [
+                    { text: "11h20", correct: true },
+                    { text: "11h00", correct: false },
+                    { text: "11h25", correct: false },
+                    { text: "11h15", correct: false }
+                ],
+                trivia: "A sincronização temporal evita que acompanhamentos esfriem enquanto a base principal termina o cozimento."
+            },
+            {
+                roomId: 'r7', type: 'math_input', char: 'aurea',
+                dialogue: "Um queimador industrial consome cerca de 2 kg de gás (GLP) por hora de uso contínuo em chama alta. Se hoje mantivermos 3 queimadores acesos simultaneamente por exatamente 4 horas para fazer todo o cozido...",
+                question: "Quantos quilos (kg) de gás de cozinha serão consumidos no total?",
+                answer: 24,
+                trivia: "O cálculo de consumo de insumos energéticos ajuda na gestão de custos operacionais da instituição."
+            },
+            {
+                roomId: 'r7', type: 'mcq', char: 'daiane',
+                dialogue: "Avalie com atenção este relato de processo de cozimento de uma carne de panela: '1. Acender o fogo; 2. Aquecer o óleo e temperos; 3. Selar a carne crua; 4. Adicionar água fervente; 5. Desligar o fogo com a carne ainda dura; 6. Deixar apurar o molho'. Onde está o erro de lógica nesta ação?",
+                question: "Identifique o erro crítico cometido na sequência do preparo:",
+                options: [
+                    { text: "Desligar o fogo com a carne ainda dura", correct: true },
+                    { text: "Acender o fogo logo no início", correct: false },
+                    { text: "Adicionar água fervente na panela quente", correct: false },
+                    { text: "Colocar os temperos antes de despejar a carne", correct: false }
+                ],
+                trivia: "Garantir o tempo de amaciamento térmico elimina riscos de contaminação e melhora a mastigação infantil."
+            },
+            {
+                roomId: 'r7', type: 'math_input', char: 'aurea',
+                dialogue: "O caldeirão principal de sopa tem capacidade para 80 litros. Para cozinhar com segurança, preenchemos apenas 3/4 do seu volume com caldo. Cada concha padrão de distribuição cheia retira 250 mL (0,25 litros) de sopa.",
+                question: "Quantas conchas cheias de sopa estão contidas dentro desse caldeirão?",
+                answer: 240,
+                trivia: "O fogão industrial da EDISCA pulsa como o verdadeiro coração da nossa cozinha! O calor controlado transforma ingredientes brutos em afeto quentinho que alimenta os corpos e as almas dos nossos alunos."
+            },
+
+            // CATEGORIA 8: MONTAGEM DOS PRATOS (r8)
+            {
+                roomId: 'r8', type: 'math_input', char: 'player',
+                dialogue: "Na linha de montagem, cada prato feito deve conter obrigatoriamente 1 opção de carboidrato, 1 de proteína e 1 de legumes cozidos. Hoje a cozinha oferece 2 tipos de carboidrato (Arroz ou Macarrão) e 2 de proteína (Frango ou Carne).",
+                question: "Quantas combinações diferentes e exclusivas de prato básico podemos montar?",
+                answer: 4,
+                trivia: "A variedade estruturada nas montagens estimula a aceitação alimentar de novos ingredientes pelos educandos."
+            },
+            {
+                roomId: 'r8', type: 'math_input', char: 'aurea',
+                dialogue: "Uma assadeira grande contém 120 pedaços simétricos de bolo para a sobremesa. Dividimos tudo igualmente entre as turmas A, B e C. Logo após receber, a turma A decidiu doar metade de todas as suas fatias para a turma B.",
+                question: "Com quantos pedaços de bolo a turma B ficará no final após essa doação?",
+                answer: 60,
+                trivia: "O porcionamento equitativo garante que o aporte calórico planejado chegue de forma justa a todas as crianças."
+            },
+            {
+                roomId: 'r8', type: 'sequence', char: 'aurea',
+                dialogue: "As cubas do balcão térmico esvaziaram com o fluxo de serviço. Precisamos substituí-las por cubas cheias sem interromper a fila ou gerar acidentes.",
+                question: "Ordene os passos do procedimento padrão para troca segura de cubas quentes:",
+                sequenceItems: [
+                    { id: 's1', text: 'Retirar a cuba vazia com cuidado usando as luvas térmicas de proteção' },
+                    { id: 's2', text: 'Limpar qualquer respingo de molho na borda interna da pista de serviço' },
+                    { id: 's3', text: 'Encaixar a nova cuba cheia e aquecida trazida direto do fogão industrial' },
+                    { id: 's4', text: 'Posicionar o utensílio de servir limpo e higienizado sobre a nova preparação' }
+                ],
+                trivia: "A organização minuciosa da troca evita queimaduras por vapor e mantém a comida sempre atraente."
+            },
+            {
+                roomId: 'r8', type: 'math_input', char: 'aurea',
+                dialogue: "A diretriz nutricional estipula que o prato ideal da criança deve ser composto por 50% de saladas e vegetais frescos, 25% de carboidratos e 25% de proteínas. O prato montado de um educando pesa 400g.",
+                question: "Quantos gramas (g) devem ser ocupados exclusivamente por vegetais e saladas?",
+                answer: 200,
+                trivia: "A montagem cuidadosa do prato ativa a alegria do olhar antes mesmo da primeira garfada! Porcionar com equilíbrio garante que cada nutriente essencial chegue de forma justa e idêntica a cada educando."
+            },
+
+            // CATEGORIA 9: REFEITÓRIO (r9)
+            {
+                roomId: 'r9', type: 'mcq', char: 'aurea',
+                dialogue: "Quatro crianças — Beto, Ana, Carla e Duda — estão sentadas em volta de uma mesa quadrada no refeitório, uma em cada lado. Beto não está na frente de Ana. Carla está sentada imediatamente à direita de Beto. Ana sentou-se no lado oposto ao de Carla. Quem está sentado na frente de Beto?",
+                question: "Mapeie as posições na mesa quadrada para descobrir quem está na frente do Beto:",
+                options: [
+                    { text: "Duda", correct: true },
+                    { text: "Ana", correct: false },
+                    { text: "Carla", correct: false },
+                    { text: "Ninguém", correct: false }
+                ],
+                trivia: "A distribuição organizada de assentos promove a socialização tranquila e o respeito coletivo na hora da refeição."
+            },
+            {
+                roomId: 'r9', type: 'math_input', char: 'aurea',
+                dialogue: "O refeitório abre o primeiro turno às 11h15. Cada turma tem 25 minutos para almoçar e 5 minutos são reservados para a higienização das mesas entre os grupos. Temos 3 turnos seguidos de turmas hoje.",
+                question: "A que horas o refeitório encerrará as atividades do almoço? (Digite sem pontuação, ex: 1240)",
+                answer: 1240,
+                trivia: "O planejamento de horários sincronizados assegura o fluxo ordenado sem aglomerações nas bancadas."
+            },
+            {
+                roomId: 'r9', type: 'mcq', char: 'player',
+                dialogue: "Analisando os registros, o ajudante nota que nas quartas-feiras o consumo de água mineral dobra no refeitório. Cruzando os dados da rotina das crianças: Segunda (Sol e Natação), Quarta (Feijoada e Dança), Sexta (Sopa e Teatro). Qual o motivo lógico?",
+                question: "Identifique a variável responsável pelo aumento de sede nas quartas:",
+                options: [
+                    { text: "A combinação do cardápio mais denso (Feijoada) com a atividade física da dança", correct: true },
+                    { text: "O fato isolado de ser exatamente o meio da semana útil", correct: false },
+                    { text: "A oscilação climática que sempre ocorre nas quartas na região", correct: false },
+                    { text: "O tamanho físico dos copos plásticos que diminui nesse dia específico", correct: false }
+                ],
+                trivia: "Estudar o comportamento do consumo ajuda a antecipar a demanda de água gelada nos dias quentes."
+            },
+            {
+                roomId: 'r9', type: 'math_input', char: 'aurea',
+                dialogue: "Temos 15 jarros de suco de frutas vermelhas com 2 litros de capacidade cada um no balcão de distribuição. Queremos servir copos cheios contendo exatamente 200 mL de suco para os educandos.",
+                question: "Quantos copos cheios conseguiremos servir utilizando todo o volume de suco disponível?",
+                answer: 150,
+                trivia: "O refeitório da EDISCA é um templo de convivência, sorrisos e partilha! Aqui, saborear uma refeição saudável ao lado dos amigos e educadores fortalece os laços de respeito, cidadania e afeto."
+            },
+
+            // CATEGORIA 10: LIMPEZA (r10)
+            {
+                roomId: 'r10', type: 'mcq', char: 'daiane',
+                dialogue: "Para realizar a desinfecção pesada do piso da nossa cozinha, usamos três baldes com funções e cores distintas: Balde Verde (Água com sabão), Balde Vermelho (Água limpa para enxágue) e Balde Branco (Solução clorada sanitizante). Qual é a ordem cronológica correta de uso dos baldes?",
+                question: "Determine a sequência correta da higienização química do chão:",
+                options: [
+                    { text: "Verde, depois Vermelho, por fim Branco", correct: true },
+                    { text: "Branco, depois Verde, por fim Vermelho", correct: false },
+                    { text: "Vermelho, depois Verde, por fim Branco", correct: false },
+                    { text: "Todos os três misturados juntos ao mesmo tempo", correct: false }
+                ],
+                trivia: "Aplicar o sanitizante por último e sem enxágue garante a eliminação contínua de bactérias do piso."
+            },
+            {
+                roomId: 'r10', type: 'math_input', char: 'daiane',
+                dialogue: "O sabão líquido concentrado rende muito na nossa rotina: 50 mL de produto são suficientes para preparar 5 litros de solução limpadora de chão. O pátio da cozinha exige 25 litros de solução completa para ser lavado.",
+                question: "Quantos mililitros (mL) de sabão concentrado precisamos despejar no balde?",
+                answer: 250,
+                trivia: "Seguir as dosagens exatas dos produtos químicos protege o meio ambiente e evita desperdícios financeiros."
+            },
+            {
+                roomId: 'r10', type: 'sequence', char: 'aurea',
+                dialogue: "Chegou o momento da faxina geral de encerramento do dia. Para não espalhar sujidade em superfícies já higienizadas, devemos seguir a lei física da gravidade.",
+                question: "Ordene as frentes de faxina da estrutura mais alta para a mais baixa:",
+                sequenceItems: [
+                    { id: 's1', text: 'Higienizar as coifas exaustoras, lâmpadas e prateleiras suspensas' },
+                    { id: 's2', text: 'Lavar e sanitizar as bancadas de inox de manipulação e cubas' },
+                    { id: 's3', text: 'Esfregar as bocas dos fogões e grelhas industriais externas' },
+                    { id: 's4', text: 'Varrer, esfregar e puxar a água do chão em direção aos ralos escuros' }
+                ],
+                trivia: "Limpar de cima para baixo poupa esforço e impede o retrabalho na linha de higienização profissional."
+            },
+            {
+                roomId: 'r10', type: 'math_input', char: 'daiane',
+                dialogue: "A equipe da cozinha coletou materiais recicláveis no mês: 14 kg de plástico, 22 kg de papelão e 9 kg de alumínio. Uma empresa parceira reverte esses insumos em doações para a EDISCA: R$ 2,00 por kg de plástico/papelão e R$ 5,00 por kg de alumínio.",
+                question: "Qual o valor total em reais (R$) gerado por essa faxina ecológica?",
+                answer: 117,
+                trivia: "Manter a nossa cozinha brilhando e reciclar os resíduos coroa o ciclo de cuidado com a saúde e o meio ambiente. Cada profissional de limpeza é um guardião essencial que sustenta toda a nossa escola com dedicação e amor!"
+            }
+        ];
+
+        let playerState = {
+            playerName: "Aluna Ajudante",
+            currentLevel: 0,
+            xp: 0,
+            level: 1,
+            stars: 0
+        };
+
+        let activeSequence = [];
+        let currentChallengeData = null;
+        let typewriterInterval = null;
+
+        function initApp() {
+            document.getElementById('ui-player-name').innerText = playerState.playerName;
+            document.getElementById('ui-level').innerText = playerState.level;
+            document.getElementById('ui-stars').innerText = playerState.stars;
+            updateXPBar();
+        }
+
+        /* FUNÇÕES DO MODAL DO NOME (PROFISSIONAL) */
+        function openNameModal() {
+            document.getElementById('modal-name-input').value = playerState.playerName;
+            document.getElementById('overlay-name').classList.add('active');
+        }
+
+        function closeNameModal() {
+            document.getElementById('overlay-name').classList.remove('active');
+        }
+
+        function saveNameModal() {
+            const inputVal = document.getElementById('modal-name-input').value.trim();
+            if (inputVal !== "") {
+                playerState.playerName = inputVal;
+                document.getElementById('ui-player-name').innerText = inputVal;
+                closeNameModal();
+            } else {
+                const inputElement = document.getElementById('modal-name-input');
+                inputElement.style.borderColor = "#EF5350";
+                setTimeout(() => inputElement.style.borderColor = "#CFD8DC", 1000);
+            }
+        }
+
+        function updateXPBar() {
+            const xpPerLevel = 100;
+            const percentage = (playerState.xp % xpPerLevel);
+            document.getElementById('ui-xp-bar').style.width = `${percentage}%`;
+        }
+
+        function gainXP(amount) {
+            playerState.xp += amount;
+            playerState.stars += 1;
+            const newLevel = Math.floor(playerState.xp / 100) + 1;
+            if(newLevel > playerState.level) {
+                playerState.level = newLevel;
+                document.getElementById('ui-level').innerText = playerState.level;
+            }
+            document.getElementById('ui-stars').innerText = playerState.stars;
+            updateXPBar();
+        }
+
+        function goToMap() {
+            document.getElementById('screen-splash').classList.add('hidden');
+            document.getElementById('screen-game').classList.add('hidden');
+            document.getElementById('hud').style.display = 'flex';
+            
+            buildSagaMap();
+            document.getElementById('screen-map').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function buildSagaMap() {
+            const container = document.getElementById('map-nodes');
+            container.innerHTML = '';
+
+            const currentRoomIndex = Math.floor(playerState.currentLevel / 4);
+
+            gameStory.rooms.forEach((room, index) => {
+                const node = document.createElement('div');
+                
+                let status = 'locked';
+                let statusIcon = '🔒';
+                
+                if (index < currentRoomIndex) {
+                    status = 'completed'; statusIcon = '✅';
+                } else if (index === currentRoomIndex) {
+                    status = 'active'; statusIcon = '🔥';
+                }
+
+                const subChallengeIndex = index === currentRoomIndex ? (playerState.currentLevel % 4) + 1 : (index < currentRoomIndex ? 4 : 1);
+
+                node.className = `node ${status}`;
+                node.innerHTML = `
+                    <div class="node-icon">${room.icon}</div>
+                    <div class="node-info">
+                        <div class="node-title">${room.name}</div>
+                        <div class="node-desc">${room.desc} (Tarefa ${subChallengeIndex}/4)</div>
+                    </div>
+                    <div class="node-status">${statusIcon}</div>
+                `;
+
+                if (status === 'active') {
+                    node.onclick = () => loadChallenge(playerState.currentLevel);
+                }
+
+                container.appendChild(node);
+            });
+            
+            setTimeout(() => {
+                const activeNode = document.querySelector('.node.active');
+                if(activeNode) activeNode.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function loadChallenge(index) {
+            currentChallengeData = gameChallenges[index];
+            if(!currentChallengeData) return;
+
+            document.getElementById('screen-map').classList.add('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            const charData = gameStory.characters[currentChallengeData.char];
+            document.getElementById('dg-avatar-icon').innerText = charData.icon;
+            document.getElementById('dg-name').innerText = charData.name;
+            document.getElementById('dg-name').style.color = charData.color;
+            
+            typewriterEffect(currentChallengeData.dialogue);
+
+            document.getElementById('pz-question').innerText = currentChallengeData.question;
+            const interactiveArea = document.getElementById('pz-interactive');
+            interactiveArea.innerHTML = '';
+            document.getElementById('btn-verify').style.display = 'none';
+
+            if (currentChallengeData.type === 'mcq') renderMCQ(interactiveArea, currentChallengeData);
+            if (currentChallengeData.type === 'math_input') renderMathInput(interactiveArea, currentChallengeData);
+            if (currentChallengeData.type === 'sequence') renderSequence(interactiveArea, currentChallengeData);
+
+            document.getElementById('screen-game').classList.remove('hidden');
+        }
+
+        function typewriterEffect(text) {
+            clearInterval(typewriterInterval);
+            const textElement = document.getElementById('dg-text');
+            textElement.innerText = '';
+            let i = 0;
+            typewriterInterval = setInterval(() => {
+                textElement.innerText += text.charAt(i);
+                i++;
+                if(i >= text.length) clearInterval(typewriterInterval);
+            }, 20);
+        }
+
+        function renderMCQ(container, data) {
+            const grid = document.createElement('div');
+            grid.className = 'mcq-grid';
+            
+            const shuffledOptions = shuffleArray([...data.options]);
+            
+            shuffledOptions.forEach((opt) => {
+                const btn = document.createElement('button');
+                btn.className = 'btn-mcq';
+                btn.innerText = opt.text;
+                btn.onclick = () => {
+                    document.querySelectorAll('.btn-mcq').forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    document.getElementById('btn-verify').onclick = () => verifyMCQ(opt.correct);
+                    document.getElementById('btn-verify').style.display = 'block';
+                };
+                grid.appendChild(btn);
+            });
+            container.appendChild(grid);
+        }
+
+        function verifyMCQ(isCorrect) {
+            if(isCorrect) triggerSuccess();
+            else triggerError();
+        }
+
+        function renderMathInput(container, data) {
+            const div = document.createElement('div');
+            div.className = 'math-input-container';
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.className = 'math-input';
+            input.placeholder = "0";
+            
+            input.addEventListener('input', () => {
+                document.getElementById('btn-verify').style.display = input.value !== '' ? 'block' : 'none';
+            });
+
+            div.appendChild(input);
+            container.appendChild(div);
+
+            document.getElementById('btn-verify').onclick = () => {
+                if(parseInt(input.value) === data.answer) triggerSuccess();
+                else triggerError();
+            }
+        }
+
+        function renderSequence(container, data) {
+            activeSequence = [];
+            const itemsDiv = document.createElement('div');
+            itemsDiv.className = 'seq-container';
+            
+            const slotsDiv = document.createElement('div');
+            slotsDiv.className = 'seq-slots';
+            
+            const shuffled = shuffleArray([...data.sequenceItems]);
+
+            shuffled.forEach((item, idx) => {
+                const slot = document.createElement('div');
+                slot.className = 'seq-slot';
+                slot.id = `slot-${idx}`;
+                slot.innerText = `Etapa ${idx + 1}`;
+                slotsDiv.appendChild(slot);
+
+                const btn = document.createElement('button');
+                btn.className = 'seq-item';
+                btn.innerText = item.text;
+                btn.onclick = () => {
+                    btn.classList.add('clicked');
+                    activeSequence.push(item.id);
+                    document.getElementById(`slot-${activeSequence.length - 1}`).innerText = item.text;
+                    document.getElementById(`slot-${activeSequence.length - 1}`).style.borderColor = "var(--primary)";
+                    
+                    if(activeSequence.length === data.sequenceItems.length) {
+                        document.getElementById('btn-verify').style.display = 'block';
+                    }
+                };
+                itemsDiv.appendChild(btn);
+            });
+
+            container.appendChild(slotsDiv);
+            container.appendChild(itemsDiv);
+            
+            document.getElementById('btn-verify').onclick = () => {
+                let correct = true;
+                data.sequenceItems.forEach((origItem, index) => {
+                    if(activeSequence[index] !== origItem.id) correct = false;
+                });
+                
+                if(correct) triggerSuccess();
+                else {
+                    triggerError();
+                    setTimeout(() => loadChallenge(playerState.currentLevel), 1200);
+                }
+            }
+        }
+
+        function triggerError() {
+            const pz = document.getElementById('puzzle-container');
+            pz.classList.add('error-anim');
+            setTimeout(() => pz.classList.remove('error-anim'), 400);
+            
+            clearInterval(typewriterInterval);
+            document.getElementById('dg-text').innerText = "Hum, essa estratégia não funcionou perfeitamente. Vamos repensar a lógica do problema e tentar de novo!";
+        }
+
+        function triggerSuccess() {
+            const overlay = document.getElementById('overlay-trivia');
+            const title = overlay.querySelector('.trivia-title');
+            const text = overlay.querySelector('.trivia-text');
+            const icon = overlay.querySelector('.trivia-icon');
+            const button = overlay.querySelector('.btn-action');
+            
+            icon.innerText = "🎉";
+            title.innerText = "Excelente!";
+            title.style.color = "var(--success)";
+            text.style.borderLeftColor = "var(--success)";
+            text.style.background = "#F1F8E9";
+            text.innerHTML = currentChallengeData.trivia;
+            button.innerText = "Continuar Jornada";
+            button.onclick = () => finishChallenge();
+
+            overlay.classList.add('active');
+        }
+
+        function finishChallenge() {
+            document.getElementById('overlay-trivia').classList.remove('active');
+            gainXP(100);
+            playerState.currentLevel++;
+            
+            if(playerState.currentLevel >= gameChallenges.length) {
+                setTimeout(() => {
+                    const overlay = document.getElementById('overlay-trivia');
+                    const title = overlay.querySelector('.trivia-title');
+                    const text = overlay.querySelector('.trivia-text');
+                    const icon = overlay.querySelector('.trivia-icon');
+                    const button = overlay.querySelector('.btn-action');
+                    
+                    icon.innerText = "❤️👩‍🍳✨";
+                    title.innerText = "Missão Cumprida com Amor!";
+                    title.style.color = "var(--primary)";
+                    
+                    text.innerHTML = `
+                        <p style="margin-bottom: 15px; font-size: 1.25rem; font-weight: 800; text-align: center; color: var(--primary);">
+                            Parabéns! Você concluiu toda a jornada pelo coração da EDISCA!
+                        </p>
+                        <p style="margin-bottom: 12px; line-height: 1.6; text-align: left;">
+                            Através do seu raciocínio lógico e matemático, você descobriu que preparar centenas de refeições saudáveis todos os dias exige muito mais do que panelas: exige <strong>conhecimento técnico, responsabilidade, organização, trabalho em equipe e dedicação profunda</strong>.
+                        </p>
+                        <p style="margin-bottom: 12px; line-height: 1.6; text-align: left;">
+                            Cada cozinheira, auxiliar e profissional de higienização é uma peça essencial que acolhe e sustenta nossa escola com muito carinho e esforço diário.
+                        </p>
+                        <p style="font-weight: 700; text-align: center; margin-top: 15px; color: var(--success); font-size: 1.1rem;">
+                            Nossa imensa gratidão, respeito e valorização a esses profissionais incríveis!
+                        </p>
+                    `;
+                    text.style.borderLeftColor = "var(--primary)";
+                    text.style.background = "#FFF3E0";
+                    
+                    button.innerText = "Reiniciar Jogo";
+                    button.onclick = () => {
+                        playerState.currentLevel = 0;
+                        playerState.xp = 0;
+                        playerState.level = 1;
+                        playerState.stars = 0;
+                        initApp();
+                        overlay.classList.remove('active');
+                        button.onclick = () => finishChallenge();
+                        goToMap();
+                    };
+                    
+                    overlay.classList.add('active');
+                }, 300);
+                return;
+            }
+            goToMap();
+        }
+
+        window.onload = initApp;
+    </script>
+</body>
+</html>
