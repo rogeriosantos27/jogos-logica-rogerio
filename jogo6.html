@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enigma 6: Oficinas da EDISCA</title>
+
+    <style>
+        /* Configurações básicas e zeramento de margens */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* 🖼️ MOTOR DE FUNDO ADAPTÁVEL */
+        .bg-fixo-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -2;
+            overflow: hidden;
+        }
+
+        .bg-fixo-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        /* Container principal */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 15px;
+            box-sizing: border-box;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Alinhamento lado a lado no Computador */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        @media (min-width: 950px) {
+            .main-content {
+                flex-direction: row;
+                align-items: flex-start;
+            }
+            .pistas-container { flex: 1; }
+            .tabuleiro-container { flex: 1.4; }
+        }
+
+        /* FUNDOS DOS CONTÊINERES GERAIS TRANSPARENTES */
+        .pistas-container, .tabuleiro-container {
+            background-color: transparent !important;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        /* Títulos principais em Amarelo para alto contraste */
+        .pistas-container h2, .tabuleiro-container h2 {
+            font-size: 1.8rem;
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: #f1c40f; 
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* 📱 SUPORTE RESPONSIVO PARA A TABELA (Garante rolagem lateral suave no celular) */
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        #tabuleiro {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            min-width: 700px;
+        }
+
+        /* CABEÇALHO DA TABELA */
+        th {
+            background-color: #2c3e50;
+            color: #ffffff;
+            font-weight: bold;
+            padding: 14px 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Células da tabela com Fundo Branco Translúcido */
+        #tabuleiro td {
+            background-color: rgba(255, 255, 255, 0.85) !important;
+            padding: 12px 8px;
+            text-align: center;
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            font-size: 0.95rem;
+            color: #1a252f;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        /* Célula lateral das Categorias */
+        .categoria-header {
+            background-color: rgba(240, 244, 248, 0.95) !important;
+            color: #2c3e50 !important;
+            font-weight: bold;
+            width: 120px;
+        }
+
+        /* Menus Dropdown (Selects) integrados */
+        #tabuleiro select {
+            width: 100%;
+            padding: 8px;
+            font-size: 0.95rem;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            background-color: #ffffff;
+            color: #333333;
+            box-sizing: border-box;
+            outline: none;
+            cursor: pointer;
+        }
+
+        /* Lista de Pistas */
+        #lista-pistas {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* Cada linha de pista com Fundo Branco Translúcido padrão */
+        #lista-pistas li {
+            background-color: rgba(255, 255, 255, 0.85) !important;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-left: 5px solid #3498db;
+            padding: 14px 18px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #2c3e50;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+            transition: all 0.2s ease;
+        }
+
+        #lista-pistas li strong {
+            color: #000000;
+            font-weight: bold;
+        }
+
+        /* Botão de Verificação */
+        .acoes {
+            text-align: center;
+            margin-top: 25px;
+        }
+
+        #btn-verificar {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            padding: 14px 35px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        #btn-verificar:hover {
+            background-color: #219653;
+            transform: scale(1.02);
+        }
+
+        /* Botão superior Voltar */
+        .btn-voltar-topo {
+            display: inline-block;
+            margin-bottom: 15px;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Imagem de fundo solicitada -->
+    <div class="bg-fixo-container">
+        <img src="imagem15.jpg" alt="Fundo EDISCA">
+    </div>
+
+    <div class="container">
+        <!-- Retorno dinâmico para a raiz do index -->
+        <a href="index.html" class="btn-voltar-topo">⬅ Voltar ao Menu</a>
+        
+        <header style="text-align: center; color: white; margin-bottom: 30px; text-shadow: 2px 2px 6px rgba(0,0,0,0.9);">
+            <h1 style="color: #f1c40f; margin-bottom: 5px; font-size: 2.5rem;">Oficinas na EDISCA</h1>
+            <p style="margin: 0; font-size: 1.2rem; opacity: 0.95;">Use o raciocínio lógico e analise as pistas para descobrir a oficina preferida de cada educanda na nossa escola!</p>
+        </header>
+
+        <main class="main-content">
+            <!-- SEÇÃO DE PISTAS -->
+            <section class="pistas-container">
+                <h2>🔍 Pistas</h2>
+                <ul id="lista-pistas">
+                    <li id="pista-1">1. A menina de <strong>Collant Verde</strong> está na primeira posição da fila.</li>
+                    <li id="pista-2">2. <strong>Mariana</strong> está em pé exatamente ao lado da menina que adora as aulas de <strong>Reforço de Matemática</strong>.</li>
+                    <li id="pista-3">3. A aluna que mais gosta de <strong>Reforço de Português</strong> está exatamente no meio da fila.</li>
+                    <li id="pista-4">4. A menina de <strong>Collant Amarelo</strong> está sentada/em pé exatamente à esquerda da menina que come <strong>Biscoito</strong>.</li>
+                    <li id="pista-5">5. A bailarina cuja aula favorita é o <strong>Ballet</strong> veste collant <strong>Rosa</strong>.</li>
+                    <li id="pista-6">6. <strong>Beatriz</strong> está imediatamente ao lado da menina que faz a oficina de <strong>Teatro</strong>.</li>
+                    <li id="pista-7">7. A menina que lancha <strong>Maçã</strong> adora as tarefas do <strong>Reforço de Português</strong>.</li>
+                    <li id="pista-8">8. Quem está comendo <strong>Pipoca</strong> ficou em algum lugar da fila à esquerda de quem come <strong>Maçã</strong>.</li>
+                    <li id="pista-9">9. <strong>Yasmin</strong> está usando uma <strong>Redinha no Coque</strong> do cabelo.</li>
+                    <li id="pista-10">10. A garota de <strong>Collant Azul</strong> é a que mais se diverte no <strong>Reforço de Português</strong>.</li>
+                    <li id="pista-11">11. A aluna que ama o <strong>Grupo de Convivência</strong> trouxe <strong>Salada de Frutas</strong> para o lanche.</li>
+                    <li id="pista-12">12. A menina de <strong>Collant Roxo</strong> guarda tudo na sua <strong>Bolsa de Ballet</strong>.</li>
+                    <li id="pista-13">13. <strong>Clara</strong> veio com uma <strong>Tiara</strong> brilhante na cabeça.</li>
+                    <li id="pista-14">14. A menina que trouxe um <strong>Sanduíche</strong> está na segunda posição da fila.</li>
+                    <li id="pista-15">15. A dona da <strong>Garrafinha</strong> de água está exatamente entre a menina de <strong>Tiara</strong> e a menina que usa <strong>Redinha no Coque</strong>.</li>
+                    <li id="pista-16">16. <strong>Sophia</strong> é a última aluna da fila.</li>
+                </ul>
+            </section>
+
+            <!-- SEÇÃO DO TABULEIRO (RESPOSTAS) -->
+            <section class="tabuleiro-container">
+                <h2>📋 Respostas</h2>
+                <div class="table-wrapper">
+                    <table id="tabuleiro">
+                        <thead>
+                            <tr>
+                                <th>Categoria</th>
+                                <th>1ª Aluna</th>
+                                <th>2ª Aluna</th>
+                                <th>3ª Aluna</th>
+                                <th>4ª Aluna</th>
+                                <th>5ª Aluna</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- LINHA: NOME -->
+                            <tr data-categoria="Nome">
+                                <td class="categoria-header">Nome</td>
+                                <td><select><option value="">--</option><option value="Clara">Clara</option><option value="Mariana">Mariana</option><option value="Yasmin">Yasmin</option><option value="Beatriz">Beatriz</option><option value="Sophia">Sophia</option></select></td>
+                                <td><select><option value="">--</option><option value="Clara">Clara</option><option value="Mariana">Mariana</option><option value="Yasmin">Yasmin</option><option value="Beatriz">Beatriz</option><option value="Sophia">Sophia</option></select></td>
+                                <td><select><option value="">--</option><option value="Clara">Clara</option><option value="Mariana">Mariana</option><option value="Yasmin">Yasmin</option><option value="Beatriz">Beatriz</option><option value="Sophia">Sophia</option></select></td>
+                                <td><select><option value="">--</option><option value="Clara">Clara</option><option value="Mariana">Mariana</option><option value="Yasmin">Yasmin</option><option value="Beatriz">Beatriz</option><option value="Sophia">Sophia</option></select></td>
+                                <td><select><option value="">--</option><option value="Clara">Clara</option><option value="Mariana">Mariana</option><option value="Yasmin">Yasmin</option><option value="Beatriz">Beatriz</option><option value="Sophia">Sophia</option></select></td>
+                            </tr>
+                            <!-- LINHA: COLLANT -->
+                            <tr data-categoria="Collant">
+                                <td class="categoria-header">Collant</td>
+                                <td><select><option value="">--</option><option value="Verde">Verde</option><option value="Rosa">Rosa</option><option value="Azul">Azul</option><option value="Amarelo">Amarelo</option><option value="Roxo">Roxo</option></select></td>
+                                <td><select><option value="">--</option><option value="Verde">Verde</option><option value="Rosa">Rosa</option><option value="Azul">Azul</option><option value="Amarelo">Amarelo</option><option value="Roxo">Roxo</option></select></td>
+                                <td><select><option value="">--</option><option value="Verde">Verde</option><option value="Rosa">Rosa</option><option value="Azul">Azul</option><option value="Amarelo">Amarelo</option><option value="Roxo">Roxo</option></select></td>
+                                <td><select><option value="">--</option><option value="Verde">Verde</option><option value="Rosa">Rosa</option><option value="Azul">Azul</option><option value="Amarelo">Amarelo</option><option value="Roxo">Roxo</option></select></td>
+                                <td><select><option value="">--</option><option value="Verde">Verde</option><option value="Rosa">Rosa</option><option value="Azul">Azul</option><option value="Amarelo">Amarelo</option><option value="Roxo">Roxo</option></select></td>
+                            </tr>
+                            <!-- LINHA: OFICINA -->
+                            <tr data-categoria="Oficina">
+                                <td class="categoria-header">Oficina</td>
+                                <td><select><option value="">--</option><option value="Matemática">Matemática</option><option value="Ballet">Ballet</option><option value="Português">Português</option><option value="Convivência">Convivência</option><option value="Teatro">Teatro</option></select></td>
+                                <td><select><option value="">--</option><option value="Matemática">Matemática</option><option value="Ballet">Ballet</option><option value="Português">Português</option><option value="Convivência">Convivência</option><option value="Teatro">Teatro</option></select></td>
+                                <td><select><option value="">--</option><option value="Matemática">Matemática</option><option value="Ballet">Ballet</option><option value="Português">Português</option><option value="Convivência">Convivência</option><option value="Teatro">Teatro</option></select></td>
+                                <td><select><option value="">--</option><option value="Matemática">Matemática</option><option value="Ballet">Ballet</option><option value="Português">Português</option><option value="Convivência">Convivência</option><option value="Teatro">Teatro</option></select></td>
+                                <td><select><option value="">--</option><option value="Matemática">Matemática</option><option value="Ballet">Ballet</option><option value="Português">Português</option><option value="Convivência">Convivência</option><option value="Teatro">Teatro</option></select></td>
+                            </tr>
+                            <!-- LINHA: LANCHE -->
+                            <tr data-categoria="Lanche">
+                                <td class="categoria-header">Lanche</td>
+                                <td><select><option value="">--</option><option value="Pipoca">Pipoca</option><option value="Sanduíche">Sanduíche</option><option value="Maçã">Maçã</option><option value="Salada de Frutas">Salada de Frutas</option><option value="Biscoito">Biscoito</option></select></td>
+                                <td><select><option value="">--</option><option value="Pipoca">Pipoca</option><option value="Sanduíche">Sanduíche</option><option value="Maçã">Maçã</option><option value="Salada de Frutas">Salada de Frutas</option><option value="Biscoito">Biscoito</option></select></td>
+                                <td><select><option value="">--</option><option value="Pipoca">Pipoca</option><option value="Sanduíche">Sanduíche</option><option value="Maçã">Maçã</option><option value="Salada de Frutas">Salada de Frutas</option><option value="Biscoito">Biscoito</option></select></td>
+                                <td><select><option value="">--</option><option value="Pipoca">Pipoca</option><option value="Sanduíche">Sanduíche</option><option value="Maçã">Maçã</option><option value="Salada de Frutas">Salada de Frutas</option><option value="Biscoito">Biscoito</option></select></td>
+                                <td><select><option value="">--</option><option value="Pipoca">Pipoca</option><option value="Sanduíche">Sanduíche</option><option value="Maçã">Maçã</option><option value="Salada de Frutas">Salada de Frutas</option><option value="Biscoito">Biscoito</option></select></td>
+                            </tr>
+                            <!-- LINHA: ACESSÓRIO -->
+                            <tr data-categoria="Acessorio">
+                                <td class="categoria-header">Acessório</td>
+                                <td><select><option value="">--</option><option value="Tiara">Tiara</option><option value="Garrafinha">Garrafinha</option><option value="Redinha">Redinha</option><option value="Chaveiro">Chaveiro</option><option value="Bolsa de Ballet">Bolsa de Ballet</option></select></td>
+                                <td><select><option value="">--</option><option value="Tiara">Tiara</option><option value="Garrafinha">Garrafinha</option><option value="Redinha">Redinha</option><option value="Chaveiro">Chaveiro</option><option value="Bolsa de Ballet">Bolsa de Ballet</option></select></td>
+                                <td><select><option value="">--</option><option value="Tiara">Tiara</option><option value="Garrafinha">Garrafinha</option><option value="Redinha">Redinha</option><option value="Chaveiro">Chaveiro</option><option value="Bolsa de Ballet">Bolsa de Ballet</option></select></td>
+                                <td><select><option value="">--</option><option value="Tiara">Tiara</option><option value="Garrafinha">Garrafinha</option><option value="Redinha">Redinha</option><option value="Chaveiro">Chaveiro</option><option value="Bolsa de Ballet">Bolsa de Ballet</option></select></td>
+                                <td><select><option value="">--</option><option value="Tiara">Tiara</option><option value="Garrafinha">Garrafinha</option><option value="Redinha">Redinha</option><option value="Chaveiro">Chaveiro</option><option value="Bolsa de Ballet">Bolsa de Ballet</option></select></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- ÁREA DE VERIFICAÇÃO -->
+                <div class="acoes">
+                    <button id="btn-verificar">Verificar Respostas</button>
+                    <p id="mensagem-resultado" style="margin-top: 15px; font-weight: bold; font-size: 1.2rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.9);"></p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- MOTOR LÓGICO DO JOGO UNIFICADO -->
+    <script>
+        // Funções auxiliares de leitura de dados da matriz
+        function getVal(cat, colIndex) {
+            const row = document.querySelector(`tr[data-categoria="${cat}"]`);
+            if (!row) return "";
+            const selects = row.querySelectorAll('select');
+            return selects[colIndex] ? selects[colIndex].value : "";
+        }
+
+        function getPos(cat, val) {
+            for (let i = 0; i < 5; i++) {
+                if (getVal(cat, i) === val) return i;
+            }
+            return -1;
+        }
+
+        // Funções de validação de regras lógicas estruturadas
+        function checkSameColumn(cat1, val1, cat2, val2) {
+            let p1 = getPos(cat1, val1);
+            let p2 = getPos(cat2, val2);
+            if (p1 !== -1 && p2 !== -1 && p1 !== p2) return "error";
+            for (let i = 0; i < 5; i++) {
+                let v1 = getVal(cat1, i);
+                let v2 = getVal(cat2, i);
+                if (v1 === val1 && v2 !== "" && v2 !== val2) return "error";
+                if (v2 === val2 && v1 !== "" && v1 !== val1) return "error";
+            }
+            if (p1 !== -1 && p2 !== -1 && p1 === p2) return "success";
+            return "neutral";
+        }
+
+        function checkAdjacent(cat1, val1, cat2, val2) {
+            let p1 = getPos(cat1, val1);
+            let p2 = getPos(cat2, val2);
+            if (p1 !== -1 && p2 !== -1) {
+                if (Math.abs(p1 - p2) !== 1) return "error";
+                return "success";
+            }
+            if (p1 === 0 && getVal(cat2, 1) !== "" && getVal(cat2, 1) !== val2) return "error";
+            if (p1 === 4 && getVal(cat2, 3) !== "" && getVal(cat2, 3) !== val2) return "error";
+            if (p2 === 0 && getVal(cat1, 1) !== "" && getVal(cat1, 1) !== val1) return "error";
+            if (p2 === 4 && getVal(cat1, 3) !== "" && getVal(cat1, 3) !== val1) return "error";
+            return "neutral";
+        }
+
+        function checkLeftOf(cat1, val1, cat2, val2) {
+            let p1 = getPos(cat1, val1);
+            let p2 = getPos(cat2, val2);
+            if (p1 === 4) return "error";
+            if (p2 === 0) return "error";
+            if (p1 !== -1 && p2 !== -1) {
+                if (p2 - p1 !== 1) return "error";
+                return "success";
+            }
+            if (p1 !== -1 && getVal(cat2, p1 + 1) !== "" && getVal(cat2, p1 + 1) !== val2) return "error";
+            if (p2 !== -1 && getVal(cat1, p2 - 1) !== "" && getVal(cat1, p2 - 1) !== val1) return "error";
+            return "neutral";
+        }
+
+        function checkSomewhereLeftOf(cat1, val1, cat2, val2) {
+            let p1 = getPos(cat1, val1);
+            let p2 = getPos(cat2, val2);
+            if (p1 === 4) return "error";
+            if (p2 === 0) return "error";
+            if (p1 !== -1 && p2 !== -1) {
+                if (p1 >= p2) return "error";
+                return "success";
+            }
+            return "neutral";
+        }
+
+        // Altera visualmente cada item <li> baseado na checagem
+        function updateClueStyles(clueId, status) {
+            const li = document.getElementById(clueId);
+            if (!li) return;
+            if (status === "error") {
+                li.style.setProperty('border-left', '5px solid #e74c3c', 'important');
+                li.style.setProperty('background-color', 'rgba(231, 76, 60, 0.18)', 'important');
+                li.style.setProperty('color', '#c0392b', 'important');
+            } else if (status === "success") {
+                li.style.setProperty('border-left', '5px solid #2ecc71', 'important');
+                li.style.setProperty('background-color', 'rgba(46, 204, 113, 0.15)', 'important');
+                li.style.setProperty('color', '#27ae60', 'important');
+            } else {
+                li.style.setProperty('border-left', '5px solid #3498db', 'important');
+                li.style.setProperty('background-color', 'rgba(255, 255, 255, 0.85)', 'important');
+                li.style.setProperty('color', '#2c3e50', 'important');
+            }
+        }
+
+        // Executa a verificação completa das 16 pistas em tempo real
+        function checarPistas() {
+            // Pista 1
+            let p1_col = getPos('Collant', 'Verde');
+            let p1_v0 = getVal('Collant', 0);
+            updateClueStyles('pista-1', (p1_v0 === 'Verde') ? "success" : ((p1_v0 !== "" || p1_col > 0) ? "error" : "neutral"));
+
+            // Pista 2
+            updateClueStyles('pista-2', checkAdjacent('Nome', 'Mariana', 'Oficina', 'Matemática'));
+
+            // Pista 3
+            let p3_of = getPos('Oficina', 'Português');
+            let p3_v2 = getVal('Oficina', 2);
+            updateClueStyles('pista-3', (p3_v2 === 'Português') ? "success" : ((p3_v2 !== "" || p3_of !== -1) ? "error" : "neutral"));
+
+            // Pista 4
+            updateClueStyles('pista-4', checkLeftOf('Collant', 'Amarelo', 'Lanche', 'Biscoito'));
+
+            // Pista 5
+            updateClueStyles('pista-5', checkSameColumn('Oficina', 'Ballet', 'Collant', 'Rosa'));
+
+            // Pista 6
+            updateClueStyles('pista-6', checkAdjacent('Nome', 'Beatriz', 'Oficina', 'Teatro'));
+
+            // Pista 7
+            updateClueStyles('pista-7', checkSameColumn('Lanche', 'Maçã', 'Oficina', 'Português'));
+
+            // Pista 8
+            updateClueStyles('pista-8', checkSomewhereLeftOf('Lanche', 'Pipoca', 'Lanche', 'Maçã'));
+
+            // Pista 9
+            updateClueStyles('pista-9', checkSameColumn('Nome', 'Yasmin', 'Acessorio', 'Redinha'));
+
+            // Pista 10
+            updateClueStyles('pista-10', checkSameColumn('Collant', 'Azul', 'Oficina', 'Português'));
+
+            // Pista 11
+            updateClueStyles('pista-11', checkSameColumn('Oficina', 'Convivência', 'Lanche', 'Salada de Frutas'));
+
+            // Pista 12
+            updateClueStyles('pista-12', checkSameColumn('Collant', 'Roxo', 'Acessorio', 'Bolsa de Ballet'));
+
+            // Pista 13
+            updateClueStyles('pista-13', checkSameColumn('Nome', 'Clara', 'Acessorio', 'Tiara'));
+
+            // Pista 14
+            let p14_lan = getPos('Lanche', 'Sanduíche');
+            let p14_v1 = getVal('Lanche', 1);
+            updateClueStyles('pista-14', (p14_v1 === 'Sanduíche') ? "success" : ((p14_v1 !== "" || p14_lan !== -1) ? "error" : "neutral"));
+
+            // Pista 15
+            let pGarrafinha = getPos('Acessorio', 'Garrafinha');
+            let pTiara = getPos('Acessorio', 'Tiara');
+            let pRedinha = getPos('Acessorio', 'Redinha');
+            let res15 = "neutral";
+            if (pGarrafinha === 0 || pGarrafinha === 4) res15 = "error";
+            else {
+                if (pGarrafinha !== -1 && pTiara !== -1 && Math.abs(pGarrafinha - pTiara) !== 1) res15 = "error";
+                else if (pGarrafinha !== -1 && pRedinha !== -1 && Math.abs(pGarrafinha - pRedinha) !== 1) res15 = "error";
+                else if (pTiara !== -1 && pRedinha !== -1 && Math.abs(pTiara - pRedinha) !== 2) res15 = "error";
+                else if (pGarrafinha !== -1 && pTiara !== -1 && pRedinha !== -1) res15 = "success";
+            }
+            updateClueStyles('pista-15', res15);
+
+            // Pista 16
+            let p16_nom = getPos('Nome', 'Sophia');
+            let p16_v4 = getVal('Nome', 4);
+            updateClueStyles('pista-16', (p16_v4 === 'Sophia') ? "success" : ((p16_v4 !== "" || p16_nom !== -1) ? "error" : "neutral"));
+        }
+
+        // MECANISMO DE PINTAR A COLUNA INTEIRA BASEADO NO COLLANT
+        function atualizarCoresColunas() {
+            const collantRow = document.querySelector('tr[data-categoria="Collant"]');
+            if (!collantRow) return;
+            const selects = collantRow.querySelectorAll('select');
+            
+            const mapaCores = {
+                "Verde": "rgba(46, 204, 113, 0.85)",
+                "Rosa": "rgba(243, 104, 224, 0.85)",
+                "Azul": "rgba(52, 152, 219, 0.85)",
+                "Amarelo": "rgba(241, 196, 15, 0.85)",
+                "Roxo": "rgba(155, 89, 182, 0.85)"
+            };
+            
+            selects.forEach((select, colIndex) => {
+                const corSelecionada = select.value;
+                const corFundo = mapaCores[corSelecionada] || "rgba(255, 255, 255, 0.85)";
+                
+                const rows = document.querySelectorAll('#tabuleiro tbody tr');
+                rows.forEach(row => {
+                    const cell = row.cells[colIndex + 1];
+                    if (cell) {
+                        cell.style.setProperty('background-color', corFundo, 'important');
+                    }
+                });
+            });
+        }
+
+        // Ativa os ouvintes em todos os menus selects do tabuleiro
+        document.querySelectorAll('#tabuleiro select').forEach(select => {
+            select.addEventListener('change', () => {
+                atualizarCoresColunas();
+                checarPistas();
+            });
+        });
+
+        // VERIFICAÇÃO DO BOTÃO FINAL DE RESPOSTAS
+        document.getElementById('btn-verificar').addEventListener('click', function() {
+            const rows = document.querySelectorAll('#tabuleiro tbody tr');
+            let totalCorretas = 0;
+            const totalCampos = 25;
+            let respondidoTudo = true;
+
+            const gabarito = {
+                "Nome": ["Clara", "Mariana", "Yasmin", "Beatriz", "Sophia"],
+                "Collant": ["Verde", "Rosa", "Azul", "Amarelo", "Roxo"],
+                "Oficina": ["Matemática", "Ballet", "Português", "Convivência", "Teatro"],
+                "Lanche": ["Pipoca", "Sanduíche", "Maçã", "Salada de Frutas", "Biscoito"],
+                "Acessorio": ["Tiara", "Garrafinha", "Redinha", "Chaveiro", "Bolsa de Ballet"]
+            };
+
+            rows.forEach(row => {
+                const categoria = row.getAttribute('data-categoria');
+                const selects = row.querySelectorAll('select');
+                
+                selects.forEach((select, index) => {
+                    if (select.value === "") {
+                        respondidoTudo = false;
+                    } else if (select.value === gabarito[categoria][index]) {
+                        totalCorretas++;
+                    }
+                });
+            });
+
+            const msgElement = document.getElementById('mensagem-resultado');
+            
+            if (!respondidoTudo) {
+                msgElement.style.color = "#f1c40f"; 
+                msgElement.textContent = "⚠️ Ops! Ainda existem espaços vazios na tabela. Preencha todos antes de verificar!";
+            } else if (totalCorretas === totalCampos) {
+                msgElement.style.color = "#2ecc71"; 
+                msgElement.textContent = "🎉 Espetacular! Você organizou a fila perfeitamente e ajudou o ensaio da EDISCA a ser um sucesso! Parabéns!";
+            } else {
+                msgElement.style.color = "#e74c3c"; 
+                msgElement.textContent = `❌ Algumas escolhas ainda não estão certas (Você acertou ${totalCorretas} de ${totalCampos}). Revise as pistas vermelhas com atenção e tente de novo!`;
+            }
+        });
+    </script>
+</body>
+</html>
