@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EDISCA: A Ilha do Conhecimento</title>
+    <style>
+        :root {
+            --primary: #ff6b6b;
+            --secondary: #4ecdc4;
+            --dark: #292f36;
+            --light: #f7fff7;
+            --accent: #ffe66d;
+            --ui-bg: rgba(41, 47, 54, 0.95);
+            --ui-border: #ffe66d;
+        }
+
+        * {
+            box-sizing: border-box; margin: 0; padding: 0;
+            user-select: none; -webkit-user-select: none;
+        }
+
+        body, html {
+            width: 100%; height: 100%; overflow: hidden;
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #1a1a1a; color: var(--light);
+        }
+
+        #game-wrapper {
+            position: relative; width: 100vw; height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        canvas {
+            display: block; image-rendering: pixelated;
+        }
+
+        /* UI e Modais */
+        .screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 10; background: radial-gradient(circle, #4ecdc4 0%, #292f36 100%);
+            transition: opacity 0.5s;
+        }
+
+        h1 { font-size: 3.5rem; color: var(--accent); text-shadow: 4px 4px 0px var(--primary), 8px 8px 0px var(--dark); margin-bottom: 10px; text-align: center; }
+        h2 { font-size: 1.5rem; background: var(--primary); padding: 5px 15px; border-radius: 10px; border: 3px solid var(--dark); margin-bottom: 20px; text-align: center;}
+
+        .form-card {
+            background: var(--ui-bg); border: 4px solid var(--ui-border); border-radius: 16px;
+            padding: 30px; width: 90%; max-width: 400px; text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        input[type="text"] {
+            width: 100%; padding: 12px; border-radius: 8px; border: 3px solid var(--secondary);
+            font-size: 1.2rem; font-weight: bold; text-align: center; margin-bottom: 20px; outline: none;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .game-btn {
+            background: var(--primary); color: var(--light); border: 3px solid var(--dark);
+            padding: 12px 25px; font-size: 1.2rem; font-weight: bold; border-radius: 12px;
+            cursor: pointer; box-shadow: 4px 4px 0px var(--dark); text-transform: uppercase;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .game-btn:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--dark); }
+
+        /* HUD Principal */
+        #hud {
+            position: absolute; top: 10px; left: 10px; display: flex; flex-direction: column; gap: 10px; z-index: 5; pointer-events: none;
+        }
+
+        .hud-panel {
+            background: var(--ui-bg); border: 3px solid var(--ui-border); border-radius: 12px;
+            padding: 10px 15px; display: inline-flex; align-items: center; gap: 10px;
+        }
+
+        .hud-medals { display: flex; flex-wrap: wrap; gap: 5px; max-width: 300px; }
+        .medal-icon {
+            width: 28px; height: 28px; background: rgba(255,255,255,0.1); border: 2px dashed rgba(255,255,255,0.3);
+            border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 0.9rem; opacity: 0.5;
+        }
+        .medal-icon.active {
+            opacity: 1; border: 2px solid var(--accent); background: radial-gradient(circle, #ffe66d 0%, #fca311 100%);
+            box-shadow: 0 0 10px var(--accent);
+        }
+
+        #tutorial-hud {
+            position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.7);
+            border: 2px solid var(--secondary); padding: 10px; border-radius: 10px;
+            color: #fff; font-size: 0.9rem; text-align: right; z-index: 5;
+        }
+
+        /* Diálogos */
+        .modal-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 20;
+        }
+        .dialog-box {
+            background: var(--ui-bg); border: 5px solid var(--ui-border); border-radius: 20px;
+            width: 90%; max-width: 700px; max-height: 90vh; display: flex; flex-direction: column;
+        }
+        .dialog-header { background: var(--dark); padding: 15px; display: flex; align-items: center; gap: 15px; border-bottom: 3px solid var(--ui-border); }
+        .dialog-avatar { width: 60px; height: 60px; background: var(--primary); border: 3px solid var(--accent); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 2rem; }
+        .dialog-body { padding: 25px; font-size: 1.1rem; line-height: 1.6; overflow-y: auto; }
+        .dialog-footer { padding: 15px; background: rgba(0,0,0,0.3); display: flex; justify-content: flex-end; gap: 10px; border-top: 2px solid rgba(255,255,255,0.1); }
+        .option-btn { background: var(--dark); border: 2px solid var(--secondary); color: var(--light); padding: 12px 15px; border-radius: 10px; margin-bottom: 10px; cursor: pointer; text-align: left; font-size: 1rem; width: 100%; font-family: 'Courier New', Courier, monospace;}
+        .option-btn:hover { background: var(--secondary); color: var(--dark); }
+
+        #interaction-prompt {
+            position: absolute; bottom: 120px; left: 50%; transform: translateX(-50%);
+            background: var(--ui-bg); border: 3px solid var(--primary); padding: 10px 20px;
+            border-radius: 20px; font-weight: bold; display: none; z-index: 5; animation: pulse 1s infinite;
+        }
+        @keyframes pulse { 0%, 100% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.05); } }
+
+        /* Controles Virtuais */
+        #controls { position: absolute; bottom: 20px; width: 100%; display: flex; justify-content: space-between; padding: 0 20px; z-index: 5; pointer-events: none; }
+        .dpad, .action-pad { pointer-events: auto; }
+        .dpad { display: grid; grid-template-columns: repeat(3, 55px); grid-template-rows: repeat(3, 55px); gap: 5px; }
+        .ctrl-btn { background: rgba(0,0,0,0.5); border: 3px solid rgba(255,255,255,0.7); border-radius: 10px; color: white; font-size: 1.5rem; display: flex; justify-content: center; align-items: center; }
+        .btn-up { grid-column: 2; grid-row: 1; } .btn-left { grid-column: 1; grid-row: 2; } .btn-down { grid-column: 2; grid-row: 3; } .btn-right { grid-column: 3; grid-row: 2; }
+        .action-btn { width: 80px; height: 80px; border-radius: 50%; background: var(--primary); border: 4px solid var(--accent); color: var(--dark); font-weight: bold; display: flex; justify-content: center; align-items: center; align-self: flex-end; margin-bottom: 15px; }
+        @media (min-width: 800px) { #controls { display: none; } }
+    </style>
+</head>
+<body>
+
+<div id="game-wrapper">
+    <div id="start-screen" class="screen">
+        <h1>EDISCA</h1>
+        <h2>A Ilha do Conhecimento</h2>
+        <div class="form-card">
+            <p style="margin-bottom: 15px; color: var(--accent);">Identifique-se, educando(a):</p>
+            <input type="text" id="player-name" value="Bailarino(a)" maxlength="15">
+            <button class="game-btn" onclick="startGame()">Iniciar</button>
+        </div>
+    </div>
+
+    <div id="hud" style="display: none;">
+        <div class="hud-panel">
+            <strong id="hud-name" style="color: var(--accent);">Jogador</strong>
+            <span id="hud-score" style="margin-left: 10px;">⭐ 0</span>
+        </div>
+        <div class="hud-panel hud-medals" id="medals-container"></div>
+    </div>
+
+    <div id="tutorial-hud" style="display: none;">
+        ⌨️ <b>WASD / Setas</b> para Andar<br>
+        🔘 <b>Espaço</b> para Falar/Interagir
+    </div>
+
+    <div id="interaction-prompt">Aperte ESPAÇO para falar</div>
+
+    <div id="controls" style="display: none;">
+        <div class="dpad">
+            <div class="ctrl-btn btn-up" id="btn-up">▲</div>
+            <div class="ctrl-btn btn-left" id="btn-left">◀</div>
+            <div class="ctrl-btn btn-right" id="btn-right">▶</div>
+            <div class="ctrl-btn btn-down" id="btn-down">▼</div>
+        </div>
+        <div class="action-pad">
+            <div class="action-btn" id="btn-action">AÇÃO</div>
+        </div>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <div id="dialog-overlay" class="modal-overlay">
+        <div class="dialog-box">
+            <div class="dialog-header">
+                <div class="dialog-avatar" id="dialog-icon">👤</div>
+                <div>
+                    <div id="dialog-npc" style="font-weight: bold; color: var(--accent); font-size: 1.2rem;">NPC</div>
+                    <div id="dialog-room" style="font-size: 0.9rem; opacity: 0.8;">Sala</div>
+                </div>
+            </div>
+            <div class="dialog-body" id="dialog-content"></div>
+            <div class="dialog-footer" id="dialog-actions"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ==========================================================================
+    // 1. MOTOR DO JOGO
+    // ==========================================================================
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+    const TILE = 40;
+    const COLS = 70;
+    const ROWS = 65;
+    const MAP_W = COLS * TILE;
+    const MAP_H = ROWS * TILE;
+    let map = [];
+    let camX = 0, camY = 0;
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    // ==========================================================================
+    // 2. GERAÇÃO DO MAPA
+    // ==========================================================================
+    function initMap() {
+        for (let r = 0; r < ROWS; r++) {
+            map[r] = [];
+            for (let c = 0; c < COLS; c++) {
+                if (r < 2 || r > ROWS-3 || c < 2 || c > COLS-3) map[r][c] = 4; // Água
+                else map[r][c] = 0; // Grama
+            }
+        }
+
+        const build = (r1, r2, c1, c2) => {
+            for (let r = r1; r <= r2; r++) {
+                for (let c = c1; c <= c2; c++) {
+                    map[r][c] = (r===r1 || r===r2 || c===c1 || c===c2) ? 1 : 3;
+                }
+            }
+            map[r2][Math.floor((c1+c2)/2)] = 3; map[r2][Math.floor((c1+c2)/2)-1] = 3; 
+        };
+
+        build(5, 12, 30, 40); // Portaria
+        build(17, 24, 10, 20); // Secretaria
+        build(17, 24, 50, 60); // Diretoria
+        build(29, 36, 10, 20); // Cozinha
+        build(29, 36, 50, 60); // Reforço
+        build(41, 48, 10, 20); // Financeiro
+        build(41, 48, 50, 60); // Artes
+        build(53, 60, 20, 30); // Dança
+        build(53, 60, 40, 50); // Teatro/Espetáculo
+        build(53, 60, 5, 15);  // Saúde
+        build(53, 60, 55, 65); // Biblioteca
+        
+        // Jardim com abertura (Área de Limpeza)
+        build(58, 62, 32, 38);
+        map[58][34] = 0; map[58][35] = 2; map[58][36] = 2; 
+
+        // Caminhos Principais
+        for(let r=12; r<58; r++) {
+            for(let c=32; c<=38; c++) map[r][c] = 2;
+        }
+        for(let c=20; c<50; c++) {
+            for(let r=25; r<=27; r++) map[r][c] = 2; 
+            for(let r=37; r<=39; r++) map[r][c] = 2; 
+            for(let r=49; r<=51; r++) map[r][c] = 2; 
+        }
+    }
+
+    // ==========================================================================
+    // 3. DESAFIOS (Focados na Rotina da EDISCA)
+    // ==========================================================================
+    const questsData = {
+        portaria: { room: "Portaria", npcs: ["Prof. Junior", "Profª Cris"], icon: "🚪",
+            intro: "Bem-vindos à portaria da EDISCA! Somos o Professor Junior e a Professor Cris. Nosso trabalho é garantir a segurança e o acesso correto de todos. Vamos testar sua lógica de organização?",
+            questions: [
+                { q: "Se a turma A tem 20 alunos e a turma B tem 15, e cada aluno leva 10 segundos para passar a carteirinha na catraca, qual turma libera a portaria mais rápido?", opts: ["Turma A", "Turma B", "As duas ao mesmo tempo", "Depende do dia"], ans: 1, exp: "A Turma B tem menos alunos, portanto, o tempo total de passagem na catraca será menor." },
+                { q: "Um educando esqueceu a carteirinha em casa. A regra de segurança diz que sem identificação não há acesso direto. Qual o procedimento lógico?", opts: ["Pular a catraca", "Voltar para casa", "Avisar a secretaria e solicitar liberação provisória", "Entrar junto com um amigo"], ans: 2, exp: "A comunicação com a secretaria garante o controle seguro de quem está dentro da instituição." },
+                { q: "O ensaio termina às 17h30. Os pais começam a chegar 15 minutos antes. A que horas a portaria deve organizar a área de espera?", opts: ["17h00", "17h15", "17h30", "17h45"], ans: 1, exp: "Se eles chegam 15 minutos antes das 17h30, a recepção deve estar pronta às 17h15." },
+                { q: "Por que não podemos deixar as portas principais totalmente abertas sem monitoramento durante as aulas?", opts: ["Para o ar condicionado não vazar", "Por medidas rigorosas de proteção aos educandos", "Para não entrar poeira", "Porque a porta quebra"], ans: 1, exp: "A prioridade número um da portaria é a segurança física de todos os alunos e funcionários." },
+                { q: "Se 3 ônibus fretados chegam com 40 alunos cada, e temos 2 catracas funcionando. Quantos alunos passarão, em média, por cada catraca?", opts: ["40", "60", "80", "120"], ans: 1, exp: "Total de 120 alunos (3x40). Dividido por 2 catracas, são 60 alunos por catraca." }
+            ]},
+        secretaria: { room: "Secretaria", npcs: ["Profª Gesliane"], icon: "🗂️",
+            intro: "Oi, aqui é a Professora Gesliane! Cuidamos de toda a documentação, presenças e matrículas para que vocês possam estudar em paz. Me ajude com a rotina administrativa!",
+            questions: [
+                { q: "Temos 100 pastas de alunos e precisamos organizá-las em ordem alfabética. A pasta da 'Ana' e do 'Bruno' já estão no lugar. Onde entra a pasta da 'Beatriz'?", opts: ["Antes da Ana", "Depois do Bruno", "Entre Ana e Bruno", "No final"], ans: 2, exp: "Na ordem alfabética, 'Beatriz' (Be) vem depois de 'Ana' (An) e antes de 'Bruno' (Br)." },
+                { q: "Para manter a bolsa, o aluno precisa de 75% de presença. Se o mês tem 20 aulas, qual é o número MÁXIMO de faltas que ele pode ter?", opts: ["3 faltas", "5 faltas", "7 faltas", "10 faltas"], ans: 1, exp: "75% de 20 é 15 aulas. Portanto, ele pode faltar no máximo 5 vezes (20 - 15 = 5)." },
+                { q: "Um edital exige RG, CPF e Comprovante de Residência de cada aluno. Se vamos matricular 30 novos educandos, quantos documentos, no total, a secretaria precisará arquivar?", opts: ["30", "60", "90", "120"], ans: 2, exp: "São 3 documentos por aluno. 30 alunos x 3 = 90 documentos processados com muito cuidado!" },
+                { q: "Se um pai liga perguntando sobre o calendário de férias, qual documento a secretaria consulta para dar a informação exata?", opts: ["Livro de presenças", "Calendário letivo institucional", "Lista de materiais", "O cardápio da cozinha"], ans: 1, exp: "O calendário letivo é o documento oficial que rege todas as datas da instituição." },
+                { q: "A atualização de dados cadastrais ocorre a cada semestre. Se estamos em fevereiro, a próxima atualização será em:", opts: ["Março", "Agosto", "Dezembro", "Outubro"], ans: 1, exp: "Um semestre tem 6 meses. Fevereiro (mês 2) + 6 meses = Agosto (mês 8)." }
+            ]},
+        diretoria: { room: "Diretoria", npcs: ["Profª Andrea", "Profª Claudia", "Profª Dora"], icon: "🏢",
+            intro: "Olá! Somos as Professoras Andrea, Claudia e Dora. Como líderes da instituição, planejamos o futuro da EDISCA, buscamos parcerias e mantemos nossos projetos vivos. Vamos testar sua visão estratégica?",
+            questions: [
+                { q: "A EDISCA precisa planejar um novo espetáculo. Qual a sequência lógica de planejamento?", opts: ["Ensaiar > Apresentar > Captar Recursos", "Captar Recursos > Criar > Ensaiar > Apresentar", "Apresentar > Criar > Captar Recursos", "Criar > Apresentar > Ensaiar"], ans: 1, exp: "Sem recursos e sem criação, não há ensaio. E o espetáculo é a etapa final de todo esse esforço." },
+                { q: "Para garantir que a escola continue funcionando por anos, a diretoria prioriza:", opts: ["Gastar todo o recurso em um único evento", "Sustentabilidade financeira e planejamento a longo prazo", "Fazer apenas reuniões sem ação", "Não ter parceiros"], ans: 1, exp: "A sustentabilidade garante que as futuras gerações de alunos também tenham as mesmas oportunidades." },
+                { q: "Temos uma reunião com 3 possíveis patrocinadores. Cada um exige um relatório de impacto social diferente. Quantos relatórios precisamos preparar?", opts: ["1 geral", "Nenhum", "3 personalizados", "10"], ans: 2, exp: "Se cada um exige um formato diferente, devemos honrar o compromisso preparando 3 relatórios específicos." },
+                { q: "A missão da EDISCA envolve arte e educação. Se tivermos que cortar custos, qual área NÃO pode ser comprometida?", opts: ["O desenvolvimento e bem-estar dos educandos", "A pintura externa do muro", "Decorações de escritório", "Troca de móveis da diretoria"], ans: 0, exp: "Vocês, educandos, são o coração do nosso projeto. O investimento no bem-estar de vocês é intocável." },
+                { q: "Se um projeto social dura 2 anos e é avaliado trimestralmente. Quantas avaliações a diretoria fará até o fim do projeto?", opts: ["4", "6", "8", "12"], ans: 2, exp: "Cada ano tem 4 trimestres. Em 2 anos, são 8 avaliações para garantir o sucesso do projeto." }
+            ]},
+        cozinha: { room: "Cozinha", npcs: ["Profª Aurea", "Profª Daiane"], icon: "🍳",
+            intro: "Cheirinho de comida boa! Somos as Professoras Aurea e Daiane. Preparamos a alimentação nutritiva que dá energia para vocês dançarem. Vamos calcular nossa rotina?",
+            questions: [
+                { q: "Para fazer o lanche de 1 turma, usamos 2 pacotes de macarrão. Hoje temos 5 turmas para alimentar. Quantos pacotes precisamos?", opts: ["5", "7", "10", "12"], ans: 2, exp: "5 turmas x 2 pacotes = 10 pacotes de macarrão. Ninguém pode ficar com fome!" },
+                { q: "A distribuição da refeição exige higiene rigorosa. Qual a ordem correta antes de servir?", opts: ["Servir > Lavar as mãos > Cozinhar", "Lavar as mãos > Colocar touca > Cozinhar > Servir", "Cozinhar > Comer > Servir", "Lavar os alimentos depois de picar"], ans: 1, exp: "A higienização (mãos e cabelo) é o primeiro passo para garantir a segurança alimentar de todos." },
+                { q: "Temos 150 maçãs e 150 alunos. Cada aluno recebe uma maçã. Se 10 alunos faltaram, quantas maçãs sobrarão na cozinha?", opts: ["Nenhuma", "5", "10", "15"], ans: 2, exp: "Se temos 150 e entregamos 140, sobram 10. Evitamos desperdício guardando corretamente!" },
+                { q: "Um suco precisa de 1 litro de polpa para cada 4 litros de água. Se vamos usar 2 litros de polpa, quanta água precisamos?", opts: ["4 litros", "6 litros", "8 litros", "10 litros"], ans: 2, exp: "Se a proporção é 1 para 4. Dobrando a polpa (2), dobramos a água (8)." },
+                { q: "Por que o cardápio da EDISCA é planejado por nutricionistas semanas antes?", opts: ["Para comprar os ingredientes com antecedência e garantir o valor nutricional", "Porque é mais fácil cozinhar qualquer coisa na hora", "Para esconder a comida", "Para fazer sempre a mesma comida"], ans: 0, exp: "Planejamento garante economia na compra e refeições balanceadas para a saúde de vocês." }
+            ]},
+        financeiro: { room: "Financeiro", npcs: ["Profª Clecia", "Profª Vanessa", "Profª Flaviane"], icon: "💰",
+            intro: "Bem-vindos ao coração financeiro da escola! Somos as Professoras Clecia, Vanessa e Flaviane. Cuidamos para que o dinheiro doado se transforme em arte e estrutura. Calcule conosco:",
+            questions: [
+                { q: "Recebemos uma doação de R$ 1.000,00. Precisamos comprar 10 figurinos que custam R$ 80,00 cada. Quanto sobrará no caixa da escola?", opts: ["R$ 100,00", "R$ 200,00", "R$ 300,00", "Não sobra nada"], ans: 1, exp: "10 x 80 = 800. 1000 - 800 = R$ 200,00 de saldo positivo para a instituição!" },
+                { q: "O pagamento da conta de luz vence dia 10. Hoje é dia 5 e o banco demora 2 dias úteis para compensar. Qual o raciocínio financeiro correto?", opts: ["Pagar no dia 15", "Pagar hoje para garantir que compense antes do vencimento", "Ignorar o vencimento", "Pagar no dia 10 e arriscar juros"], ans: 1, exp: "Pagamentos antecipados evitam multas por atraso e protegem os recursos da ONG." },
+                { q: "Precisamos cotar preços de tecidos. O Fornecedor A vende por 50,00 e frete 20,00. O Fornecedor B vende por 60,00 com frete grátis. Qual é o mais barato no total?", opts: ["Fornecedor A", "Fornecedor B", "São iguais", "Depende do tecido"], ans: 1, exp: "Fornecedor A (50+20 = 70). Fornecedor B (60+0 = 60). Logo, o B é mais econômico para a escola." },
+                { q: "A manutenção da escola custa dinheiro. Se um aluno deixa a torneira aberta, o que acontece com os recursos?", opts: ["Nada", "A água é de graça", "Aumenta a conta, tirando dinheiro que poderia ir para o lanche ou figurinos", "O financeiro não paga água"], ans: 2, exp: "Todos os custos são conectados. Desperdiçar recursos físicos é jogar fora recursos financeiros que beneficiariam vocês mesmos." },
+                { q: "Para aprovar uma despesa, precisamos de 3 assinaturas da diretoria. Se já temos a da Profª Andrea e da Profª Claudia, o que falta?", opts: ["Aprovação do porteiro", "A assinatura da Profª Dora", "Comprar e assinar depois", "Nenhuma"], ans: 1, exp: "O processo exige a aprovação do trio de diretoria para total transparência institucional." }
+            ]},
+        reforco: { room: "Reforço Escolar", npcs: ["Prof. Rogério"], icon: "📐",
+            intro: "E aí! Sou o Professor Rogério. Sem estudo não há arte completa. Nosso reforço garante que vocês brilhem na escola regular também. Vamos aos desafios!",
+            questions: [
+                { q: "Uma turma tem dificuldade em Matemática, outra em Português. O professor tem 2 horas. Como dividir o tempo de forma lógica e justa?", opts: ["2h só para Matemática", "Dar 1h para cada matéria, focando nas maiores dúvidas", "Não dar aula", "Falar sobre outra coisa"], ans: 1, exp: "A divisão equitativa garante que ambas as defasagens de aprendizado sejam atendidas." },
+                { q: "Na interpretação de texto: 'A dedicação no balé reflete na disciplina escolar'. O que essa frase significa na prática?", opts: ["O balé atrapalha os estudos", "Quem tem disciplina na arte, naturalmente aplica essa organização nos cadernos e notas", "Balé é só diversão", "A escola não importa"], ans: 1, exp: "A concentração exigida pela dança desenvolve habilidades cognitivas úteis para as disciplinas regulares." },
+                { q: "Se um aluno lê 5 páginas de um livro por dia. Em uma semana (7 dias), quantas páginas ele terá lido no projeto de leitura?", opts: ["25", "30", "35", "40"], ans: 2, exp: "5 páginas x 7 dias = 35 páginas lidas e muito vocabulário novo adquirido!" },
+                { q: "Um cronograma de estudos eficiente deve intercalar:", opts: ["Matérias fáceis e difíceis, com pequenas pausas", "Apenas a matéria que se gosta por 6 horas seguidas", "Estudar com a TV ligada", "Estudar na véspera da prova"], ans: 0, exp: "As pausas e a variação de matérias ajudam o cérebro a fixar melhor o conteúdo, sem sobrecarga." },
+                { q: "Um educando precisa entregar um trabalho amanhã e ir ao ensaio hoje. Qual a gestão de tempo ideal?", opts: ["Faltar o ensaio", "Não fazer o trabalho", "Fazer o trabalho antes do ensaio ou organizar o tempo restante à noite", "Fazer de qualquer jeito"], ans: 2, exp: "Responsabilidade dupla: honrar o compromisso com a EDISCA e com a educação formal." }
+            ]},
+        artes: { room: "Ateliê de Artes", npcs: ["Profª Gislene"], icon: "🎨",
+            intro: "Bem-vindos ao ateliê! Sou a Professora Gislene. Aqui transformamos tecidos e criatividade nos figurinos e cenários mágicos que vocês usam. Preparados?",
+            questions: [
+                { q: "Para fazer a saia de uma bailarina (tutu), precisamos de 3 metros de tule. Para vestir 12 bailarinas, de quantos metros precisaremos?", opts: ["30", "36", "40", "42"], ans: 1, exp: "3 metros x 12 bailarinas = 36 metros de tule a serem cortados e costurados com carinho." },
+                { q: "O cenário do espetáculo é uma floresta. Misturando a tinta azul e amarela do nosso estoque, que cor vamos criar para as árvores?", opts: ["Verde", "Roxo", "Laranja", "Marrom"], ans: 0, exp: "Azul + Amarelo resulta no Verde, essencial para pintar folhagens no cenário." },
+                { q: "Um zíper quebrou 5 minutos antes da bailarina entrar no palco. Qual a solução lógica mais rápida no camarim?", opts: ["Costurar um zíper novo do zero", "Prender firmemente com alfinetes de segurança por dentro", "Deixar a roupa aberta", "Chorar no canto"], ans: 1, exp: "Na urgência dos bastidores, o alfinete de segurança salva o figurino temporariamente." },
+                { q: "Temos caixas organizadoras para separar acessórios: a caixa 1 é para sapatilhas, a 2 para adereços de cabeça. Onde guardamos as tiaras do espetáculo?", opts: ["Caixa 1", "Caixa 2", "Junto com os sapatos", "Espalhadas no chão"], ans: 1, exp: "Tiaras são adereços de cabeça (Caixa 2). Organização previne perda de materiais caros!" },
+                { q: "O figurino do espetáculo 'Estrelas' usa tecidos que refletem luz. Qual material o ateliê deve escolher?", opts: ["Algodão fosco", "Lã grossa", "Tecidos metalizados ou com lantejoulas", "Jeans"], ans: 2, exp: "A propriedade física da reflexão de luz acontece em superfícies brilhosas e metalizadas." }
+            ]},
+        danca: { room: "Sala de Dança", npcs: ["Prof. Anderson"], icon: "🩰",
+            intro: "Fala, artistas! Sou o Professor Anderson. Na sala de dança usamos não só o corpo, mas muita matemática e noção espacial. Vamos aquecer a mente!",
+            questions: [
+                { q: "A coreografia pede uma formação em triângulo com 6 bailarinos. O vértice da frente tem 1 pessoa. Quantas pessoas devem ficar nas outras duas fileiras lógicas?", opts: ["2 na segunda e 3 na terceira", "1 na segunda e 4 na terceira", "3 na segunda e 2 na terceira", "Todos em círculo"], ans: 0, exp: "Formação em triângulo crescente: 1 na frente + 2 no meio + 3 atrás = 6 bailarinos." },
+                { q: "Na música, contamos os tempos em blocos (oitos). Se uma sequência coreográfica leva quatro 'oitos' para terminar, quantos tempos musicais se passaram?", opts: ["16 tempos", "24 tempos", "32 tempos", "40 tempos"], ans: 2, exp: "4 blocos multiplicados por 8 tempos = 32 tempos cravados na música." },
+                { q: "Você está no centro da sala e o professor pede para você usar todo o seu 'Cinesfera' (espaço pessoal). O que você deve fazer?", opts: ["Ficar imóvel", "Esticar braços e pernas em todas as direções ao redor do seu corpo", "Correr para a parede", "Sentar"], ans: 1, exp: "A cinesfera é a bolha imaginária que envolve o limite máximo de alcance dos seus membros sem sair do lugar." },
+                { q: "Dois grupos vão cruzar a sala em diagonais opostas ao mesmo tempo. Para não baterem no centro, qual a regra lógica de ensaio?", opts: ["Fechar os olhos e correr", "O grupo A passa pela frente e o grupo B por trás", "Gritar enquanto cruza", "Parar no meio da sala"], ans: 1, exp: "A marcação de espaçamento e definição de quem passa pela frente evita acidentes nas travessias." },
+                { q: "Se um *plié* exige que o joelho siga a linha da ponta do pé, o que acontece se o bailarino fechar o joelho para dentro?", opts: ["Fica mais bonito", "Ele ganha velocidade", "Risco de lesão no joelho e desalinhamento", "Nada acontece"], ans: 2, exp: "A anatomia humana exige alinhamento ósseo. Dançar com técnica é cuidar da própria saúde física." }
+            ]},
+        teatro: { room: "Palco / Espetáculos", npcs: ["Prof. Jessy"], icon: "🎭",
+            intro: "Bem-vindos ao palco! Sou o Professor Jessy. Na EDISCA, a culminância do nosso trabalho são os grandes espetáculos de dança. Preparados para a lógica dos bastidores?",
+            questions: [
+                { q: "A iluminação de um espetáculo tem a Luz Frontal (ilumina o rosto) e a Contra-luz (ilumina de trás). Se quisermos criar apenas a silhueta escura do bailarino, o que o iluminador deve ligar?", opts: ["Luz Frontal", "Contra-luz", "Todas as luzes", "Deixar tudo no escuro total"], ans: 1, exp: "A contra-luz cria o efeito de 'sombra chinesa', destacando a silhueta sem mostrar o rosto." },
+                { q: "No teatro, as laterais do palco de onde os bailarinos entram escondidos do público chamam-se 'Coxias'. Se um bailarino entra pela coxia da Esquerda e tem que sair pelo lado oposto, por onde ele sai?", opts: ["Pelo teto", "Pela coxia Direita", "Pelo fundo do palco", "Pela plateia"], ans: 1, exp: "O lado oposto da Esquerda do palco é sempre a coxia da Direita." },
+                { q: "O espetáculo dura 60 minutos. A bailarina principal tem 2 minutos para trocar o figurino entre o Primeiro e o Segundo Ato. Qual atitude lógica no camarim?", opts: ["Dobrar a roupa devagar", "Conversar com as amigas", "Deixar o novo figurino já aberto e na ordem de vestir antes de o espetáculo começar", "Procurar a roupa na hora"], ans: 2, exp: "Planejamento prévio! A 'troca rápida' exige que a roupa esteja armada e pronta para vestir." },
+                { q: "Na marcação de palco, a numeração vai do centro (0) para as laterais (1, 2, 3...). Se a coreógrafa pede para todos se concentrarem no 'Ponto Zero', para onde o elenco vai?", opts: ["Para o canto direito", "Para o fundo do palco", "Para o centro exato do palco", "Para a coxia"], ans: 2, exp: "O 'Ponto 0' (ou centro) é a principal referência de alinhamento simétrico para a dança." },
+                { q: "Durante o espetáculo 'Moinhos' da EDISCA, a música parou acidentalmente. Como o elenco bem ensaiado deve reagir logicamente?", opts: ["Parar e olhar para a coxia", "Sair do palco chorando", "Continuar dançando no silêncio mantendo a contagem mental em grupo", "Sentar no chão"], ans: 2, exp: "O show não pode parar. O profissionalismo exige manter a contagem interna até o som voltar." }
+            ]},
+        biblioteca: { room: "Biblioteca", npcs: ["Profª Neile"], icon: "📚",
+            intro: "Silêncio e respeito ao conhecimento! Sou a Professora Neile. Aqui guardamos o acervo literário da instituição. Vamos testar sua lógica de pesquisa e organização?",
+            questions: [
+                { q: "A biblioteca divide os livros por seção. Se temos: Artes, História e Ciências. Em qual prateleira guardamos um livro sobre a 'História do Ballet Moderno'?", opts: ["Apenas em História", "Na lixeira", "Na seção de Artes, subcategoria Dança", "Em Ciências"], ans: 2, exp: "Sendo um tema técnico de dança, ele pertence fundamentalmente ao acervo de Artes/Dança." },
+                { q: "Um livro foi retirado por um aluno que tem prazo de 7 dias para devolver. Ele pegou o livro numa terça-feira. Qual o dia lógico da devolução?", opts: ["Domingo", "Próxima terça-feira", "Sexta-feira", "Próxima quarta-feira"], ans: 1, exp: "Contando 7 dias exatos, o ciclo se fecha no mesmo dia da semana seguinte." },
+                { q: "A ordem correta nas prateleiras segue as letras do alfabeto. Qual sequência está correta?", opts: ["Almeida, Costa, Silva, Barros", "Almeida, Barros, Costa, Silva", "Silva, Costa, Barros, Almeida", "Barros, Almeida, Silva, Costa"], ans: 1, exp: "A-B-C-S é a sequência alfabética correta para facilitar a localização das obras." },
+                { q: "Por que não podemos comer lanches ou beber água perto dos livros do acervo da EDISCA?", opts: ["Para a biblioteca não ficar suja", "Livros não sentem fome", "Farelos atraem insetos que comem papel e líquidos podem manchar e destruir as páginas", "Para o bibliotecário não ver"], ans: 2, exp: "Preservação patrimonial. Livros são frágeis e os resíduos orgânicos os destroem rapidamente." },
+                { q: "Você precisa pesquisar sobre a biografia de Pina Bausch para um trabalho do reforço. Qual a atitude mais eficiente?", opts: ["Ler todos os livros da biblioteca até achar", "Procurar a bibliotecária e pedir orientação para o catálogo de dança contemporânea", "Desistir da pesquisa", "Pegar um livro de matemática"], ans: 1, exp: "A bibliotecária tem o mapa lógico de todo o conhecimento armazenado no local. Sempre peça ajuda!" }
+            ]},
+        jardim: { room: "Manutenção e Zelo", npcs: ["Profª Fátima e Equipe"], icon: "🌱",
+            intro: "Bom dia! Nós somos a equipe de manutenção. Mantemos a EDISCA limpa, segura e cheirosa para todos vocês. Cuidar do espaço é responsabilidade coletiva. Vamos organizar?",
+            questions: [
+                { q: "Para lavar o pátio externo, a equipe utiliza baldes no lugar da mangueira aberta. Qual é a lógica sustentável dessa atitude?", opts: ["Para demorar mais o serviço", "Evitar o desperdício de água, preservando um recurso natural e economizando dinheiro da ONG", "Porque a mangueira quebrou", "Apenas por costume"], ans: 1, exp: "A mangueira aberta gasta centenas de litros. O uso consciente de água é um pilar da responsabilidade social." },
+                { q: "A coleta seletiva na escola tem as cores: Azul (Papel), Vermelho (Plástico) e Orgânico (Marrom). Onde você joga o copinho de água vazio e a casca de banana, respectivamente?", opts: ["Vermelho e Azul", "Azul e Marrom", "Vermelho e Marrom", "Tudo no Azul"], ans: 2, exp: "Plástico (copinho) vai no vermelho. Restos de comida (casca) vão no marrom (orgânico)." },
+                { q: "Varremos a escola de cima para baixo (do último andar para o térreo). Por que usar essa lógica na faxina?", opts: ["Porque é mais fácil descer escadas", "Para a sujeira dos andares de cima não cair nas áreas inferiores já limpas", "Para não cansar as pernas", "Por estética"], ans: 1, exp: "A gravidade faz com que a poeira sempre desça. Começar de cima garante que o trabalho não tenha que ser refeito." },
+                { q: "O que acontece logicamente se os educandos deixam papeis picados no chão da sala de dança antes de saírem?", opts: ["O papel some magicamente", "A equipe de limpeza é sobrecarregada, atrasando a liberação da sala para a próxima turma", "Nada, é a função deles", "O chão fica mais bonito"], ans: 1, exp: "Manter a limpeza é dever de todos. Se cada turma sujar sem recolher, o cronograma da escola inteira atrasa." },
+                { q: "Um produto de limpeza precisa ser diluído: 1 tampa de produto para 10 litros de água. Se vamos preparar 20 litros, quantas tampas usamos?", opts: ["1 tampa", "2 tampas", "3 tampas", "5 tampas"], ans: 1, exp: "Mantendo a proporção, se dobramos a quantidade de água, dobramos o produto: 2 tampas." }
+            ]},
+        saude: { room: "Setor de Saúde", npcs: ["Profª Lorena", "Profª Livia"], icon: "❤️",
+            intro: "Saúde física e mental em primeiro lugar! Somos as Professoras Lorena e Livia. Cuidamos das lesões e do bem-estar psicológico de nossos talentos. Resolvam esses casos clínicos!",
+            questions: [
+                { q: "Um bailarino torceu o tornozelo na aula. Para estancar o inchaço nos primeiros 15 minutos, a fisioterapia aplica:", opts: ["Bolsa de água quente", "Gelo (crioterapia)", "Massagear com força", "Mandar ele voltar a dançar"], ans: 1, exp: "O gelo contrai os vasos sanguíneos, diminuindo imediatamente a inflamação e a dor no momento do trauma." },
+                { q: "Na psicologia escolar, um aluno chega chorando muito por um problema familiar. Qual é a primeira etapa do atendimento?", opts: ["Dar conselhos rápidos e mandar voltar para a aula", "Ouvir ativamente e oferecer um espaço seguro de acolhimento emocional", "Brigar com o aluno", "Ignorar e falar de dança"], ans: 1, exp: "A escuta ativa e o acolhimento sem julgamentos formam a base do suporte psicológico na EDISCA." },
+                { q: "O ensaio do espetáculo é intenso e dura 4 horas. A sala é quente. O que deve ser feito logisticamente para evitar desidratação e cãibras?", opts: ["Beber apenas no final das 4h", "Paradas curtas e programadas para ingestão de água", "Beber 3 litros de uma vez", "Comer salgado"], ans: 1, exp: "A hidratação constante mantém os músculos oxigenados e previne lesões durante o esforço extremo." },
+                { q: "Qual postura corporal é ensinada na fisioterapia para proteger a coluna de uma costureira ou funcionário que trabalha muito tempo sentado?", opts: ["Sentar na ponta da cadeira com os ombros curvados", "Apoiar a lombar no encosto e manter os pés no chão", "Cruzar as pernas o dia todo", "Sentar no chão"], ans: 1, exp: "A ergonomia (pés apoiados e coluna reta) distribui o peso do corpo e evita compressões na coluna vertebral." },
+                { q: "Se a psicologia foca na mente e a fisioterapia no corpo, o que significa a expressão 'cuidado integral' praticada na EDISCA?", opts: ["Cuidar de um de cada vez em anos diferentes", "Entender que o sofrimento mental pode gerar dor física, e tratar o educando como um todo", "Apenas focar na dança", "Apenas medicar"], ans: 1, exp: "Corpo e mente estão interligados. A ansiedade pode tencionar o corpo e causar lesões físicas, por isso o cuidado é integrado." }
+            ]}
+    };
+
+    let questState = {};
+    const medalsContainer = document.getElementById("medals-container");
+    for (let key in questsData) {
+        questState[key] = { currentQ: 0, completed: false };
+        medalsContainer.innerHTML += `<div id="m-${key}" class="medal-icon" title="${questsData[key].room}">${questsData[key].icon}</div>`;
+    }
+
+    const player = { name: "Bailarino(a)", x: 35 * TILE, y: 15 * TILE, width: 24, height: 38, speed: 6, score: 0 };
+
+    // Definição dos perfis de estilo dos NPCs - Corrigido os gêneros em relação aos nomes das professoras e professores
+    const npcLocations = {
+        portaria: { 
+            x: 35*TILE, y: 11*TILE, 
+            npcs: [
+                { skin: "#8d5524", shirt: "#3b82f6", pants: "#1e3a8a", hair: "#000", hStyle: 1, glasses: true }, // Prof. Junior (Masculino)
+                { skin: "#f1c27d", shirt: "#f472b6", pants: "#1e1b4b", hair: "#b55239", hStyle: 2, glasses: false } // Profª Cris (Masculino)
+            ]
+        },
+        secretaria: { 
+            x: 15*TILE, y: 22*TILE, 
+            npcs: [
+                { skin: "#ffdbac", shirt: "#f472b6", pants: "#000", hair: "#b55239", hStyle: 2, glasses: true } // Profª Gesliane (Feminino)
+            ]
+        },
+        diretoria: { 
+            x: 55*TILE, y: 22*TILE, 
+            npcs: [
+                { skin: "#e0ac69", shirt: "#10b981", pants: "#064e3b", hair: "#000", hStyle: 3, glasses: false }, // Profª Andrea (Feminino)
+                { skin: "#8d5524", shirt: "#ef4444", pants: "#000", hair: "#4a3018", hStyle: 2, glasses: true },  // Profª Claudia (Feminino)
+                { skin: "#ffdbac", shirt: "#3b82f6", pants: "#1e3a8a", hair: "#fcd34d", hStyle: 3, glasses: false } // Profª Dora (Feminino)
+            ]
+        },
+        cozinha: { 
+            x: 15*TILE, y: 34*TILE, 
+            npcs: [
+                { skin: "#c68642", shirt: "#fef08a", pants: "#000", hair: "#4a3018", hStyle: 2, glasses: false }, // Profª Aurea (Feminino)
+                { skin: "#ffdbac", shirt: "#e0ac69", pants: "#1e1b4b", hair: "#fcd34d", hStyle: 3, glasses: false } // Profª Daiane (Feminino)
+            ]
+        },
+        reforco: { 
+            x: 55*TILE, y: 34*TILE, 
+            npcs: [
+                { skin: "#f1c27d", shirt: "#6366f1", pants: "#1e1b4b", hair: "#6b7280", hStyle: 1, glasses: true } // Prof. Rogério (Masculino)
+            ]
+        },
+        financeiro: { 
+            x: 15*TILE, y: 46*TILE, 
+            npcs: [
+                { skin: "#8d5524", shirt: "#facc15", pants: "#713f12", hair: "#000", hStyle: 2, glasses: true }, // Profª Clecia (Feminino)
+                { skin: "#ffdbac", shirt: "#a855f7", pants: "#4c1d95", hair: "#b55239", hStyle: 3, glasses: false }, // Profª Vanessa (Feminino)
+                { skin: "#e0ac69", shirt: "#2dd4bf", pants: "#134e4a", hair: "#000", hStyle: 2, glasses: true }  // Profª Flaviane (Feminino)
+            ]
+        },
+        artes: { 
+            x: 55*TILE, y: 46*TILE, 
+            npcs: [
+                { skin: "#ffdbac", shirt: "#a855f7", pants: "#4c1d95", hair: "#fcd34d", hStyle: 3, glasses: false } // Profª Gislene (Feminino)
+            ]
+        },
+        danca: { 
+            x: 25*TILE, y: 58*TILE, 
+            npcs: [
+                { skin: "#e0ac69", shirt: "#ef4444", pants: "#000", hair: "#000", hStyle: 1, glasses: false } // Prof. Anderson (Masculino)
+            ]
+        },
+        teatro: { 
+            x: 45*TILE, y: 58*TILE, 
+            npcs: [
+                { skin: "#ffdbac", shirt: "#000", pants: "#52525b", hair: "#a8a29e", hStyle: 1, glasses: true } // Prof. Jessy (Masculino)
+            ]
+        },
+        saude: { 
+            x: 10*TILE, y: 58*TILE, 
+            npcs: [
+                { skin: "#c68642", shirt: "#2dd4bf", pants: "#134e4a", hair: "#4a3018", hStyle: 2, glasses: false }, // Profª Lorena (Feminino)
+                { skin: "#ffdbac", shirt: "#ec4899", pants: "#4c0519", hair: "#fcd34d", hStyle: 3, glasses: true }  // Profª Livia (Feminino)
+            ]
+        },
+        biblioteca: { 
+            x: 60*TILE, y: 58*TILE, 
+            npcs: [
+                { skin: "#8d5524", shirt: "#94a3b8", pants: "#0f172a", hair: "#000", hStyle: 2, glasses: true } // Profª Neile (Feminino)
+            ]
+        },
+        jardim: { 
+            x: 35*TILE, y: 60*TILE, 
+            npcs: [
+                { skin: "#f1c27d", shirt: "#84cc16", pants: "#3f6212", hair: "#4a3018", hStyle: 2, glasses: false } // Profª Fátima e Equipe (Feminino)
+            ]
+        }
+    };
+
+    const keys = { up: false, down: false, left: false, right: false, action: false };
+
+    function setupInput() {
+        const setKey = (k, state) => {
+            if (k === "ArrowUp" || k === "w") keys.up = state;
+            if (k === "ArrowDown" || k === "s") keys.down = state;
+            if (k === "ArrowLeft" || k === "a") keys.left = state;
+            if (k === "ArrowRight" || k === "d") keys.right = state;
+            if (k === " " || k === "Enter") { keys.action = state; if(state) checkInteraction(); }
+        };
+        window.addEventListener("keydown", e => setKey(e.key, true));
+        window.addEventListener("keyup", e => setKey(e.key, false));
+    }
+
+    function checkCollision(nx, ny) {
+        const pad = 2; 
+        const c1 = Math.floor((nx+pad) / TILE), c2 = Math.floor((nx + player.width - pad) / TILE);
+        const r1 = Math.floor((ny+pad) / TILE), r2 = Math.floor((ny + player.height - pad) / TILE);
+        for (let r = r1; r <= r2; r++) {
+            for (let c = c1; c <= c2; c++) {
+                if (!map[r] || map[r][c] === 1 || map[r][c] === 4) return true;
+            }
+        }
+        return false;
+    }
+
+    function updatePhysics() {
+        if (document.getElementById("dialog-overlay").style.display === "flex") return;
+
+        let dx = 0, dy = 0;
+        if (keys.up) dy = -player.speed;
+        if (keys.down) dy = player.speed;
+        if (keys.left) dx = -player.speed;
+        if (keys.right) dx = player.speed;
+
+        if (dx !== 0 && !checkCollision(player.x + dx, player.y)) player.x += dx;
+        if (dy !== 0 && !checkCollision(player.x, player.y + dy)) player.y += dy;
+
+        camX = Math.max(0, Math.min(player.x - canvas.width / 2, MAP_W - canvas.width));
+        camY = Math.max(0, Math.min(player.y - canvas.height / 2, MAP_H - canvas.height));
+
+        checkProximity();
+    }
+
+    let activeNPC = null;
+    function checkProximity() {
+        activeNPC = null;
+        for (let key in npcLocations) {
+            let loc = npcLocations[key];
+            let dist = Math.hypot(player.x - loc.x, player.y - loc.y);
+            if (dist < 80) { activeNPC = key; break; } 
+        }
+        const prompt = document.getElementById("interaction-prompt");
+        if (activeNPC && !questState[activeNPC].completed) {
+            prompt.style.display = "block";
+            prompt.innerHTML = `Falar com: <b>${questsData[activeNPC].npcs.join(", ")}</b>`;
+        } else { prompt.style.display = "none"; }
+    }
+
+    // ==========================================================================
+    // 4. SISTEMA DE DESAFIOS (Lógica de Modais)
+    // ==========================================================================
+    function checkInteraction() {
+        if (activeNPC && document.getElementById("dialog-overlay").style.display !== "flex") openDialog(activeNPC);
+    }
+
+    function openDialog(npcKey) {
+        const data = questsData[npcKey];
+        const state = questState[npcKey];
+        document.getElementById("dialog-overlay").style.display = "flex";
+        document.getElementById("dialog-npc").innerText = data.npcs.join(" & ");
+        document.getElementById("dialog-room").innerText = data.room;
+        document.getElementById("dialog-icon").innerText = data.icon;
+
+        if (state.completed) {
+            document.getElementById("dialog-content").innerHTML = `Excelente trabalho! Nosso espaço está mais organizado e preparado graças a você.`;
+            document.getElementById("dialog-actions").innerHTML = `<button class="game-btn" onclick="closeDialog()">Valeu!</button>`;
+        } else {
+            document.getElementById("dialog-content").innerHTML = data.intro;
+            document.getElementById("dialog-actions").innerHTML = `<button class="game-btn" onclick="startChallenge('${npcKey}')">Começar</button> <button class="game-btn" style="background:var(--dark);" onclick="closeDialog()">Depois</button>`;
+        }
+    }
+
+    function startChallenge(npcKey) {
+        const data = questsData[npcKey];
+        const qIndex = questState[npcKey].currentQ;
+        const q = data.questions[qIndex];
+        
+        let html = `<div style="color:var(--accent); font-weight:bold; margin-bottom:10px;">Desafio Operacional ${qIndex + 1}/5:</div><div style="margin-bottom:20px;">${q.q}</div>`;
+        q.opts.forEach((opt, idx) => {
+            html += `<button class="option-btn" onclick="answer('${npcKey}', ${idx}, ${q.ans}, '${q.exp.replace(/'/g, "\\'")}')">${opt}</button>`;
+        });
+        document.getElementById("dialog-content").innerHTML = html;
+        document.getElementById("dialog-actions").innerHTML = "";
+    }
+
+    function answer(npcKey, selected, correct, exp) {
+        const state = questState[npcKey];
+        let c = document.getElementById("dialog-content"), a = document.getElementById("dialog-actions");
+        if (selected === correct) {
+            player.score += 20; document.getElementById("hud-score").innerText = `⭐ ${player.score}`;
+            c.innerHTML = `<h3 style="color:#4ecdc4;">✨ Brilhante! É assim que se faz.</h3><p style="margin-top:10px;">${exp}</p>`;
+            state.currentQ++;
+            if (state.currentQ >= 5) {
+                state.completed = true;
+                a.innerHTML = `<button class="game-btn" style="background:#ffe66d; color:#292f36;" onclick="earnMedal('${npcKey}')">Receber Selo</button>`;
+            } else { a.innerHTML = `<button class="game-btn" onclick="startChallenge('${npcKey}')">Próxima Situação</button>`; }
+        } else {
+            c.innerHTML = `<h3 style="color:#ff6b6b;">❌ Atenção!</h3><p>Esse não é o procedimento correto para a nossa rotina. Pense em como as coisas funcionam aqui e tente novamente!</p>`;
+            a.innerHTML = `<button class="game-btn" onclick="startChallenge('${npcKey}')">Tentar Novamente</button>`;
+        }
+    }
+
+    function earnMedal(npcKey) {
+        document.getElementById("m-" + npcKey).classList.add("active");
+        closeDialog();
+        if (Object.values(questState).every(s => s.completed)) {
+            setTimeout(() => {
+                document.getElementById("dialog-overlay").style.display = "flex";
+                document.getElementById("dialog-npc").innerText = "🏆 Coração EDISCA 🏆";
+                document.getElementById("dialog-content").innerHTML = `<h2 style="color:#ffe66d;text-align:center;">PARABÉNS, ${player.name}!</h2><p style="text-align:center;">Você ajudou em todos os setores da instituição. Agora você entende perfeitamente que o espetáculo no palco só acontece por causa do trabalho de cada equipe nos bastidores. O talento brilha onde a educação e a união são a base!</p>`;
+                document.getElementById("dialog-actions").innerHTML = `<button class="game-btn" onclick="location.reload()">Recomeçar</button>`;
+            }, 1000);
+        }
+    }
+    function closeDialog() { document.getElementById("dialog-overlay").style.display = "none"; }
+
+    // ==========================================================================
+    // 5. RENDERIZAÇÃO
+    // ==========================================================================
+    function drawSign(x, y, text) {
+        ctx.font = "bold 12px 'Courier New'";
+        let textW = ctx.measureText(text).width;
+        let boxW = Math.max(textW + 16, 60); 
+        let offset = (boxW - 60) / 2; // Centraliza a placa no NPC
+        
+        // Fundo e Borda de Madeira
+        ctx.fillStyle = "#78350f"; ctx.fillRect(x - offset, y, boxW, 20); 
+        ctx.fillStyle = "#d97706"; ctx.fillRect(x - offset + 2, y + 2, boxW - 4, 16);
+        
+        // Estaca de madeira (Centralizada)
+        ctx.fillStyle = "#451a03"; ctx.fillRect(x + 25, y + 20, 10, 15);
+        
+        // Texto Centralizado
+        ctx.fillStyle = "#fff"; ctx.textAlign = "center";
+        ctx.fillText(text, x + 30, y + 14);
+        ctx.textAlign = "left";
+    }
+
+    function drawCharacter(x, y, skin, shirt, pants, hair, hStyle, glasses, isHero) {
+        ctx.fillStyle = "rgba(0,0,0,0.3)"; ctx.beginPath(); ctx.ellipse(x+12, y+36, 12, 4, 0, 0, Math.PI*2); ctx.fill();
+        ctx.lineWidth = 2; ctx.strokeStyle = "#111";
+
+        if(isHero) {
+            ctx.fillStyle = "#18181b"; ctx.fillRect(x+6, y+14, 12, 14); ctx.strokeRect(x+6, y+14, 12, 14);
+            ctx.fillStyle = skin; ctx.fillRect(x+6, y+28, 4, 10); ctx.strokeRect(x+6, y+28, 4, 10);
+            ctx.fillRect(x+14, y+28, 4, 10); ctx.strokeRect(x+14, y+28, 4, 10);
+            ctx.fillStyle = "#fef08a"; ctx.fillRect(x+5, y+35, 6, 4); ctx.fillRect(x+13, y+35, 6, 4);
+            ctx.fillStyle = skin; ctx.fillRect(x+2, y+15, 4, 12); ctx.strokeRect(x+2, y+15, 4, 12);
+            ctx.fillRect(x+18, y+15, 4, 12); ctx.strokeRect(x+18, y+15, 4, 12);
+        } else {
+            ctx.fillStyle = pants; ctx.fillRect(x+6, y+26, 4, 10); ctx.strokeRect(x+6, y+26, 4, 10);
+            ctx.fillRect(x+14, y+26, 4, 10); ctx.strokeRect(x+14, y+26, 4, 10);
+            ctx.fillStyle = "#000"; ctx.fillRect(x+5, y+34, 6, 4); ctx.fillRect(x+13, y+34, 6, 4);
+            ctx.fillStyle = shirt; ctx.fillRect(x+5, y+14, 14, 13); ctx.strokeRect(x+5, y+14, 14, 13);
+            ctx.fillStyle = shirt; ctx.fillRect(x+1, y+14, 4, 6); ctx.fillRect(x+19, y+14, 4, 6);
+            ctx.fillStyle = skin; ctx.fillRect(x+1, y+20, 4, 6); ctx.strokeRect(x+1, y+20, 4, 6);
+            ctx.fillRect(x+19, y+20, 4, 6); ctx.strokeRect(x+19, y+20, 4, 6);
+        }
+
+        ctx.fillStyle = skin; ctx.fillRect(x+6, y+2, 12, 12); ctx.strokeRect(x+6, y+2, 12, 12);
+        ctx.fillStyle = "#000"; ctx.fillRect(x+8, y+7, 2, 3); ctx.fillRect(x+14, y+7, 2, 3);
+
+        if(glasses) {
+            ctx.strokeStyle = "#4b5563"; ctx.lineWidth = 1;
+            ctx.strokeRect(x+7, y+6, 4, 4); ctx.strokeRect(x+13, y+6, 4, 4);
+            ctx.beginPath(); ctx.moveTo(x+11, y+8); ctx.lineTo(x+13, y+8); ctx.stroke();
+        }
+
+        ctx.fillStyle = hair;
+        if(hStyle === 1) { 
+            ctx.fillRect(x+5, y, 14, 4); 
+            ctx.fillRect(x+5, y+4, 2, 4); ctx.fillRect(x+17, y+4, 2, 4);
+        } else if (hStyle === 2) { // Feminino: Cabelo Longo
+            ctx.fillRect(x+4, y-2, 16, 6);
+            ctx.fillRect(x+4, y+4, 3, 10); ctx.fillRect(x+17, y+4, 3, 10);
+        } else if (hStyle === 3) { // Feminino: Coque
+            ctx.fillRect(x+5, y, 14, 4);
+            ctx.beginPath(); ctx.arc(x+12, y, 4, 0, Math.PI*2); ctx.fill(); 
+        }
+    }
+
+    function draw() {
+        ctx.fillStyle = "#1a1a1a"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.save();
+        ctx.translate(Math.floor(-camX), Math.floor(-camY));
+
+        const c1 = Math.max(0, Math.floor(camX / TILE)), c2 = Math.min(COLS - 1, Math.floor((camX + canvas.width) / TILE));
+        const r1 = Math.max(0, Math.floor(camY / TILE)), r2 = Math.min(ROWS - 1, Math.floor((camY + canvas.height) / TILE));
+
+        for (let r = r1; r <= r2; r++) {
+            for (let c = c1; c <= c2; c++) {
+                let tx = c * TILE, ty = r * TILE, type = map[r][c];
+                if (type === 0) { ctx.fillStyle = "#65a30d"; ctx.fillRect(tx, ty, TILE, TILE); ctx.fillStyle = "#4d7c0f"; ctx.fillRect(tx+15, ty+15, 4, 4); }
+                else if (type === 1) { ctx.fillStyle = "#334155"; ctx.fillRect(tx, ty, TILE, TILE); ctx.fillStyle = "#1e293b"; ctx.fillRect(tx, ty, TILE, 10); }
+                else if (type === 2) { ctx.fillStyle = "#d97706"; ctx.fillRect(tx, ty, TILE, TILE); } 
+                else if (type === 3) { ctx.fillStyle = "#fef08a"; ctx.fillRect(tx, ty, TILE, TILE); ctx.fillStyle = "#facc15"; ctx.fillRect(tx, ty, 2, TILE); }
+                else if (type === 4) { ctx.fillStyle = "#0ea5e9"; ctx.fillRect(tx, ty, TILE, TILE); let w=Math.sin(Date.now()/300+c)*2; ctx.fillStyle="#38bdf8"; ctx.fillRect(tx+5, ty+10+w, 20, 3); }
+            }
+        }
+
+        // Desenha as Placas
+        for(let key in npcLocations) {
+            drawSign(npcLocations[key].x - 15, npcLocations[key].y - 30, questsData[key].room);
+        }
+
+        // Desenha os Personagens com gênero correto
+        for (let key in npcLocations) {
+            let loc = npcLocations[key];
+            let count = loc.npcs.length;
+            let bounce = Math.sin(Date.now() / 200 + loc.x) * 2;
+            
+            if(count === 1) {
+                let n = loc.npcs[0];
+                drawCharacter(loc.x, loc.y + bounce, n.skin, n.shirt, n.pants, n.hair, n.hStyle, n.glasses, false);
+            } else if(count === 2) {
+                let n1 = loc.npcs[0];
+                let n2 = loc.npcs[1];
+                drawCharacter(loc.x - 12, loc.y + bounce, n1.skin, n1.shirt, n1.pants, n1.hair, n1.hStyle, n1.glasses, false);
+                drawCharacter(loc.x + 12, loc.y + bounce + 2, n2.skin, n2.shirt, n2.pants, n2.hair, n2.hStyle, n2.glasses, false);
+            } else if(count === 3) {
+                let n1 = loc.npcs[0];
+                let n2 = loc.npcs[1];
+                let n3 = loc.npcs[2];
+                drawCharacter(loc.x - 20, loc.y + bounce, n1.skin, n1.shirt, n1.pants, n1.hair, n1.hStyle, n1.glasses, false);
+                drawCharacter(loc.x, loc.y + bounce + 1, n2.skin, n2.shirt, n2.pants, n2.hair, n2.hStyle, n2.glasses, false);
+                drawCharacter(loc.x + 20, loc.y + bounce, n3.skin, n3.shirt, n3.pants, n3.hair, n3.hStyle, n3.glasses, false);
+            }
+
+            if (!questState[key].completed) {
+                ctx.fillStyle = "#ffe66d"; ctx.font = "bold 24px Arial"; ctx.fillText("!", loc.x + 8, loc.y - 15 + bounce);
+            }
+        }
+
+        let bob = (keys.up || keys.down || keys.left || keys.right) ? Math.sin(Date.now() / 80) * 3 : 0;
+        drawCharacter(player.x, player.y + bob, "#ffdbac", "#18181b", "#18181b", "#292524", 3, false, true);
+
+        ctx.restore();
+    }
+
+    function loop() {
+        updatePhysics();
+        draw();
+        requestAnimationFrame(loop);
+    }
+
+    function startGame() {
+        let name = document.getElementById("player-name").value.trim();
+        if(name) player.name = name;
+        document.getElementById("hud-name").innerText = player.name;
+        
+        document.getElementById("start-screen").style.opacity = "0";
+        setTimeout(() => {
+            document.getElementById("start-screen").style.display = "none";
+            document.getElementById("hud").style.display = "flex";
+            document.getElementById("tutorial-hud").style.display = "block";
+            if (window.innerWidth < 800) document.getElementById("controls").style.display = "flex";
+        }, 500);
+
+        initMap();
+        setupInput();
+        requestAnimationFrame(loop);
+    }
+</script>
+</body>
+</html>
