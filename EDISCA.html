@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>EDISCA: Uma aventura educativa pelos caminhos da EDISCA.</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #ff6b6b;
@@ -11,8 +14,10 @@
             --dark: #292f36;
             --light: #f7fff7;
             --accent: #ffe66d;
-            --ui-bg: rgba(28, 33, 41, 0.96);
+            --ui-bg: rgba(32, 38, 46, 0.88);
             --ui-border: #ffe66d;
+            --font-head: 'Baloo 2', 'Courier New', sans-serif;
+            --font-body: 'Nunito', 'Courier New', sans-serif;
         }
 
         * {
@@ -22,8 +27,8 @@
 
         body, html {
             width: 100%; height: 100%; overflow: hidden;
-            font-family: 'Courier New', Courier, monospace;
-            background-color: #11141a; color: var(--light);
+            font-family: var(--font-body);
+            background-color: #142018; color: var(--light);
         }
 
         #game-wrapper {
@@ -32,42 +37,65 @@
         }
 
         canvas {
-            display: block; image-rendering: pixelated;
-            width: 100%; height: 100%;
+            display: block; image-rendering: auto;
         }
 
         /* UI e Modais */
         .screen {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            z-index: 10; 
-            background: radial-gradient(circle, #2d5a57 0%, #11141a 100%);
+            z-index: 10; overflow: hidden;
+            background:
+                radial-gradient(circle at 30% 20%, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 35%),
+                linear-gradient(180deg, #7fe3d4 0%, #4ecdc4 35%, #2a9d8f 65%, #21665c 100%);
             transition: opacity 0.5s;
         }
+        .screen::before, .screen::after {
+            content: ""; position: absolute; border-radius: 50%;
+            background: rgba(255,255,255,0.35); filter: blur(1px);
+            animation: floatCloud 22s linear infinite;
+        }
+        .screen::before { width: 140px; height: 40px; top: 14%; left: -20%; box-shadow: 60px 20px 0 -5px rgba(255,255,255,0.25), 110px -5px 0 -8px rgba(255,255,255,0.3); }
+        .screen::after { width: 100px; height: 32px; top: 65%; left: -25%; animation-duration: 30s; animation-delay: 4s; box-shadow: 50px 15px 0 -6px rgba(255,255,255,0.2); }
+        @keyframes floatCloud { from { transform: translateX(0); } to { transform: translateX(160vw); } }
 
-        h1 { font-size: 3.5rem; color: var(--accent); text-shadow: 4px 4px 0px var(--primary), 8px 8px 0px var(--dark); margin-bottom: 10px; text-align: center; }
-        h2 { font-size: 1.5rem; background: var(--primary); padding: 5px 15px; border-radius: 10px; border: 3px solid var(--dark); margin-bottom: 20px; text-align: center;}
+        h1 {
+            font-family: var(--font-head); font-weight: 800;
+            font-size: 4rem; color: var(--accent);
+            text-shadow: 3px 3px 0px var(--primary), 6px 6px 0px var(--dark), 0 10px 25px rgba(0,0,0,0.35);
+            margin-bottom: 6px; text-align: center; letter-spacing: 1px;
+        }
+        h2 {
+            font-family: var(--font-head); font-weight: 700;
+            font-size: 1.4rem; background: linear-gradient(135deg, var(--primary), #ff8e8e);
+            padding: 6px 18px; border-radius: 30px; border: 3px solid var(--dark);
+            margin-bottom: 22px; text-align: center; box-shadow: 0 4px 0 var(--dark);
+        }
 
         .form-card {
-            background: var(--ui-bg); border: 4px solid var(--ui-border); border-radius: 16px;
-            padding: 30px; width: 90%; max-width: 400px; text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+            background: var(--ui-bg); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+            border: 4px solid var(--ui-border); border-radius: 22px;
+            padding: 34px 30px; width: 90%; max-width: 400px; text-align: center;
+            box-shadow: 0 16px 40px rgba(0,0,0,0.45), inset 0 0 0 2px rgba(255,255,255,0.06);
+            position: relative; z-index: 1;
         }
 
         input[type="text"] {
-            width: 100%; padding: 12px; border-radius: 8px; border: 3px solid var(--secondary);
-            font-size: 1.2rem; font-weight: bold; text-align: center; margin-bottom: 20px; outline: none;
-            font-family: 'Courier New', Courier, monospace;
-            background: #fff; color: #000;
+            width: 100%; padding: 12px; border-radius: 10px; border: 3px solid var(--secondary);
+            font-size: 1.2rem; font-weight: 800; text-align: center; margin-bottom: 20px; outline: none;
+            font-family: var(--font-body); background: #fff; color: var(--dark);
+            transition: box-shadow 0.2s, border-color 0.2s;
         }
+        input[type="text"]:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(255,230,109,0.35); }
 
         .game-btn {
-            background: var(--primary); color: var(--light); border: 3px solid var(--dark);
-            padding: 12px 25px; font-size: 1.2rem; font-weight: bold; border-radius: 12px;
-            cursor: pointer; box-shadow: 4px 4px 0px var(--dark); text-transform: uppercase;
-            font-family: 'Courier New', Courier, monospace;
+            background: linear-gradient(180deg, #ff8a8a, var(--primary)); color: var(--light); border: 3px solid var(--dark);
+            padding: 13px 26px; font-size: 1.15rem; font-weight: 800; border-radius: 14px;
+            cursor: pointer; box-shadow: 0 5px 0px var(--dark), 0 8px 18px rgba(0,0,0,0.3); text-transform: uppercase;
+            font-family: var(--font-head); letter-spacing: 0.5px; transition: transform 0.08s, box-shadow 0.08s, filter 0.15s;
         }
-        .game-btn:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px var(--dark); }
+        .game-btn:hover { filter: brightness(1.08); }
+        .game-btn:active { transform: translate(0, 5px); box-shadow: 0px 0px 0px var(--dark); }
 
         /* HUD Principal */
         #hud {
@@ -75,55 +103,57 @@
         }
 
         .hud-panel {
-            background: var(--ui-bg); border: 3px solid var(--ui-border); border-radius: 12px;
-            padding: 10px 15px; display: inline-flex; align-items: center; gap: 10px;
-            pointer-events: auto;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            background: var(--ui-bg); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+            border: 3px solid var(--ui-border); border-radius: 14px;
+            padding: 10px 16px; display: inline-flex; align-items: center; gap: 10px;
+            font-family: var(--font-head); box-shadow: 0 6px 16px rgba(0,0,0,0.35);
         }
 
-        .hud-medals { display: flex; flex-wrap: wrap; gap: 5px; max-width: 320px; }
+        .hud-medals { display: flex; flex-wrap: wrap; gap: 6px; max-width: 320px; }
         .medal-icon {
-            width: 32px; height: 32px; background: rgba(255,255,255,0.05); border: 2px dashed rgba(255,255,255,0.2);
-            border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.1rem; opacity: 0.4;
-            transition: all 0.3s ease;
+            width: 30px; height: 30px; background: rgba(255,255,255,0.08); border: 2px dashed rgba(255,255,255,0.35);
+            border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 0.95rem; opacity: 0.55;
+            transition: transform 0.25s, opacity 0.25s;
         }
         .medal-icon.active {
-            opacity: 1; border: 2px solid var(--accent); background: radial-gradient(circle, #ffe66d 0%, #fca311 100%);
-            box-shadow: 0 0 12px var(--accent);
-            transform: scale(1.1);
+            opacity: 1; border: 2px solid var(--accent); background: radial-gradient(circle, #fff4b8 0%, #fca311 100%);
+            box-shadow: 0 0 12px var(--accent), 0 0 0 3px rgba(255,230,109,0.25);
+            animation: medalPop 0.5s ease;
         }
+        @keyframes medalPop { 0% { transform: scale(0.3) rotate(-15deg); } 60% { transform: scale(1.25) rotate(6deg); } 100% { transform: scale(1) rotate(0); } }
 
         #tutorial-hud {
-            position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.8);
-            border: 2px solid var(--secondary); padding: 10px; border-radius: 10px;
+            position: absolute; top: 10px; right: 10px; background: var(--ui-bg);
+            backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+            border: 2px solid var(--secondary); padding: 12px 16px; border-radius: 14px;
             color: #fff; font-size: 0.9rem; text-align: right; z-index: 5;
-            pointer-events: none;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.35); line-height: 1.5;
         }
 
         /* Diálogos */
         .modal-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.75); display: none; justify-content: center; align-items: center; z-index: 20;
+            background: rgba(10,15,12,0.72); backdrop-filter: blur(2px);
+            display: none; justify-content: center; align-items: center; z-index: 20;
         }
         .dialog-box {
-            background: var(--ui-bg); border: 5px solid var(--ui-border); border-radius: 20px;
+            background: var(--ui-bg); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+            border: 4px solid var(--ui-border); border-radius: 22px;
             width: 90%; max-width: 700px; max-height: 90vh; display: flex; flex-direction: column;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5); overflow: hidden;
         }
-        .dialog-header { background: #1a1e24; padding: 15px; display: flex; align-items: center; gap: 15px; border-bottom: 3px solid var(--ui-border); }
-        .dialog-avatar { width: 60px; height: 60px; background: var(--primary); border: 3px solid var(--accent); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 2rem; }
-        .dialog-body { padding: 25px; font-size: 1.1rem; line-height: 1.6; overflow-y: auto; color: var(--light); }
-        .dialog-footer { padding: 15px; background: rgba(0,0,0,0.3); display: flex; justify-content: flex-end; gap: 10px; border-top: 2px solid rgba(255,255,255,0.1); }
-        .option-btn { background: var(--dark); border: 2px solid var(--secondary); color: var(--light); padding: 12px 15px; border-radius: 10px; margin-bottom: 10px; cursor: pointer; text-align: left; font-size: 1rem; width: 100%; font-family: 'Courier New', Courier, monospace; transition: all 0.2s; }
-        .option-btn:hover { background: var(--secondary); color: var(--dark); font-weight: bold; transform: translateX(5px); }
+        .dialog-header { background: linear-gradient(135deg, var(--dark), #1b2026); padding: 16px 18px; display: flex; align-items: center; gap: 15px; border-bottom: 3px solid var(--ui-border); }
+        .dialog-avatar { width: 60px; height: 60px; background: radial-gradient(circle at 35% 30%, #ff9a9a, var(--primary)); border: 3px solid var(--accent); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 2rem; box-shadow: 0 0 0 4px rgba(255,230,109,0.2); }
+        .dialog-body { padding: 26px; font-size: 1.08rem; line-height: 1.65; overflow-y: auto; font-family: var(--font-body); font-weight: 600; }
+        .dialog-footer { padding: 16px; background: rgba(0,0,0,0.25); display: flex; justify-content: flex-end; gap: 10px; border-top: 2px solid rgba(255,255,255,0.08); }
+        .option-btn { background: rgba(255,255,255,0.04); border: 2px solid var(--secondary); color: var(--light); padding: 13px 16px; border-radius: 12px; margin-bottom: 10px; cursor: pointer; text-align: left; font-size: 1rem; width: 100%; font-family: var(--font-body); font-weight: 700; transition: background 0.15s, color 0.15s, transform 0.1s; border-left-width: 6px;}
+        .option-btn:hover { background: var(--secondary); color: var(--dark); transform: translateX(3px); }
 
         #interaction-prompt {
             position: absolute; bottom: 120px; left: 50%; transform: translateX(-50%);
-            background: var(--ui-bg); border: 3px solid var(--primary); padding: 12px 24px;
-            border-radius: 24px; font-weight: bold; display: none; z-index: 5; animation: pulse 1s infinite;
-            text-align: center; color: var(--light);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            background: var(--ui-bg); backdrop-filter: blur(6px); border: 3px solid var(--primary); padding: 10px 22px;
+            border-radius: 24px; font-weight: 800; font-family: var(--font-head); display: none; z-index: 5; animation: pulse 1s infinite;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.4);
         }
         @keyframes pulse { 0%, 100% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.05); } }
 
@@ -131,11 +161,9 @@
         #controls { position: absolute; bottom: 20px; width: 100%; display: flex; justify-content: space-between; padding: 0 20px; z-index: 5; pointer-events: none; }
         .dpad, .action-pad { pointer-events: auto; }
         .dpad { display: grid; grid-template-columns: repeat(3, 55px); grid-template-rows: repeat(3, 55px); gap: 5px; }
-        .ctrl-btn { background: rgba(0,0,0,0.7); border: 3px solid rgba(255,255,255,0.7); border-radius: 10px; color: white; font-size: 1.5rem; display: flex; justify-content: center; align-items: center; cursor: pointer; }
-        .ctrl-btn:active { background: var(--secondary); }
+        .ctrl-btn { background: rgba(20,25,20,0.55); backdrop-filter: blur(3px); border: 3px solid rgba(255,255,255,0.75); border-radius: 12px; color: white; font-size: 1.5rem; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.35); }
         .btn-up { grid-column: 2; grid-row: 1; } .btn-left { grid-column: 1; grid-row: 2; } .btn-down { grid-column: 2; grid-row: 3; } .btn-right { grid-column: 3; grid-row: 2; }
-        .action-btn { width: 80px; height: 80px; border-radius: 50%; background: var(--primary); border: 4px solid var(--accent); color: var(--dark); font-weight: bold; display: flex; justify-content: center; align-items: center; align-self: flex-end; margin-bottom: 15px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        .action-btn:active { transform: scale(0.9); }
+        .action-btn { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(180deg, #ff8a8a, var(--primary)); border: 4px solid var(--accent); color: var(--dark); font-weight: 800; font-family: var(--font-head); display: flex; justify-content: center; align-items: center; align-self: flex-end; margin-bottom: 15px; box-shadow: 0 6px 14px rgba(0,0,0,0.4); }
         @media (min-width: 800px) { #controls { display: none; } }
     </style>
 </head>
@@ -210,57 +238,11 @@
     let map = [];
     let camX = 0, camY = 0;
 
-    // Elementos estéticos adicionais para simular vento e vida ambiental
-    let leafParticles = [];
-    let butterflyParticles = [];
-    let birdParticles = [];
-    
-    function initAmbientParticles() {
-        // Inicializa folhas ao vento
-        for (let i = 0; i < 60; i++) {
-            leafParticles.push({
-                x: Math.random() * MAP_W,
-                y: Math.random() * MAP_H,
-                size: Math.random() * 3 + 2,
-                speedX: Math.random() * 1 + 0.5,
-                speedY: Math.random() * 0.5 + 0.2,
-                color: ["#4d7c0f", "#a3e635", "#84cc16", "#ca8a04"][Math.floor(Math.random() * 4)]
-            });
-        }
-        // Inicializa borboletas
-        for (let i = 0; i < 20; i++) {
-            butterflyParticles.push({
-                x: Math.random() * MAP_W,
-                y: Math.random() * MAP_H,
-                wingCycle: Math.random() * Math.PI,
-                color: ["#ffe66d", "#4ecdc4", "#ff6b6b"][Math.floor(Math.random() * 3)],
-                speedX: (Math.random() - 0.5) * 0.8,
-                speedY: (Math.random() - 0.5) * 0.8
-            });
-        }
-        // Inicializa passarinhos ocasionais
-        for (let i = 0; i < 5; i++) {
-            birdParticles.push({
-                x: Math.random() * MAP_W,
-                y: Math.random() * 10 * TILE,
-                wing: 0,
-                speed: Math.random() * 1.5 + 1
-            });
-        }
-    }
-
     function resizeCanvas() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
     }
-    window.addEventListener('resize', () => {
-        resizeCanvas();
-        if (window.innerWidth < 800 && document.getElementById("start-screen").style.display === "none") {
-            document.getElementById("controls").style.display = "flex";
-        } else {
-            document.getElementById("controls").style.display = "none";
-        }
-    });
+    window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
     // ==========================================================================
@@ -325,11 +307,19 @@
         portaria: { room: "Portaria", npcs: ["Prof. Junior", "Prof. Cris"], icon: "🚪",
             intro: "Bem-vindos à portaria da EDISCA! Somos o Professor Junior e o Professor Cris. Nosso trabalho é garantir a segurança e o acesso correto de todos. Vamos testar sua lógica de organização?",
             questions: [
-                { q: "Se a turma A tem 20 alunos e a turma B tem 15, e cada aluno leva 10 segundos para passar a carteirinha na catraca, qual turma libera a portaria mais rápido?", opts: ["Turma A", "Turma B", "As duas ao mesmo tempo", "Depende do dia"], ans: 1, exp: "A Turma B tem menos alunos, portanto, o tempo total de passagem na catraca será menor." },
-                { q: "Um educando esqueceu a carteirinha em casa. A regra de segurança diz que sem identificação não há acesso direto. Qual o procedimento lógico?", opts: ["Pular a catraca", "Voltar para casa", "Avisar a secretaria e solicitar liberação provisória", "Entrar junto com um amigo"], ans: 2, exp: "A comunicação com a secretaria garante o controle seguro de quem está dentro da instituição." },
-                { q: "O ensaio termina às 17h30. Os pais começam a chegar 15 minutos antes. A que horas a portaria deve organizar a área de espera?", opts: ["17h00", "17h15", "17h30", "17h45"], ans: 1, exp: "Se eles chegam 15 minutos antes das 17h30, a recepção deve estar pronta às 17h15." },
+               { q: "Na entrada da EDISCA, quatro educandos chegaram à portaria. Sofia entrou antes de Miguel. Ana entrou depois de Miguel, mas antes de Lucas. Quem foi o terceiro a passar pela catraca?",
+  opts: ["Sofia", "Miguel", "Ana", "Lucas"],
+  ans: 2,
+  exp: "A ordem correta é: Sofia → Miguel → Ana → Lucas. Portanto, a terceira pessoa a passar pela catraca foi Ana." },
+              { q: "A equipe da portaria precisa localizar um educando. Eles sabem apenas que ele não está na recepção, nem na biblioteca, e que ainda não foi para o refeitório. Em qual lugar ele provavelmente está?",
+  opts: ["Sala de aula", "Recepção", "Biblioteca", "Refeitório"],
+  ans: 0,
+  exp: "Como os outros locais já foram descartados, a única possibilidade restante é que ele esteja na sala de aula." },                { q: "O ensaio termina às 17h30. Os pais começam a chegar 15 minutos antes. A que horas a portaria deve organizar a área de espera?", opts: ["17h00", "17h15", "17h30", "17h45"], ans: 1, exp: "Se eles chegam 15 minutos antes das 17h30, a recepção deve estar pronta às 17h15." },
                 { q: "Por que não podemos deixar as portas principais totalmente abertas sem monitoramento durante as aulas?", opts: ["Para o ar condicionado não vazar", "Por medidas rigorosas de proteção aos educandos", "Para não entrar poeira", "Porque a porta quebra"], ans: 1, exp: "A prioridade número um da portaria é a segurança física de todos os alunos e funcionários." },
-                { q: "Se 3 ônibus fretados chegam com 40 alunos cada, e temos 2 catracas funcionando. Quantos alunos passarão, em média, por cada catraca?", opts: ["40", "60", "80", "120"], ans: 1, exp: "Total de 120 alunos (3x40). Dividido por 2 catracas, são 60 alunos por catraca." }
+               { q: "Na entrada da EDISCA há quatro mochilas esquecidas. Uma é azul, uma verde, uma vermelha e uma amarela. Sabe-se que: a mochila azul não é de quem chegou primeiro; a vermelha pertence a alguém que chegou antes do dono da verde; a amarela foi a última a ser identificada. Qual mochila certamente não foi a primeira a chegar?",
+  opts: ["Azul", "Verde", "Vermelha", "Amarela"],
+  ans: 0,
+  exp: "O enunciado informa diretamente que a mochila azul não pertence a quem chegou primeiro." }
             ]},
         secretaria: { room: "Secretaria", npcs: ["Profª Gesliane"], icon: "🗂️",
             intro: "Oi, aqui é a Professora Gesliane! Cuidamos de toda a documentação, presenças e matrículas para que vocês possam estudar em paz. Me ajude com a rotina administrativa!",
@@ -352,11 +342,27 @@
         cozinha: { room: "Cozinha", npcs: ["Profª Aurea", "Profª Daiane"], icon: "🍳",
             intro: "Cheirinho de comida boa! Somos as Professoras Aurea e Daiane. Preparamos a alimentação nutritiva que dá energia para vocês dançarem. Vamos calcular nossa rotina?",
             questions: [
-                { q: "Para fazer o lanche de 1 turma, usamos 2 pacotes de macarrão. Hoje temos 5 turmas para alimentar. Quantos pacotes precisamos?", opts: ["5", "7", "10", "12"], ans: 2, exp: "5 turmas x 2 pacotes = 10 pacotes de macarrão. Ninguém pode ficar com fome!" },
+               { q: "Na cozinha, as bandejas recebem etiquetas nesta sequência: A, B, C, A, B, C, A... Qual letra aparecerá na 11ª bandeja?",
+  opts: [
+    "A",
+    "B",
+    "C",
+    "D"
+  ],
+  ans: 1,
+  exp: "A sequência se repete a cada três bandejas. A 11ª posição corresponde à letra B." },
                 { q: "A distribuição da refeição exige higiene rigorosa. Qual a ordem correta antes de servir?", opts: ["Servir > Lavar as mãos > Cozinhar", "Lavar as mãos > Colocar touca > Cozinhar > Servir", "Cozinhar > Comer > Servir", "Lavar os alimentos depois de picar"], ans: 1, exp: "A higienização (mãos e cabelo) é o primeiro passo para garantir a segurança alimentar de todos." },
-                { q: "Temos 150 maçãs e 150 alunos. Cada aluno recebe uma maçã. Se 10 alunos faltaram, quantas maçãs sobrarão na cozinha?", opts: ["Nenhuma", "5", "10", "15"], ans: 2, exp: "Se temos 150 e entregamos 140, sobram 10. Evitamos desperdício guardando corretamente!" },
-                { q: "Um suco precisa de 1 litro de polpa para cada 4 litros de água. Se vamos usar 2 litros de polpa, quanta água precisamos?", opts: ["4 litros", "6 litros", "8 litros", "10 litros"], ans: 2, exp: "Se a proporção é 1 para 4. Dobrando a polpa (2), dobramos a água (8)." },
-                { q: "Por que o cardápio da EDISCA é planejado por nutricionistas semanas antes?", opts: ["Para comprar os ingredientes com antecedência e garantir o valor nutricional", "Porque é mais fácil cozinhar qualquer coisa na hora", "Para esconder a comida", "Para fazer sempre a mesma comida"], ans: 0, exp: "Planejamento garante economia na compra e refeições balanceadas para a saúde de vocês." }
+               { q: "As frutas precisam ser organizadas em ordem alfabética. Qual sequência está correta?",
+  opts: [
+    "Banana → Maçã → Melancia → Pera",
+    "Maçã → Banana → Melancia → Pera",
+    "Banana → Melancia → Maçã → Pera",
+    "Melancia → Banana → Maçã → Pera"
+  ],
+  ans: 0,
+  exp: "Em ordem alfabética: Banana, Maçã, Melancia e Pera." },
+                { q: "Na cozinha, quatro recipientes estão identificados como Açúcar, Sal, Farinha e Arroz. Sabe-se que apenas um rótulo está correto. Ao abrir o recipiente escrito 'Sal', você encontra farinha. Qual rótulo certamente está errado?", opts: ["Açúcar", "Sal", "Farinha", "Arroz"], ans: 1, exp: "Como o recipiente identificado como 'Sal' contém farinha, esse rótulo certamente está errado." },
+                { q: "Por que o cardápio da EDISCA é planejado semanas antes?", opts: ["Para comprar os ingredientes com antecedência e garantir o valor nutricional", "Porque é mais fácil cozinhar qualquer coisa na hora", "Para esconder a comida", "Para fazer sempre a mesma comida"], ans: 0, exp: "Planejamento garante economia na compra e refeições balanceadas para a saúde de vocês." }
             ]},
         financeiro: { room: "Financeiro", npcs: ["Profª Clecia", "Profª Vanessa", "Profª Flaviane"], icon: "💰",
             intro: "Bem-vindos ao coração financeiro da escola! Somos as Professoras Clecia, Vanessa e Flaviane. Cuidamos para que o dinheiro doado se transforme em arte e estrutura. Calcule conosco:",
@@ -370,38 +376,38 @@
         reforco: { room: "Reforço Escolar", npcs: ["Prof. Rogério"], icon: "📐",
             intro: "E aí! Sou o Professor Rogério. Sem estudo não há arte completa. Nosso reforço garante que vocês brilhem na escola regular também. Vamos aos desafios!",
             questions: [
-                { q: "Uma turma tem dificuldade em Matemática, outra em Português. O professor tem 2 horas. Como dividir o tempo de forma lógica e justa?", opts: ["2h só para Matemática", "Dar 1h para cada matéria, focando nas maiores dúvidas", "Não dar aula", "Falar sobre outra coisa"], ans: 1, exp: "A divisão equitativa garante que ambas as defasagens de aprendizado sejam atendidas." },
-                { q: "Na interpretação de texto: 'A dedicação no balé reflete na disciplina escolar'. O que essa frase significa na prática?", opts: ["O balé atrapalha os estudos", "Quem tem disciplina na arte, naturalmente aplica essa organização nos cadernos e notas", "Balé é só diversão", "A escola não importa"], ans: 1, exp: "A concentração exigida pela dança desenvolve habilidades cognitivas úteis para as disciplinas regulares." },
-                { q: "Se um aluno lê 5 páginas de um livro por dia. Em uma semana (7 dias), quantas páginas ele terá lido no projeto de leitura?", opts: ["25", "30", "35", "40"], ans: 2, exp: "5 páginas x 7 dias = 35 páginas lidas e muito vocabulário novo adquirido!" },
-                { q: "Um cronograma de estudos eficiente deve intercalar:", opts: ["Matérias fáceis e difíceis, com pequenas pausas", "Apenas a matéria que se gosta por 6 horas seguidas", "Estudar com a TV ligada", "Estudar na véspera da prova"], ans: 0, exp: "As pausas e a variação de matérias ajudam o cérebro a fixar melhor o conteúdo, sem sobrecarga." },
-                { q: "Um educando precisa entregar um trabalho amanhã e ir ao ensaio hoje. Qual a gestão de tempo ideal?", opts: ["Faltar o ensaio", "Não fazer o trabalho", "Fazer o trabalho antes do ensaio ou organizar o tempo restante à noite", "Fazer de qualquer jeito"], ans: 2, exp: "Responsabilidade dupla: honrar o compromisso com a EDISCA e com a educação formal." }
+                { q: "Na sala de reforço, quatro alunos fizeram atividades diferentes: leitura, escrita, cálculo e lógica. Sabe-se que Ana Luiza não fez cálculo, Hellen fez lógica e Anny Naomy fez leitura. Qual atividade sobrou para Giovana?", opts: ["Escrita", "Leitura", "Cálculo", "Lógica"], ans: 2, exp: "Como Hellen fez lógica, Anny Naomy fez leitura e Ana Luiza não fez cálculo, a única atividade restante para Giovana é cálculo." },
+               { q: "Durante uma atividade, Tio Rogério escreveu um código: A1, B2, C3, D4. Se a mesma lógica continuar, qual código representa a letra F?", opts: ["F5", "F6", "E6", "G6"], ans: 1, exp: "Cada letra corresponde à sua posição no alfabeto: A=1, B=2, C=3... Portanto, F corresponde ao número 6." },
+                { q: "Se Ketlein lê 5 páginas de um livro por dia. Em uma semana (7 dias), quantas páginas ela terá lido no projeto de leitura?", opts: ["25", "30", "35", "40"], ans: 2, exp: "5 páginas x 7 dias = 35 páginas lidas e muito vocabulário novo adquirido!" },
+                { q: "Qual alternativa não segue o mesmo padrão das demais?", opts: ["ABAB", "CDCD", "EFEF", "GHHI"], ans: 3, exp: "As três primeiras repetem um bloco de duas letras. 'GHHI' quebra esse padrão." },
+                { q: "Tio Rogério escreveu no quadro: 'Leia todas as alternativas antes de responder.' Qual é a atitude mais lógica?", opts: ["Marcar a primeira resposta", "Responder sem ler", "Ler todas as alternativas antes de escolher", "Perguntar ao colega"], ans: 2, exp: "Seguir a instrução evita erros por falta de atenção e aumenta as chances de escolher a resposta correta." }
             ]},
         artes: { room: "Ateliê de Artes e Desenhos", npcs: ["Profª Gislene"], icon: "🎨",
             intro: "Bem-vindos ao ateliê de artes! Sou a Professora Gislene. Aqui transformamos papel, tintas e criatividade em lindos desenhos, pinturas e cenários para os nossos espetáculos. Preparados?",
             questions: [
-                { q: "Para desenhar um cenário com sensação de profundidade e distância, qual técnica de desenho devemos utilizar?", opts: ["Perspectiva linear com ponto de fuga", "Pintura abstrata", "Desenho às cegas", "Contorno simples"], ans: 0, exp: "A perspectiva com ponto de fuga é a técnica clássica do desenho para criar a illusions de profundidade tridimensional em uma folha plana." },
+                { q: "Um artista desenhou um quadrado, depois um pentágono, em seguida um hexágono. Mantendo o mesmo padrão, qual será a próxima figura?", opts: ["Triângulo", "Hexágono", "Heptágono", "Octógono"], ans: 2, exp: "O número de lados aumenta de um em um: 4, 5, 6... Portanto, a próxima figura tem 7 lados: um heptágono." },
                 { q: "O cenário do espetáculo representa uma floresta viva. Misturando as tintas azul e amarela em nossa paleta, qual cor secundária obteremos para pintar as folhagens?", opts: ["Roxo", "Laranja", "Verde", "Marrom"], ans: 2, exp: "A mistura das cores primárias azul e amarelo gera a cor secundária verde, perfeita para os elementos da natureza!" },
-                { q: "Para fazer sombreados suaves e degradês realistas em um desenho a grafite, qual tipo de lápis é o mais adequado por ter a grafite mais macia e escura?", opts: ["Lápis 2H", "Lápis HB", "Lápis 6B", "Lapiseira 0.5 com grafite duro"], ans: 2, exp: "Os lápis da linha B (como o 6B) possuem grafite mais macia e escura, ideal para criar sombras, profundidade e texturas no papel." },
+                { q: "Um educando desenhou metade de uma borboleta no papel dobrado ao meio. Para completar o desenho corretamente, o outro lado deve ser:", opts: ["Maior que o primeiro lado", "Uma imagem espelhada do primeiro lado", "Um desenho diferente", "Com cores aleatórias"], ans: 1, exp: "A simetria acontece quando um lado é o reflexo do outro, como em uma imagem no espelho." },
                 { q: "Estamos desenhando uma máscara teatral simétrica. O que significa garantir a simetria no desenho?", opts: ["Fazer um lado completamente diferente do outro", "Garantir que os dois lados divididos ao meio sejam correspondentes e equilibrados", "Pintar tudo com uma única cor", "Desenhar sem usar linhas"], ans: 1, exp: "A simetria em artes visuais cria um equilíbrio perfeito, onde o lado esquerdo espelha o lado direito harmoniosamente." },
                 { q: "Para pintar um cenário que transmita energia, calor e alegria, a professora Gislene sugere usar cores quentes. Quais são as principais cores desse grupo?", opts: ["Azul, verde e roxo", "Preto, branco e cinza", "Vermelho, laranja e amarelo", "Rosa, lilás e prata"], ans: 2, exp: "Vermelho, laranja e amarelo são cores quentes, associadas ao fogo e ao sol, excelentes para transmitir vibração e energia em uma obra de arte." }
             ]},
         danca: { room: "Sala de Dança", npcs: ["Prof. Anderson", "Prof. Jessy", "Prof. Vitor", "Prof. Daniel"], icon: "🩰",
             intro: "Fala, artistas! Somos os Professores Anderson, Jessy, Vitor e Daniel. Na sala de dança usamos não só o corpo, mas muita matemática, contagem e ritmo espacial. Vamos aquecer a mente!",
             questions: [
-                { q: "A coreografia pede uma formação em triângulo com 6 bailarinos. O vértice da frente tem 1 pessoa. Quantas pessoas devem ficar nas outras duas fileiras lógicas?", opts: ["2 na segunda e 3 na terceira", "1 na segunda e 4 na terceira", "3 na segunda e 2 na terceira", "Todos em círculo"], ans: 0, exp: "Formação em triângulo crescente: 1 na frente + 2 no meio + 3 atrás = 6 bailarinos." },
-                { q: "Na música, contamos os tempos em blocos (oitos). Se uma sequência coreográfica leva quatro 'oitos' para terminar, quantos tempos musicais se passaram?", opts: ["16 tempos", "24 tempos", "32 tempos", "40 tempos"], ans: 2, exp: "4 blocos multiplicados por 8 tempos = 32 tempos cravados na música." },
-                { q: "Você está no centro da sala e o professor pede para você usar todo o seu 'Cinesfera' (espaço pessoal). O que você deve fazer?", opts: ["Ficar imóvel", "Esticar braços e pernas em todas as direções ao redor do seu corpo", "Correr para a parede", "Sentar"], ans: 1, exp: "A cinesfera é a bolha imaginária que envolve o limite máximo de alcance dos seus membros sem sair do lugar." },
-                { q: "Dois grupos vão cruzar a sala em diagonais opostas ao mesmo tempo. Para não baterem no centro, qual a regra lógica de ensaio?", opts: ["Fechar os olhos e correr", "O grupo A passa pela frente e o grupo B por trás", "Gritar enquanto cruza", "Parar no meio da sala"], ans: 1, exp: "A marcação de espaçamento e definição de quem passa pela frente evita acidentes nas travessias." },
+                { q: "Em uma coreografia, Yasmin levanta o braço direito e Heloisa deve fazer o movimento como se fosse seu reflexo no espelho. Qual braço Heloisa deve levantar?", opts: ["Direito", "Esquerdo", "Os dois braços", "Nenhum braço"], ans: 1, exp: "Quando uma pessoa imita outra como um espelho, os lados ficam invertidos. O braço direito de um corresponde ao esquerdo do outro." },
+                { q: "Para uma apresentação, Tio Jessy precisa escolher 3 bailarinas entre Vitória, Rayla, Cecilia e Emilly. Vitória só pode participar se Rayla também participar. Se Cecilia já foi escolhida, qual grupo pode subir ao palco?", opts: ["Vitória, Rayla e Emilly", "Vitória, Rayla e Cecilia", "Rayla, Cecilia e Emilly", "Vitória, Cecilia e Emilly"], ans: 1, exp: "Vitória só pode participar junto com Rayla. Como Cecilia já está no grupo, a única opção possível com Vitória é Vitória, Rayla e Cecilia." },
+                { q: "Durante uma atividade na sala de dança da EDISCA, quatro bailarinas ocupam posições diferentes no espaço. Viviam está no centro da sala. Isabelly está à frente de Viviam. Flora está atrás de Viviam. Laissy está ao lado direito de Viviam. Quem está mais distante da frente da sala?", opts: ["Viviam", "Isabelly", "Flora", "Laissy"], ans: 2, exp: "Isabelly está à frente de Viviam e Flora está atrás dela. Portanto, Flora é quem está mais distante da frente da sala." },
+                { q: "Na coreografia da EDISCA, cada sequência de movimentos segue um padrão: P = passo, G = giro e S = salto. Tio Anderson escreveu: P - G - S - G - P - G - S - G - P - G - __. Qual movimento completa a sequência?", opts: ["Passo", "Giro", "Salto", "Parada"], ans: 2, exp: "O bloco que se repete é P - G - S - G. Depois de P - G, o próximo movimento é S." },
                 { q: "Se um *plié* exige que o joelho siga a linha da ponta do pé, o que acontece se o bailarino fechar o joelho para dentro?", opts: ["Fica mais bonito", "Ele ganha velocidade", "Risco de lesão no joelho e desalinhamento", "Nada acontece"], ans: 2, exp: "A anatomia humana exige alinhamento ósseo. Dançar com técnica é cuidar da própria saúde física." }
             ]},
-        teatro: { room: "Teatro", npcs: ["Coordenadora Mayra", "Profª Hariane", "Profª Adrielly", "Profª Gabrielle"], icon: "🎭",
-            intro: "Bem-vindos ao Teatro! Somos a Coordenadora Mayra e as Professoras Hariane, Adrielly e Gabrielle. Na EDISCA, o ápice do nosso trabalho são os grandes espetáculos de dança. Preparados para a lógica dos bastidores?",
+        teatro: { room: "Teatro", npcs: ["Profª Mayra", "Profª Hariane", "Profª Adrielly", "Profª Gabrielle"], icon: "🎭",
+            intro: "Bem-vindos ao Teatro! Somos a Professoras Mayra, Hariane, Adrielly e Gabrielle. Na EDISCA, o ápice do nosso trabalho são os grandes espetáculos de dança. Preparados para a lógica dos bastidores?",
             questions: [
-                { q: "A iluminação de um espetáculo tem a Luz Frontal (ilumina o rosto) e a Contra-luz (ilumina de trás). Se quisermos criar apenas a silhueta escura do bailarino, o que o iluminador deve ligar?", opts: ["Luz Frontal", "Contra-luz", "Todas as luzes", "Deixar tudo no escuro total"], ans: 1, exp: "A contra-luz cria o efeito de 'sombra chinesa', destacando a silhueta sem mostrar o rosto." },
+                { q: "Na apresentação de ballet, Tia Adrielly combinou três regras: as bailarinas entram pelo lado esquerdo, a música começa antes da entrada e a iluminação muda durante a coreografia. Qual situação quebra uma dessas regras?", opts: ["A música começa antes da entrada", "A luz muda no meio da dança", "As bailarinas entram pelo lado direito", "A coreografia termina com a música"], ans: 2, exp: "A única regra quebrada é a entrada pelo lado direito, pois foi combinado que a entrada seria pelo lado esquerdo." },
                 { q: "No teatro, as laterais do palco de onde os bailarinos entram escondidos do público chamam-se 'Coxias'. Se um bailarino entra pela coxia da Esquerda e tem que sair pelo lado oposto, por onde ele sai?", opts: ["Pelo teto", "Pela coxia Direita", "Pelo fundo do palco", "Pela plateia"], ans: 1, exp: "O lado oposto da Esquerda do palco é sempre a coxia da Direita." },
-                { q: "O espetáculo dura 60 minutos. A bailarina principal tem 2 minutos para trocar o figurino entre o Primeiro e o Segundo Ato. Qual atitude lógica no camarim?", opts: ["Dobrar a roupa devagar", "Conversar com as amigas", "Deixar o novo figurino já aberto e na ordem de vestir antes de o espetáculo começar", "Procurar a roupa na hora"], ans: 2, exp: "Planejamento prévio! A 'troca rápida' exige que a roupa esteja armada e pronta para vestir." },
+               { q: "Na coxia do teatro, a equipe recebeu três avisos: 'A bailarina azul entra antes da vermelha'. 'A bailarina verde entra depois da azul'. 'A bailarina vermelha entra depois da verde'. Qual é a ordem correta de entrada?", opts: ["Azul → Verde → Vermelha", "Vermelha → Azul → Verde", "Verde → Azul → Vermelha", "Azul → Vermelha → Verde"], ans: 0, exp: "A azul deve vir antes da verde, e a verde antes da vermelha. Portanto, a ordem correta é Azul → Verde → Vermelha." },
                 { q: "Na marcação de palco, a numeração vai do centro (0) para as laterais (1, 2, 3...). Se a coreógrafa pede para todos se concentrarem no 'Ponto Zero', para onde o elenco vai?", opts: ["Para o canto direito", "Para o fundo do palco", "Para o centro exato do palco", "Para a coxia"], ans: 2, exp: "O 'Ponto 0' (ou centro) é a referência de alinhamento simétrico para a dança." },
-                { q: "Durante o espetáculo 'Moinhos' da EDISCA, a música parou acidentalmente. Como o elenco bem ensaiado deve reagir logicamente?", opts: ["Parar e olhar para a coxia", "Sair do palco chorando", "Continuar dançando no silêncio mantendo a contagem mental em grupo", "Sentar no chão"], ans: 2, exp: "O show não pode parar. O profissionalismo exige manter a contagem interna até o som voltar." }
+                { q: "Durante o espetáculo 'Periferia' da EDISCA, a música parou acidentalmente. Como o elenco bem ensaiado deve reagir logicamente?", opts: ["Parar e olhar para a coxia", "Sair do palco chorando", "Continuar dançando no silêncio mantendo a contagem mental em grupo", "Sentar no chão"], ans: 2, exp: "O show não pode parar. O profissionalismo exige manter a contagem interna até o som voltar." }
             ]},
         biblioteca: { room: "Biblioteca", npcs: ["Profª Neile", "Profª Thafilla"], icon: "📚",
             intro: "Silêncio e respeito ao conhecimento! Somos as Professoras Neile e Thafilla. Aqui guardamos o precioso acervo literário e de pesquisa da instituição. Prontos para os desafios?",
@@ -424,8 +430,8 @@
         saude: { room: "Saúde", npcs: ["Profª Lorena", "Profª Livia"], icon: "❤️",
             intro: "Saúde física e mental em primeiro lugar! Somos as Professoras Lorena e Livia. Cuidamos das lesões e do bem-estar psicológico de nossos talentos. Resolvam esses casos clínicos!",
             questions: [
-                { q: "Um bailarino torceu o fluxo no tornozelo na aula. Para estancar o inchaço nos primeiros 15 minutos, a fisioterapia aplica:", opts: ["Bolsa de água quente", "Gelo (crioterapia)", "Massagear com força", "Mandar ele voltar a dançar"], ans: 1, exp: "O gelo contrai os vasos sanguíneos, diminuindo imediatamente a inflamação e a dor no momento do trauma." },
-                { q: "Na psicologia escolar, um aluno chega chorando muito por um problema familiar. Qual é a primeira etapa do atendimento?", opts: ["Dar conselhos rápidos e mandar voltar para a aula", "Ouvir ativamente e oferecer um espaço seguro de acolhimento emocional", "Brigar com o aluno", "Ignorar e falar de dança"], ans: 1, exp: "A escuta ativa e o acolhimento sem julgamentos formam a base do suporte psicológico na EDISCA." },
+                { q: "Um bailarino torceu o tornozelo na aula. Para estancar o inchaço nos primeiros 15 minutos, a fisioterapia aplica:", opts: ["Bolsa de água quente", "Gelo (crioterapia)", "Massagear com força", "Mandar ele voltar a dançar"], ans: 1, exp: "O gelo contrai os vasos sanguíneos, diminuindo imediatamente a inflamação e a dor no momento do trauma." },
+                { q: "Na sala da saúde, a equipe acompanha quatro educandas. Sabe-se que: Kamilla está com dor no pé; Nikaelly precisa descansar; Isadora está aguardando uma avaliação; e Valentina já foi liberada. Quem deve ser atendida primeiro pela equipe?", opts: ["Valentina", "Isadora", "Kamilla", "Nikaelly"], ans: 2, exp: "Entre as situações apresentadas, Kamilla possui uma queixa física que precisa ser avaliada antes de uma liberação ou orientação." },
                 { q: "O ensaio do espetáculo é intenso e dura 4 horas. A sala é quente. O que deve ser feito logisticamente para evitar desidratação e cãibras?", opts: ["Beber apenas no final das 4h", "Paradas curtas e programadas para ingestão de água", "Beber 3 litros de uma vez", "Comer salgado"], ans: 1, exp: "A hidratação constante mantém os músculos oxigenados e previne lesões durante o esforço extremo." },
                 { q: "Qual postura corporal é ensinada na fisioterapia para proteger a coluna de uma costureira ou funcionário que trabalha muito tempo sentado?", opts: ["Sentar na ponta da cadeira com os ombros curvados", "Apoiar a lombar no encosto e manter os pés no chão", "Cruzar as pernas o dia todo", "Sentar no chão"], ans: 1, exp: "A ergonomia (pés apoiados e coluna reta) distribui o peso do corpo e evita compressões na coluna vertebral." },
                 { q: "Se a psicologia foca na mente e a fisioterapia no corpo, o que significa a expressão 'cuidado integral' praticada na EDISCA?", opts: ["Cuidar de um de cada vez em anos diferentes", "Entender que o sofrimento mental pode gerar dor física, e tratar o educando como um todo", "Apenas focar na dança", "Apenas medicar"], ans: 1, exp: "Corpo e mente estão interligados. A ansiedade pode tencionar o corpo e causar lesões físicas, por isso o cuidado é integrado." }
@@ -439,14 +445,14 @@
                 { q: "A secretaria recebe um e-mail com o título 'Urgente: Altere sua senha clicando neste link' enviado por um endereço desconhecido. O que fazer?", opts: ["Clicar correndo e digitar a senha de administrador", "Não clicar, alertar o Prof. Vinicius de TI e marcar como spam/phishing", "Encaminhar para o grupo de pais", "Excluir o computador"], ans: 1, exp: "Ataques de Phishing tentam enganar usuários com urgências falsas. Desconfie, não clique e acione o suporte de TI." },
                 { q: "Se temos um plano de banda de internet de 600 Megas e precisamos distribuí-la igualmente entre 6 salas com computadores de aula. Quanto cada sala recebe?", opts: ["50 Megas", "100 Megas", "150 Megas", "600 Megas"], ans: 1, exp: "Dividindo 600 Megas de banda por 6 setores, obtemos 100 Megas por setor para garantir conectividade estável para todos." }
             ]},
-        brecho: { room: "Brechó Segundo Ato", npcs: ["Profª Marina", "Prof. Pedro"], icon: "🛍️",
+        brecho: { room: "Brechó Segundo Ato", npcs: ["Profª Marina, Prof. Pedro"], icon: "🛍️",
             intro: "Seja muito bem-vindo ao Brechó Segundo Ato! Somos Marina e Pedro. Aqui damos uma nova vida a roupas e calçados doados. Os lucros de nossas vendas sustentam diretamente nossos espetáculos. Vamos ao caixa?",
             questions: [
                 { q: "Ao receber uma sacola cheia de doações no Brechó Segundo Ato, qual é o fluxo lógico inicial de processamento?", opts: ["Vender na calçada imediatamente", "Fazer a triagem (verificar estado, higienizar, definir preço justo e etiquetar)", "Guardar em caixas sem abrir", "Devolver ao doador"], ans: 1, exp: "A triagem profissional garante que apenas roupas excelentes e limpas fiquem nas araras, valorizando o brechó." },
                 { q: "Um cliente compra uma jaqueta de R$ 35,00 e um cinto de R$ 15,00. Ele paga com uma nota de R$ 100,00. Quanto você deve devolver de troco?", opts: ["R$ 30,00", "R$ 40,00", "R$ 50,00", "R$ 60,00"], ans: 2, exp: "O total da compra é R$ 50,00 (35 + 15). Portanto, o troco exato a ser devolvido é de R$ 50,00." },
-                { q: "Para otimizar o espaço físico do Brechó e impulsionar as vendas que financiam as oficinas, qual atitude de vitrinismo é correta?", opts: ["Deixar as roupas misturadas no chão", "Exibir as melhores peças em uma vitrine limpa, combinando styles e cores", "Esconder as etiquetas de preço", "Apagar as luzes da sala"], ans: 1, exp: "Uma exposição limpa e estilizada valoriza o brechó, atrai o olhar dos clientes e gera mais recursos para a escola." },
+                { q: "No controle do Brechó Segundo Ato, Marina registrou: 'Todas as peças da arara azul são vestidos'. Ao verificar a arara, encontrou uma camisa azul. O que podemos concluir?", opts: ["O registro está incorreto", "A camisa não existe", "Todos os vestidos sumiram", "A arara azul está vazia"], ans: 0, exp: "Se uma camisa foi encontrada na arara azul, então a informação de que todas as peças eram vestidos não pode estar correta." },
                 { q: "A filosofia do nosso Brechó Segundo Ato é fortemente focada em moda sustentável. Ela se apoia em quais conceitos fundamentais?", opts: ["Acumular, ostentar e descartar", "Reduzir o consumo desenfreado, Reutilizar peças e Reciclar materiais", "Copiar, costurar e raspar", "Esquecer, perder e comprar"], ans: 1, exp: "Reduzir, Reutilizar e Reciclar formam a base da economia circular e sustentável praticada em nosso brechó." },
-                { q: "Todo o dinheiro arrecadado com as vendas diárias das peças do Brechó Segundo Ato é revertido para:", opts: ["Comprar itens de luxo para a secretaria", "Financiar passagens, sapatilhas, figurinos e lanches para as apresentações de vocês", "A conta pessoal da gerência", "Dividir igualmente entre marcas famosas"], ans: 1, exp: "O brechó é uma iniciativa social. Todo o lucro alimenta diretamente o sonho e o desenvolvimento dos nossos educandos." }
+                { q: "Todo o dinheiro arrecadado com as vendas diárias das peças do Brechó Segundo Ato é revertido para:", opts: ["Comprar itens de luxo para a secretaria", "Financiar passagens, adereços, figurinos e lanches para as apresentações de vocês", "A conta pessoal da gerência", "Dividir igualmente entre marcas famosas"], ans: 1, exp: "O brechó é uma iniciativa social. Todo o lucro alimenta diretamente o sonho e o desenvolvimento dos nossos educandos." }
             ]},
         comunicacao: { room: "Comunicação e Marketing", npcs: ["Profª Isabelle"], icon: "📢",
             intro: "Olá! Sou a Professora Isabelle. Eu cuido da imagem, das redes sociais, do marketing e da assessoria de imprensa da EDISCA. Meu papel é fazer com que a nossa arte toque o coração de cada vez mais pessoas. Vamos comunicar?",
@@ -477,129 +483,548 @@
 
     const player = { name: "Bailarino(a)", x: 35 * TILE, y: 15 * TILE, width: 24, height: 38, speed: 6, score: 0 };
 
-    // PERFIS FISIOLÓGICOS E ESTILOS ORIGINAIS DO SEU NPC
+    // Definição dos perfis de estilo dos NPCs - Corrigido os gêneros e adicionado os novos professores solicitados
     const npcLocations = {
         portaria: { 
             x: 35*TILE, y: 11*TILE, 
             npcs: [
-                { skin: "#8d5524", shirt: "#3b82f6", pants: "#1e3a8a", hair: "#000", hStyle: 1, glasses: true }, // Prof. Junior
-                { skin: "#f1c27d", shirt: "#f472b6", pants: "#1e1b4b", hair: "#b55239", hStyle: 2, glasses: false } // Prof. Cris
+                { skin: "#8d5524", shirt: "#3b82f6", pants: "#1e3a8a", hair: "#000", hStyle: 1, glasses: true }, // Prof. Junior (Masculino)
+                { skin: "#f1c27d", shirt: "#f472b6", pants: "#1e1b4b", hair: "#b55239", hStyle: 2, glasses: false } // Prof. Cris (Masculino)
             ]
         },
         secretaria: { 
             x: 15*TILE, y: 22*TILE, 
             npcs: [
-                { skin: "#ffdbac", shirt: "#f472b6", pants: "#000", hair: "#b55239", hStyle: 2, glasses: true } // Profª Gesliane
+                { skin: "#ffdbac", shirt: "#f472b6", pants: "#000", hair: "#b55239", hStyle: 2, glasses: true } // Profª Gesliane (Feminino)
             ]
         },
         diretoria: { 
             x: 55*TILE, y: 22*TILE, 
             npcs: [
-                { skin: "#e0ac69", shirt: "#10b981", pants: "#064e3b", hair: "#000", hStyle: 3, glasses: false }, // Profª Andrea
-                { skin: "#8d5524", shirt: "#ef4444", pants: "#000", hair: "#4a3018", hStyle: 2, glasses: true },  // Profª Claudia
-                { skin: "#ffdbac", shirt: "#3b82f6", pants: "#1e3a8a", hair: "#fcd34d", hStyle: 3, glasses: false }, // Dirª Dora
-                { skin: "#f1c27d", shirt: "#ec4899", pants: "#3f1212", hair: "#b55239", hStyle: 2, glasses: false }  // Profª Amanda
+                { skin: "#e0ac69", shirt: "#10b981", pants: "#064e3b", hair: "#000", hStyle: 3, glasses: false }, // Profª Andrea (Feminino)
+                { skin: "#8d5524", shirt: "#ef4444", pants: "#000", hair: "#4a3018", hStyle: 2, glasses: true },  // Profª Claudia (Feminino)
+                { skin: "#ffdbac", shirt: "#3b82f6", pants: "#1e3a8a", hair: "#fcd34d", hStyle: 3, glasses: false }, // Dirª Dora (Feminino)
+                { skin: "#f1c27d", shirt: "#ec4899", pants: "#3f1212", hair: "#b55239", hStyle: 2, glasses: false }  // Profª Amanda (Feminino)
             ]
         },
         cozinha: { 
             x: 15*TILE, y: 34*TILE, 
             npcs: [
-                { skin: "#c68642", shirt: "#fef08a", pants: "#000", hair: "#4a3018", hStyle: 2, glasses: false }, // Profª Aurea
-                { skin: "#ffdbac", shirt: "#e0ac69", pants: "#1e1b4b", hair: "#fcd34d", hStyle: 3, glasses: false } // Profª Daiane
+                { skin: "#c68642", shirt: "#fef08a", pants: "#000", hair: "#4a3018", hStyle: 2, glasses: false }, // Profª Aurea (Feminino)
+                { skin: "#ffdbac", shirt: "#e0ac69", pants: "#1e1b4b", hair: "#fcd34d", hStyle: 3, glasses: false } // Profª Daiane (Feminino)
             ]
         },
         reforco: { 
             x: 55*TILE, y: 34*TILE, 
             npcs: [
-                { skin: "#f1c27d", shirt: "#6366f1", pants: "#1e1b4b", hair: "#6b7280", hStyle: 1, glasses: true } // Prof. Rogério
+                { skin: "#f1c27d", shirt: "#6366f1", pants: "#1e1b4b", hair: "#6b7280", hStyle: 1, glasses: true } // Prof. Rogério (Masculino)
             ]
         },
         financeiro: { 
             x: 15*TILE, y: 46*TILE, 
             npcs: [
-                { skin: "#8d5524", shirt: "#facc15", pants: "#713f12", hair: "#000", hStyle: 2, glasses: true }, // Profª Clecia
-                { skin: "#ffdbac", shirt: "#a855f7", pants: "#4c1d95", hair: "#b55239", hStyle: 3, glasses: false }, // Profª Vanessa
-                { skin: "#e0ac69", shirt: "#2dd4bf", pants: "#134e4a", hair: "#000", hStyle: 2, glasses: true }  // Profª Flaviane
+                { skin: "#8d5524", shirt: "#facc15", pants: "#713f12", hair: "#000", hStyle: 2, glasses: true }, // Profª Clecia (Feminino)
+                { skin: "#ffdbac", shirt: "#a855f7", pants: "#4c1d95", hair: "#b55239", hStyle: 3, glasses: false }, // Profª Vanessa (Feminino)
+                { skin: "#e0ac69", shirt: "#2dd4bf", pants: "#134e4a", hair: "#000", hStyle: 2, glasses: true }  // Profª Flaviane (Feminino)
             ]
         },
         artes: { 
             x: 55*TILE, y: 46*TILE, 
             npcs: [
-                { skin: "#ffdbac", shirt: "#a855f7", pants: "#4c1d95", hair: "#fcd34d", hStyle: 3, glasses: false } // Profª Gislene
+                { skin: "#ffdbac", shirt: "#a855f7", pants: "#4c1d95", hair: "#fcd34d", hStyle: 3, glasses: false } // Profª Gislene (Feminino)
             ]
         },
         danca: { 
             x: 25*TILE, y: 58*TILE, 
             npcs: [
-                { skin: "#e0ac69", shirt: "#ef4444", pants: "#000", hair: "#000", hStyle: 1, glasses: false },   // Prof. Anderson
-                { skin: "#ffdbac", shirt: "#000", pants: "#52525b", hair: "#a8a29e", hStyle: 1, glasses: true },   // Prof. Jessy
-                { skin: "#c68642", shirt: "#3b82f6", pants: "#1e3a8a", hair: "#4a3018", hStyle: 1, glasses: false }, // Prof. Vitor
-                { skin: "#f1c27d", shirt: "#10b981", pants: "#064e3b", hair: "#6b7280", hStyle: 1, glasses: true }  // Prof. Daniel
+                { skin: "#e0ac69", shirt: "#ef4444", pants: "#000", hair: "#000", hStyle: 1, glasses: false },   // Prof. Anderson (Masculino)
+                { skin: "#ffdbac", shirt: "#000", pants: "#52525b", hair: "#a8a29e", hStyle: 1, glasses: true },   // Prof. Jessy (Masculino)
+                { skin: "#c68642", shirt: "#3b82f6", pants: "#1e3a8a", hair: "#4a3018", hStyle: 1, glasses: false }, // Prof. Vitor (Masculino)
+                { skin: "#f1c27d", shirt: "#10b981", pants: "#064e3b", hair: "#6b7280", hStyle: 1, glasses: true }  // Prof. Daniel (Masculino)
             ]
         },
         teatro: { 
             x: 45*TILE, y: 58*TILE, 
             npcs: [
-                { skin: "#ffdbac", shirt: "#a855f7", pants: "#1e1b4b", hair: "#b55239", hStyle: 3, glasses: true },  // Coordenadora Mayra
-                { skin: "#e0ac69", shirt: "#f472b6", pants: "#000", hair: "#000", hStyle: 2, glasses: false },       // Profª Hariane
-                { skin: "#8d5524", shirt: "#2dd4bf", pants: "#134e4a", hair: "#4a3018", hStyle: 2, glasses: false }, // Profª Adrielly
-                { skin: "#f1c27d", shirt: "#fef08a", pants: "#1e1b4b", hair: "#fcd34d", hStyle: 3, glasses: true }   // Profª Gabrielle
+                { skin: "#ffdbac", shirt: "#a855f7", pants: "#1e1b4b", hair: "#b55239", hStyle: 3, glasses: true },  // Profª Mayra (Feminino)
+                { skin: "#e0ac69", shirt: "#f472b6", pants: "#000", hair: "#000", hStyle: 2, glasses: false },       // Profª Hariane (Feminino)
+                { skin: "#8d5524", shirt: "#2dd4bf", pants: "#134e4a", hair: "#4a3018", hStyle: 2, glasses: false }, // Profª Adrielly (Feminino)
+                { skin: "#f1c27d", shirt: "#fef08a", pants: "#1e1b4b", hair: "#fcd34d", hStyle: 3, glasses: true }   // Profª Gabrielle (Feminino)
             ]
         },
         saude: { 
             x: 10*TILE, y: 58*TILE, 
             npcs: [
-                { skin: "#c68642", shirt: "#2dd4bf", pants: "#134e4a", hair: "#4a3018", hStyle: 2, glasses: false }, // Profª Lorena
-                { skin: "#ffdbac", shirt: "#ec4899", pants: "#4c0519", hair: "#fcd34d", hStyle: 3, glasses: true }  // Profª Livia
+                { skin: "#c68642", shirt: "#2dd4bf", pants: "#134e4a", hair: "#4a3018", hStyle: 2, glasses: false }, // Profª Lorena (Feminino)
+                { skin: "#ffdbac", shirt: "#ec4899", pants: "#4c0519", hair: "#fcd34d", hStyle: 3, glasses: true }  // Profª Livia (Feminino)
             ]
         },
         biblioteca: { 
             x: 60*TILE, y: 58*TILE, 
             npcs: [
-                { skin: "#8d5524", shirt: "#94a3b8", pants: "#0f172a", hair: "#000", hStyle: 2, glasses: true }, // Profª Neile
-                { skin: "#ffdbac", shirt: "#ec4899", pants: "#1e1b4b", hair: "#4a3018", hStyle: 3, glasses: false } // Profª Thafilla
+                { skin: "#8d5524", shirt: "#94a3b8", pants: "#0f172a", hair: "#000", hStyle: 2, glasses: true }, // Profª Neile (Feminino)
+                { skin: "#ffdbac", shirt: "#ec4899", pants: "#1e1b4b", hair: "#4a3018", hStyle: 3, glasses: false } // Profª Thafilla (Feminino)
             ]
         },
         jardim: { 
             x: 35*TILE, y: 60*TILE, 
             npcs: [
-                { skin: "#f1c27d", shirt: "#84cc16", pants: "#3f6212", hair: "#4a3018", hStyle: 2, glasses: false }, // Profª Fátima
-                { skin: "#e0ac69", shirt: "#1e293b", pants: "#0f172a", hair: "#000", hStyle: 1, glasses: false },    // Prof. João
-                { skin: "#ffdbac", shirt: "#3b82f6", pants: "#1e3a8a", hair: "#6b7280", hStyle: 1, glasses: true },   // Prof. Igor
-                { skin: "#8d5524", shirt: "#059669", pants: "#064e3b", hair: "#000", hStyle: 1, glasses: false }     // Prof. Clemilson
+                { skin: "#f1c27d", shirt: "#84cc16", pants: "#3f6212", hair: "#4a3018", hStyle: 2, glasses: false }, // Profª Fátima (Feminino)
+                { skin: "#e0ac69", shirt: "#1e293b", pants: "#0f172a", hair: "#000", hStyle: 1, glasses: false },    // Prof. João (Masculino)
+                { skin: "#ffdbac", shirt: "#3b82f6", pants: "#1e3a8a", hair: "#6b7280", hStyle: 1, glasses: true },   // Prof. Igor (Masculino)
+                { skin: "#8d5524", shirt: "#059669", pants: "#064e3b", hair: "#000", hStyle: 1, glasses: false }     // Prof. Clemilson (Masculino)
             ]
         },
+        // Configuração visual das novas salas
         ti: {
             x: 25*TILE, y: 20*TILE,
             npcs: [
-                { skin: "#ffdbac", shirt: "#3b82f6", pants: "#1e3a8a", hair: "#000", hStyle: 1, glasses: true } // Prof. Vinicius
+                { skin: "#ffdbac", shirt: "#3b82f6", pants: "#1e3a8a", hair: "#000", hStyle: 1, glasses: true } // Prof. Vinicius (Masculino)
             ]
         },
-        brecho: {
+brecho: {
             x: 44*TILE, y: 20*TILE,
             npcs: [
-                { skin: "#f1c27d", shirt: "#ec4899", pants: "#000", hair: "#b55239", hStyle: 2, glasses: false }, // Profª Marina
-                { skin: "#ffdbac", shirt: "#3b82f6", pants: "#1e3a8a", hair: "#000", hStyle: 1, glasses: true }  // Prof. Pedro
+                { skin: "#f1c27d", shirt: "#ec4899", pants: "#000", hair: "#b55239", hStyle: 2, glasses: false }, // Profª Marina (Feminino)
+                { skin: "#ffdbac", shirt: "#3b82f6", pants: "#1e3a8a", hair: "#000", hStyle: 1, glasses: true }  // Prof. Pedro (Masculino)
             ]
         },
         comunicacao: {
             x: 25*TILE, y: 32*TILE,
             npcs: [
-                { skin: "#e0ac69", shirt: "#2dd4bf", pants: "#134e4a", hair: "#fcd34d", hStyle: 3, glasses: true } // Profª Isabelle
+                { skin: "#e0ac69", shirt: "#2dd4bf", pants: "#134e4a", hair: "#fcd34d", hStyle: 3, glasses: true } // Profª Isabelle (Feminino)
             ]
         },
         refeitorio: {
             x: 44*TILE, y: 32*TILE,
             npcs: [
-                { skin: "#ffdbac", shirt: "#fef08a", pants: "#1e1b4b", hair: "#4a3018", hStyle: 2, glasses: false } // Profª Jaqueline
+                { skin: "#ffdbac", shirt: "#fef08a", pants: "#1e1b4b", hair: "#4a3018", hStyle: 2, glasses: false } // Profª Jaqueline (Feminino)
             ]
         }
     };
 
+    // ==========================================================================
+    // SISTEMA DE AMBIENTAÇÃO VISUAL (100% cosmético — não interfere em mapa,
+    // colisão, NPCs, missões ou diálogos. Apenas desenha por cima do cenário já existente)
+    // ==========================================================================
+
+    // Bounding boxes (em tiles) das mesmas salas já construídas em initMap(), copiadas
+    // apenas para posicionar a decoração interna — não afeta a geração do mapa.
+    const ROOM_INFO = {
+        portaria:    { r1:5,  r2:12, c1:30, c2:40 },
+        secretaria:  { r1:17, r2:24, c1:10, c2:20 },
+        diretoria:   { r1:17, r2:24, c1:50, c2:60 },
+        cozinha:     { r1:29, r2:36, c1:10, c2:20 },
+        reforco:     { r1:29, r2:36, c1:50, c2:60 },
+        financeiro:  { r1:41, r2:48, c1:10, c2:20 },
+        artes:       { r1:41, r2:48, c1:50, c2:60 },
+        ti:          { r1:17, r2:24, c1:22, c2:29 },
+        brecho:      { r1:17, r2:24, c1:41, c2:48 },
+        comunicacao: { r1:29, r2:36, c1:22, c2:29 },
+        refeitorio:  { r1:29, r2:36, c1:41, c2:48 },
+        danca:       { r1:53, r2:60, c1:20, c2:30 },
+        teatro:      { r1:53, r2:60, c1:40, c2:50 },
+        saude:       { r1:53, r2:60, c1:5,  c2:15 },
+        biblioteca:  { r1:53, r2:60, c1:55, c2:65 },
+        jardim:      { r1:58, r2:62, c1:32, c2:38 }
+    };
+
+    // Ruído determinístico por tile (mesmo resultado sempre, sem precisar guardar array)
+    function seededRand(x, y, seed) {
+        let n = Math.sin(x * 127.1 + y * 311.7 + (seed||0) * 74.7) * 43758.5453123;
+        return n - Math.floor(n);
+    }
+
+    function tileClear(r, c, margin) {
+        for (let dr = -margin; dr <= margin; dr++) {
+            for (let dc = -margin; dc <= margin; dc++) {
+                let rr = r + dr, cc = c + dc;
+                if (rr < 0 || rr >= ROWS || cc < 0 || cc >= COLS) return false;
+                let t = map[rr][cc];
+                if (t === 1 || t === 2 || t === 3) return false;
+            }
+        }
+        return true;
+    }
+
+    // ---- Primitivas de móveis/objetos (reaproveitadas entre as salas) ----
+    function decoShadow(x, y, w, h) { ctx.fillStyle = "rgba(0,0,0,0.18)"; ctx.fillRect(x, y + h, w, 3); }
+    function decoDesk(x, y, color) {
+        color = color || "#a16207";
+        decoShadow(x, y, 30, 16);
+        ctx.fillStyle = "#78350f"; ctx.fillRect(x + 1, y + 15, 4, 11); ctx.fillRect(x + 25, y + 15, 4, 11);
+        ctx.fillStyle = color; ctx.fillRect(x, y, 30, 15);
+        ctx.strokeStyle = "rgba(0,0,0,0.25)"; ctx.lineWidth = 1; ctx.strokeRect(x, y, 30, 15);
+        ctx.fillStyle = "rgba(255,255,255,0.15)"; ctx.fillRect(x, y, 30, 3);
+    }
+    function decoChair(x, y, color) {
+        color = color || "#7c2d12";
+        ctx.fillStyle = color; ctx.fillRect(x, y - 10, 12, 6); ctx.fillRect(x, y, 12, 12);
+        ctx.fillStyle = "rgba(0,0,0,0.2)"; ctx.fillRect(x, y + 12, 12, 2);
+    }
+    function decoShelf(x, y, w, h) {
+        decoShadow(x, y, w, h);
+        ctx.fillStyle = "#92400e"; ctx.fillRect(x, y, w, h);
+        ctx.strokeStyle = "rgba(0,0,0,0.3)"; ctx.strokeRect(x, y, w, h);
+        const bookColors = ["#dc2626", "#2563eb", "#16a34a", "#f59e0b", "#7c3aed", "#ec4899"];
+        const rows = Math.max(1, Math.floor(h / 16));
+        for (let ri = 0; ri < rows; ri++) {
+            let bx = x + 3, by = y + 3 + ri * (h / rows);
+            let i = 0;
+            while (bx < x + w - 4) {
+                ctx.fillStyle = bookColors[(i + ri * 3) % bookColors.length];
+                let bw = 3 + ((i * 7 + ri) % 4);
+                ctx.fillRect(bx, by, bw, h / rows - 6);
+                bx += bw + 1; i++;
+            }
+        }
+    }
+    function decoCabinet(x, y, w, h, color) {
+        w = w || 24; h = h || 32; color = color || "#57534e";
+        decoShadow(x, y, w, h);
+        ctx.fillStyle = color; ctx.fillRect(x, y, w, h);
+        ctx.strokeStyle = "rgba(0,0,0,0.3)"; ctx.strokeRect(x, y, w, h);
+        ctx.beginPath(); ctx.moveTo(x + w / 2, y + 3); ctx.lineTo(x + w / 2, y + h - 3); ctx.strokeStyle = "rgba(0,0,0,0.25)"; ctx.stroke();
+        ctx.fillStyle = "#fbbf24"; ctx.fillRect(x + w / 2 - 3, y + h / 2 - 1, 2, 3); ctx.fillRect(x + w / 2 + 1, y + h / 2 - 1, 2, 3);
+    }
+    function decoComputer(x, y) {
+        ctx.fillStyle = "#334155"; ctx.fillRect(x, y, 18, 13);
+        ctx.fillStyle = "#7dd3fc"; ctx.fillRect(x + 2, y + 2, 14, 9);
+        ctx.fillStyle = "#1e293b"; ctx.fillRect(x + 6, y + 13, 6, 4); ctx.fillRect(x + 2, y + 17, 14, 2);
+    }
+    function decoPlant(x, y) {
+        ctx.fillStyle = "#7c2d12"; ctx.fillRect(x, y + 9, 13, 9);
+        ctx.fillStyle = "#16a34a";
+        ctx.beginPath(); ctx.arc(x + 6, y + 3, 7, 0, Math.PI * 2); ctx.arc(x, y + 8, 5, 0, Math.PI * 2); ctx.arc(x + 13, y + 8, 5, 0, Math.PI * 2); ctx.fill();
+    }
+    function decoRug(x, y, w, h, color) {
+        ctx.fillStyle = color || "#b91c1c"; ctx.fillRect(x, y, w, h);
+        ctx.strokeStyle = "rgba(255,255,255,0.25)"; ctx.lineWidth = 2; ctx.strokeRect(x + 3, y + 3, w - 6, h - 6);
+    }
+    function decoClock(x, y) {
+        ctx.fillStyle = "#fef9c3"; ctx.beginPath(); ctx.arc(x, y, 8, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = "#78350f"; ctx.lineWidth = 2; ctx.stroke();
+        ctx.strokeStyle = "#000"; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y - 5); ctx.moveTo(x, y); ctx.lineTo(x + 4, y + 2); ctx.stroke();
+    }
+    function decoCounter(x, y, w, h) {
+        w = w || 44; h = h || 14;
+        decoShadow(x, y, w, h);
+        ctx.fillStyle = "#a8a29e"; ctx.fillRect(x, y, w, h);
+        ctx.fillStyle = "#78716c"; ctx.fillRect(x, y + h - 3, w, 3);
+    }
+    function decoBlackboard(x, y, w, h) {
+        w = w || 54; h = h || 26;
+        ctx.fillStyle = "#78350f"; ctx.fillRect(x - 3, y - 3, w + 6, h + 6);
+        ctx.fillStyle = "#1f3d2b"; ctx.fillRect(x, y, w, h);
+        ctx.strokeStyle = "rgba(255,255,255,0.55)"; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(x + 6, y + 8); ctx.lineTo(x + w * 0.4, y + 8); ctx.moveTo(x + 6, y + 16); ctx.lineTo(x + w * 0.6, y + 16); ctx.stroke();
+        ctx.fillStyle = "#e7e5e4"; ctx.fillRect(x + w - 16, y + h - 6, 12, 4);
+    }
+    function decoEasel(x, y) {
+        ctx.strokeStyle = "#78350f"; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(x, y + 26); ctx.lineTo(x + 7, y); ctx.moveTo(x + 14, y + 26); ctx.lineTo(x + 7, y); ctx.moveTo(x - 4, y + 22); ctx.lineTo(x + 18, y + 22); ctx.stroke();
+        ctx.fillStyle = "#fefce8"; ctx.fillRect(x - 2, y + 2, 18, 15); ctx.strokeStyle = "#a8a29e"; ctx.strokeRect(x - 2, y + 2, 18, 15);
+        ctx.fillStyle = "#f87171"; ctx.beginPath(); ctx.arc(x + 4, y + 9, 2, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = "#60a5fa"; ctx.beginPath(); ctx.arc(x + 10, y + 12, 2, 0, Math.PI * 2); ctx.fill();
+    }
+    function decoMirror(x, y, w, h) {
+        w = w || 8; h = h || 44;
+        ctx.fillStyle = "#78350f"; ctx.fillRect(x - 2, y - 2, w + 4, h + 4);
+        ctx.fillStyle = "#bae6fd"; ctx.globalAlpha = 0.65; ctx.fillRect(x, y, w, h); ctx.globalAlpha = 1;
+    }
+    function decoBarre(x, y, w) {
+        w = w || 60;
+        ctx.fillStyle = "#57534e"; ctx.fillRect(x, y - 2, 5, 22); ctx.fillRect(x + w - 5, y - 2, 5, 22);
+        ctx.strokeStyle = "#a16207"; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + w, y); ctx.stroke();
+    }
+    function decoSpeaker(x, y) {
+        ctx.fillStyle = "#1c1917"; ctx.fillRect(x, y, 14, 20);
+        ctx.fillStyle = "#44403c"; ctx.beginPath(); ctx.arc(x + 7, y + 7, 4, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(x + 7, y + 15, 3, 0, Math.PI * 2); ctx.fill();
+    }
+    function decoStove(x, y) {
+        ctx.fillStyle = "#9ca3af"; ctx.fillRect(x, y - 8, 26, 8);
+        ctx.fillStyle = "#e5e7eb"; ctx.fillRect(x, y, 26, 20);
+        ctx.fillStyle = "#1f2937"; ctx.fillRect(x + 3, y + 3, 8, 6); ctx.fillRect(x + 15, y + 3, 8, 6);
+    }
+    function decoFridge(x, y) {
+        ctx.fillStyle = "#e0f2fe"; ctx.fillRect(x, y, 18, 32);
+        ctx.strokeStyle = "#94a3b8"; ctx.strokeRect(x, y, 18, 32);
+        ctx.beginPath(); ctx.moveTo(x, y + 12); ctx.lineTo(x + 18, y + 12); ctx.stroke();
+        ctx.fillStyle = "#64748b"; ctx.fillRect(x + 14, y + 2, 2, 7);
+    }
+    function decoSink(x, y) {
+        ctx.fillStyle = "#cbd5e1"; ctx.fillRect(x, y, 22, 10);
+        ctx.fillStyle = "#64748b"; ctx.fillRect(x + 9, y - 6, 2, 6);
+        ctx.beginPath(); ctx.arc(x + 10, y - 6, 2, 0, Math.PI * 2); ctx.fill();
+    }
+    function decoSafe(x, y) {
+        ctx.fillStyle = "#44403c"; ctx.fillRect(x, y, 18, 18);
+        ctx.strokeStyle = "#fbbf24"; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(x + 9, y + 9, 4, 0, Math.PI * 2); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x + 9, y + 9); ctx.lineTo(x + 11, y + 7); ctx.stroke();
+    }
+    function decoBed(x, y, w, h) {
+        w = w || 42; h = h || 18;
+        decoShadow(x, y, w, h);
+        ctx.fillStyle = "#f1f5f9"; ctx.fillRect(x, y, w, h);
+        ctx.strokeStyle = "#94a3b8"; ctx.strokeRect(x, y, w, h);
+        ctx.fillStyle = "#38bdf8"; ctx.fillRect(x, y, 10, h);
+    }
+    function decoArmchair(x, y) {
+        ctx.fillStyle = "#f59e0b"; ctx.fillRect(x, y, 20, 16);
+        ctx.fillRect(x - 4, y - 4, 4, 20); ctx.fillRect(x + 20, y - 4, 4, 20);
+    }
+    function decoCurtain(x, y, h) {
+        h = h || 60;
+        ctx.fillStyle = "#7f1d1d";
+        for (let i = 0; i < 4; i++) {
+            ctx.beginPath(); ctx.moveTo(x + i * 4, y); ctx.quadraticCurveTo(x + i * 4 + 3, y + h / 2, x + i * 4, y + h);
+            ctx.lineTo(x + i * 4 + 4, y + h); ctx.quadraticCurveTo(x + i * 4 + 7, y + h / 2, x + i * 4 + 4, y); ctx.closePath(); ctx.fill();
+        }
+    }
+    function decoSpotlight(x, y) {
+        ctx.fillStyle = "#facc15"; ctx.globalAlpha = 0.13;
+        ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - 12, y + 46); ctx.lineTo(x + 12, y + 46); ctx.closePath(); ctx.fill();
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = "#27272a"; ctx.fillRect(x - 6, y - 7, 12, 8);
+    }
+    function decoTrophy(x, y) {
+        ctx.fillStyle = "#facc15";
+        ctx.beginPath(); ctx.arc(x + 5, y, 5, Math.PI, 0); ctx.fill();
+        ctx.fillRect(x + 3, y, 4, 7); ctx.fillRect(x, y + 7, 10, 3);
+    }
+    function decoPrinter(x, y) {
+        ctx.fillStyle = "#e5e7eb"; ctx.fillRect(x, y, 18, 12);
+        ctx.fillStyle = "#334155"; ctx.fillRect(x, y + 10, 18, 3);
+    }
+    function decoEmoji(x, y, ch, size) {
+        ctx.font = (size || 16) + "px Arial";
+        ctx.textAlign = "center"; ctx.fillText(ch, x, y);
+        ctx.textAlign = "left";
+    }
+
+    // ---- Decoração específica de cada sala (usa apenas ROOM_INFO como referência) ----
+    function drawRoomDecor(key) {
+        const room = ROOM_INFO[key];
+        if (!room) return;
+        const ix = (room.c1 + 1) * TILE, iy = (room.r1 + 1) * TILE;
+        const iw = (room.c2 - room.c1 - 1) * TILE, ih = (room.r2 - room.r1 - 1) * TILE;
+
+        switch (key) {
+            case "reforco":
+                decoBlackboard(ix + iw / 2 - 30, iy + 6, 60, 24);
+                decoClock(ix + iw - 16, iy + 12);
+                for (let i = 0; i < 3; i++) { decoDesk(ix + 14 + i * 40, iy + 46, "#c07a2b"); decoChair(ix + 22 + i * 40, iy + 66); }
+                for (let i = 0; i < 3; i++) { decoDesk(ix + 14 + i * 40, iy + 82, "#c07a2b"); decoChair(ix + 22 + i * 40, iy + 102); }
+                decoCabinet(ix + iw - 30, iy + ih - 40, 26, 34);
+                decoEmoji(ix + iw - 46, iy + ih - 14, "🎒", 18);
+                decoEmoji(ix + 16, iy + ih - 10, "💨", 16);
+                break;
+            case "artes":
+                decoEasel(ix + 20, iy + 20); decoEasel(ix + 60, iy + 24); decoEasel(ix + 100, iy + 18);
+                decoShelf(ix + iw - 40, iy + 10, 32, 50);
+                decoDesk(ix + 20, iy + ih - 34, "#e5e7eb"); decoDesk(ix + 70, iy + ih - 34, "#e5e7eb");
+                decoEmoji(ix + 30, iy + ih - 40, "🖌️", 16); decoEmoji(ix + 80, iy + ih - 40, "🎨", 18);
+                break;
+            case "danca":
+                decoMirror(ix + 6, iy + 10, 6, iih(ih)); decoMirror(ix + 16, iy + 10, 6, iih(ih));
+                decoBarre(ix + 30, iy + 20, iw - 60);
+                decoSpeaker(ix + iw - 30, iy + ih - 34); decoSpeaker(ix + iw - 46, iy + ih - 34);
+                decoTrophy(ix + 16, iy + ih - 20); decoTrophy(ix + 30, iy + ih - 20);
+                decoEmoji(ix + iw / 2, iy + ih - 10, "🩰", 18);
+                break;
+            case "teatro":
+                decoCurtain(ix + 6, iy + 8, ih - 40); decoCurtain(ix + iw - 24, iy + 8, ih - 40);
+                decoSpotlight(ix + iw * 0.3, iy + 4); decoSpotlight(ix + iw * 0.7, iy + 4);
+                for (let i = 0; i < 4; i++) decoChair(ix + 30 + i * 26, iy + ih - 26, "#7f1d1d");
+                decoEmoji(ix + iw / 2, iy + ih / 2, "🎭", 22);
+                break;
+            case "biblioteca":
+                decoShelf(ix + 6, iy + 8, 20, ih - 60); decoShelf(ix + 34, iy + 8, 20, ih - 60);
+                decoShelf(ix + iw - 26, iy + 8, 20, ih - 60);
+                decoRug(ix + iw / 2 - 26, iy + ih - 40, 52, 28, "#78350f");
+                decoDesk(ix + iw / 2 - 15, iy + ih - 36, "#d6d3d1"); decoComputer(ix + iw / 2 - 9, iy + ih - 48);
+                decoEmoji(ix + 60, iy + ih - 46, "📖", 16);
+                break;
+            case "cozinha":
+                decoStove(ix + 12, iy + 20); decoFridge(ix + iw - 26, iy + 10); decoSink(ix + 50, iy + 24);
+                decoCounter(ix + 10, iy + 34, iw - 50, 12);
+                decoCabinet(ix + iw - 30, iy + ih - 40, 24, 30);
+                decoEmoji(ix + 70, iy + ih - 20, "🍲", 18);
+                break;
+            case "secretaria":
+                decoCounter(ix + 10, iy + 16, iw - 40, 16);
+                decoComputer(ix + 20, iy + 4); decoComputer(ix + 60, iy + 4);
+                decoPrinter(ix + iw - 34, iy + ih - 30);
+                decoCabinet(ix + iw - 30, iy + 10, 22, 30);
+                decoEmoji(ix + 20, iy + ih - 16, "📞", 16);
+                break;
+            case "diretoria":
+                decoDesk(ix + iw / 2 - 15, iy + ih / 2, "#78350f"); decoChair(ix + iw / 2 - 6, iy + ih / 2 + 18);
+                decoComputer(ix + iw / 2 - 9, iy + ih / 2 - 12);
+                decoCabinet(ix + 8, iy + 8, 22, 34); decoCabinet(ix + iw - 30, iy + 8, 22, 34);
+                decoPlant(ix + iw - 24, iy + ih - 30);
+                decoEmoji(ix + 20, iy + ih - 20, "🏆", 16); decoEmoji(ix + iw - 60, iy + 14, "📜", 14);
+                break;
+            case "financeiro":
+                decoDesk(ix + 14, iy + ih - 36, "#a16207"); decoComputer(ix + 20, iy + ih - 50);
+                decoDesk(ix + 60, iy + ih - 36, "#a16207"); decoComputer(ix + 66, iy + ih - 50);
+                decoSafe(ix + iw - 28, iy + 10); decoCabinet(ix + iw - 30, iy + ih - 40, 22, 32);
+                decoEmoji(ix + 100, iy + 14, "🧮", 16);
+                break;
+            case "portaria":
+                decoCounter(ix + iw / 2 - 30, iy + ih - 30, 60, 16);
+                decoComputer(ix + iw / 2 - 9, iy + ih - 44);
+                decoEmoji(ix + iw / 2 - 30, iy + 14, "📷", 16); decoEmoji(ix + iw / 2 + 26, iy + 14, "📷", 16);
+                decoEmoji(ix + iw / 2 + 20, iy + ih - 40, "📋", 16);
+                break;
+            case "saude":
+                decoBed(ix + 12, iy + 12, 44, 18); decoArmchair(ix + iw - 30, iy + ih - 30);
+                decoPlant(ix + iw - 24, iy + 10); decoRug(ix + 10, iy + ih - 26, 40, 16, "#5eead4");
+                decoEmoji(ix + iw / 2, iy + ih / 2, "➕", 18);
+                break;
+            case "ti":
+                decoDesk(ix + iw / 2 - 15, iy + ih / 2 - 6, "#334155"); decoComputer(ix + iw / 2 - 9, iy + ih / 2 - 20);
+                decoCabinet(ix + 8, iy + 8, 20, 28);
+                decoEmoji(ix + iw - 24, iy + 16, "🖥️", 16);
+                break;
+            case "brecho":
+                decoShelf(ix + 8, iy + 8, iw - 16, 14);
+                decoCounter(ix + iw / 2 - 20, iy + ih - 26, 40, 14);
+                decoEmoji(ix + 20, iy + ih - 38, "👗", 18); decoEmoji(ix + iw - 30, iy + ih - 38, "🧥", 18);
+                break;
+            case "comunicacao":
+                decoDesk(ix + iw / 2 - 15, iy + ih / 2 - 6, "#0f766e"); decoComputer(ix + iw / 2 - 9, iy + ih / 2 - 20);
+                decoEmoji(ix + iw - 24, iy + 16, "📢", 16);
+                break;
+            case "refeitorio":
+                decoCounter(ix + 8, iy + ih - 24, iw - 16, 14);
+                decoCabinet(ix + iw - 28, iy + 8, 22, 30);
+                decoEmoji(ix + iw / 2, iy + ih - 34, "🍽️", 18);
+                break;
+            case "jardim":
+                decoCabinet(ix + 6, iy + 6, 20, 26);
+                decoPlant(ix + iw - 24, iy + 6); decoPlant(ix + iw / 2, iy + ih - 20);
+                decoEmoji(ix + iw - 40, iy + ih - 16, "🧹", 16);
+                break;
+        }
+    }
+    function iih(h) { return Math.max(20, h - 20); }
+
+    // ---- Elementos naturais espalhados pelo gramado (árvores, arbustos, fauna) ----
+    let TREES = [], BUSHES = [], FLOWER_PATCHES = [], BUTTERFLIES = [], BIRDS = [], LEAVES = [];
+
+    function generateAmbientDecor() {
+        TREES = []; BUSHES = []; FLOWER_PATCHES = [];
+        for (let r = 3; r < ROWS - 3; r++) {
+            for (let c = 3; c < COLS - 3; c++) {
+                if (map[r][c] !== 0) continue;
+                let rt = seededRand(r, c, 10);
+                if (rt < 0.018 && tileClear(r, c, 1)) {
+                    TREES.push({ x: c * TILE + TILE / 2, y: r * TILE + TILE / 2, scale: 0.8 + seededRand(r, c, 11) * 0.6, sway: r * 13 + c * 7, big: seededRand(r, c, 12) > 0.5 });
+                    continue;
+                }
+                let rb = seededRand(r, c, 20);
+                if (rb < 0.012 && tileClear(r, c, 0)) {
+                    BUSHES.push({ x: c * TILE + TILE / 2, y: r * TILE + TILE / 2, sway: r * 9 + c * 5 });
+                    continue;
+                }
+                let rf = seededRand(r, c, 30);
+                if (rf < 0.02 && tileClear(r, c, 0)) {
+                    FLOWER_PATCHES.push({ x: c * TILE + TILE / 2, y: r * TILE + TILE / 2, hue: Math.floor(seededRand(r, c, 31) * 5) });
+                }
+            }
+        }
+        BUTTERFLIES = []; for (let i = 0; i < 7; i++) BUTTERFLIES.push({ x: MAP_W * Math.random(), y: MAP_H * Math.random(), a: Math.random() * Math.PI * 2, speed: 20 + Math.random() * 18, hue: Math.floor(Math.random() * 3), wobble: Math.random() * 10 });
+        BIRDS = []; for (let i = 0; i < 4; i++) BIRDS.push({ x: MAP_W * Math.random(), y: 200 + Math.random() * (MAP_H - 400), dir: Math.random() > 0.5 ? 1 : -1, speed: 60 + Math.random() * 40, offset: Math.random() * 1000 });
+        LEAVES = []; for (let i = 0; i < 18; i++) LEAVES.push({ x: MAP_W * Math.random(), y: MAP_H * Math.random(), speed: 8 + Math.random() * 10, drift: Math.random() * Math.PI * 2, hue: Math.floor(Math.random() * 3) });
+    }
+
+    let lastAmbientT = 0;
+    function updateAmbient(now) {
+        let dt = lastAmbientT ? Math.min(0.05, (now - lastAmbientT) / 1000) : 0.016;
+        lastAmbientT = now;
+        for (let b of BUTTERFLIES) {
+            b.a += (seededRand(Math.floor(b.x), Math.floor(b.y), 1) - 0.5) * 0.6 * dt * 10;
+            b.x += Math.cos(b.a) * b.speed * dt; b.y += Math.sin(b.a) * b.speed * dt + Math.sin(now / 300 + b.wobble) * 0.4;
+            if (b.x < TILE * 2) b.a = 0; if (b.x > MAP_W - TILE * 2) b.a = Math.PI;
+            if (b.y < TILE * 2) b.a = Math.PI / 2; if (b.y > MAP_H - TILE * 2) b.a = -Math.PI / 2;
+        }
+        for (let bird of BIRDS) {
+            bird.x += bird.dir * bird.speed * dt;
+            if (bird.x > MAP_W + 60) bird.x = -60;
+            if (bird.x < -60) bird.x = MAP_W + 60;
+        }
+        for (let lf of LEAVES) {
+            lf.y += lf.speed * dt; lf.x += Math.sin(now / 500 + lf.drift) * 12 * dt;
+            if (lf.y > MAP_H) lf.y = 0;
+        }
+    }
+
+    function drawTree(t, now) {
+        let sway = Math.sin(now / 1400 + t.sway) * 3 * t.scale;
+        let s = t.scale, big = t.big;
+        ctx.fillStyle = "rgba(0,0,0,0.18)"; ctx.beginPath(); ctx.ellipse(t.x, t.y + 4, 16 * s, 6 * s, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = "#5b3a21"; ctx.lineWidth = 6 * s; ctx.lineCap = "round";
+        ctx.beginPath(); ctx.moveTo(t.x, t.y); ctx.lineTo(t.x + sway * 0.3, t.y - 22 * s); ctx.stroke();
+        ctx.save(); ctx.translate(t.x + sway * 0.3, t.y - 30 * s); ctx.rotate(sway * 0.01);
+        const green1 = big ? "#2f6b2f" : "#3a7d3a", green2 = big ? "#3f8f3f" : "#4fa84f", green3 = big ? "#5cb35c" : "#68c268";
+        ctx.fillStyle = green1; ctx.beginPath(); ctx.arc(0, 4, 20 * s, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = green2; ctx.beginPath(); ctx.arc(-10 * s, -6 * s, 15 * s, 0, Math.PI * 2); ctx.arc(11 * s, -4 * s, 15 * s, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = green3; ctx.beginPath(); ctx.arc(-2 * s, -14 * s, 13 * s, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+    }
+    function drawBush(b, now) {
+        let sway = Math.sin(now / 900 + b.sway) * 1.5;
+        ctx.fillStyle = "rgba(0,0,0,0.15)"; ctx.beginPath(); ctx.ellipse(b.x, b.y + 6, 12, 4, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = "#3f8f3f";
+        ctx.beginPath(); ctx.arc(b.x - 6 + sway, b.y, 7, 0, Math.PI * 2); ctx.arc(b.x + 6 + sway, b.y, 7, 0, Math.PI * 2); ctx.arc(b.x + sway, b.y - 5, 8, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = "#5cb35c";
+        ctx.beginPath(); ctx.arc(b.x - 2 + sway, b.y - 6, 4, 0, Math.PI * 2); ctx.fill();
+    }
+    function drawFlowerPatch(f, now) {
+        const palettes = [["#f43f5e", "#fecdd3"], ["#f59e0b", "#fde68a"], ["#8b5cf6", "#ddd6fe"], ["#ec4899", "#fbcfe8"], ["#3b82f6", "#bfdbfe"]];
+        const [dark, light] = palettes[f.hue];
+        for (let i = 0; i < 4; i++) {
+            let ang = i * 1.7 + f.hue;
+            let px = f.x + Math.cos(ang) * 6, py = f.y + Math.sin(ang) * 5 + Math.sin(now / 700 + f.x) * 1;
+            ctx.fillStyle = i % 2 === 0 ? dark : light;
+            ctx.beginPath(); ctx.arc(px, py, 2.4, 0, Math.PI * 2); ctx.fill();
+        }
+        ctx.fillStyle = "#facc15"; ctx.beginPath(); ctx.arc(f.x, f.y, 1.4, 0, Math.PI * 2); ctx.fill();
+    }
+    function drawButterfly(b, now) {
+        let flap = Math.sin(now / 90 + b.x) * 0.5 + 0.5;
+        const colors = [["#f59e0b", "#fde68a"], ["#ec4899", "#fbcfe8"], ["#38bdf8", "#bae6fd"]];
+        const [c1, c2] = colors[b.hue];
+        ctx.save(); ctx.translate(b.x, b.y);
+        ctx.fillStyle = c1;
+        ctx.beginPath(); ctx.ellipse(-3, 0, 3.2 * (0.4 + flap * 0.6), 4, 0.3, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = c2;
+        ctx.beginPath(); ctx.ellipse(3, 0, 3.2 * (0.4 + flap * 0.6), 4, -0.3, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = "#292524"; ctx.fillRect(-0.5, -3, 1, 6);
+        ctx.restore();
+    }
+    function drawBird(b, now) {
+        let flap = Math.sin(now / 120 + b.offset) * 4;
+        ctx.strokeStyle = "#292524"; ctx.lineWidth = 1.6; ctx.lineCap = "round";
+        ctx.beginPath();
+        ctx.moveTo(b.x - 6, b.y - flap); ctx.quadraticCurveTo(b.x, b.y + 3, b.x + 6, b.y - flap);
+        ctx.stroke();
+    }
+    function drawLeaf(lf, now) {
+        const colors = ["#eab308", "#f97316", "#a16207"];
+        ctx.fillStyle = colors[lf.hue];
+        ctx.save(); ctx.translate(lf.x, lf.y); ctx.rotate(now / 600 + lf.drift);
+        ctx.beginPath(); ctx.ellipse(0, 0, 3, 1.6, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+    }
+
     const keys = { up: false, down: false, left: false, right: false, action: false };
 
     // ==========================================================================
-    // SISTEMA DE INPUT (COMPATIBILIDADE MULTI-TOQUE MOBILE SEM CONFLITOS DE EVENTO)
+    // SISTEMA DE INPUT (COMPATIBILIDADE MULTI-TOQUE MOBILE SEM TRAVAMENTOS)
     // ==========================================================================
     function setupInput() {
         const setKey = (k, state) => {
@@ -622,7 +1047,6 @@
         touchMappings.forEach(mapping => {
             const btn = document.getElementById(mapping.id);
             if (btn) {
-                // Impede o comportamento padrão de zoom e rolagem no mobile de forma focada e limpa
                 btn.addEventListener("touchstart", (e) => {
                     e.preventDefault();
                     keys[mapping.key] = true;
@@ -638,7 +1062,6 @@
                     keys[mapping.key] = false;
                 }, { passive: false });
 
-                // Eventos de Mouse como Fallback para testes rápidos ou híbridos
                 btn.addEventListener("mousedown", (e) => {
                     keys[mapping.key] = true;
                 });
@@ -685,7 +1108,6 @@
         if (keys.left) dx = -player.speed;
         if (keys.right) dx = player.speed;
 
-        // Movimento suavizado em 8 direções com colisão individualizada por eixo
         if (dx !== 0 && !checkCollision(player.x + dx, player.y)) player.x += dx;
         if (dy !== 0 && !checkCollision(player.x, player.y + dy)) player.y += dy;
 
@@ -693,36 +1115,6 @@
         camY = Math.max(0, Math.min(player.y - canvas.height / 2, MAP_H - canvas.height));
 
         checkProximity();
-        updateParticles();
-    }
-
-    function updateParticles() {
-        // Atualização de partículas estéticas do ecossistema
-        leafParticles.forEach(p => {
-            p.x += p.speedX;
-            p.y += p.speedY;
-            if (p.x > MAP_W) p.x = 0;
-            if (p.y > MAP_H) p.y = 0;
-        });
-
-        butterflyParticles.forEach(p => {
-            p.x += p.speedX + Math.sin(Date.now() / 300) * 0.2;
-            p.y += p.speedY + Math.cos(Date.now() / 300) * 0.2;
-            p.wingCycle += 0.2;
-            if (p.x < 0) p.x = MAP_W;
-            if (p.x > MAP_W) p.x = 0;
-            if (p.y < 0) p.y = MAP_H;
-            if (p.y > MAP_H) p.y = 0;
-        });
-
-        birdParticles.forEach(p => {
-            p.x += p.speed;
-            p.wing = Math.sin(Date.now() / 50);
-            if (p.x > MAP_W) {
-                p.x = -50;
-                p.y = Math.random() * 15 * TILE;
-            }
-        });
     }
 
     let activeNPC = null;
@@ -809,146 +1201,32 @@
     function closeDialog() { document.getElementById("dialog-overlay").style.display = "none"; }
 
     // ==========================================================================
-    // 5. RENDERIZAÇÃO (RE-DISEGNADO COM QUALIDADE VISUAL DE ALTO NÍVEL)
+    // 5. RENDERIZAÇÃO
     // ==========================================================================
-    function drawSign(x, y, text) {
-        ctx.save();
-        ctx.shadowColor = "rgba(0, 0, 0, 0.4)";
-        ctx.shadowBlur = 4;
-        ctx.shadowOffsetY = 3;
+    function drawSign(x, y, text, icon) {
+        let label = (icon ? icon + "  " : "") + text;
+        ctx.font = "bold 12px 'Baloo 2', 'Courier New', sans-serif";
+        let textW = ctx.measureText(label).width;
+        let boxW = Math.max(textW + 18, 60);
+        let offset = (boxW - 60) / 2; // Centraliza a placa no NPC
+        let sx = x - offset;
 
-        ctx.font = "bold 11px 'Courier New'";
-        let textW = ctx.measureText(text).width;
-        let boxW = Math.max(textW + 16, 60); 
-        let offset = (boxW - 60) / 2;
-        
-        // Estilo placa de madeira entalhada tradicional de ilhas retro
-        ctx.fillStyle = "#5c2d16"; 
-        ctx.fillRect(x - offset, y, boxW, 20); 
-        ctx.fillStyle = "#a16207"; 
-        ctx.fillRect(x - offset + 2, y + 2, boxW - 4, 16);
-        ctx.fillStyle = "#3b1e0f"; 
-        ctx.fillRect(x + 25, y + 20, 10, 15);
-        
-        ctx.fillStyle = "#fff"; ctx.textAlign = "center";
-        ctx.fillText(text, x + 30 - offset + (boxW/2), y + 14);
-        ctx.restore();
+        ctx.fillStyle = "rgba(0,0,0,0.22)"; ctx.fillRect(sx + 3, y + 3, boxW, 20);
+        ctx.fillStyle = "#5b3a21"; ctx.fillRect(x + 26, y + 20, 8, 16);
+        ctx.fillStyle = "#78350f"; ctx.fillRect(x + 27, y + 20, 2, 16);
+        ctx.fillStyle = "#92400e"; ctx.fillRect(sx, y, boxW, 20);
+        ctx.strokeStyle = "#451a03"; ctx.lineWidth = 2; ctx.strokeRect(sx, y, boxW, 20);
+        ctx.fillStyle = "#d97706"; ctx.fillRect(sx + 2, y + 2, boxW - 4, 16);
+        ctx.fillStyle = "rgba(255,255,255,0.18)"; ctx.fillRect(sx + 2, y + 2, boxW - 4, 4);
+        ctx.fillStyle = "#451a03";
+        ctx.beginPath(); ctx.arc(sx + 6, y + 5, 1.4, 0, Math.PI * 2); ctx.arc(sx + boxW - 6, y + 5, 1.4, 0, Math.PI * 2); ctx.fill();
+
+        ctx.fillStyle = "#fffbeb"; ctx.textAlign = "center";
+        ctx.fillText(label, x + 30, y + 14);
+        ctx.textAlign = "left";
     }
 
-    // Desenha decorações internas baseadas no tipo de sala (Mapeamento do TILE 3)
-    function drawIndoorDecor(tx, ty, r, c) {
-        // Encontra em qual faixa de sala estamos para desenhar o background decorativo correspondente
-        ctx.save();
-        
-        // Chão de Madeira das Salas
-        ctx.fillStyle = "#b45309";
-        ctx.fillRect(tx, ty, TILE, TILE);
-        ctx.fillStyle = "#78350f";
-        ctx.fillRect(tx, ty + TILE - 2, TILE, 2); // Textura de tábuas
-
-        // Identifica sala por faixas de colunas/linhas para criar cenários temáticos
-        if (r >= 17 && r <= 24) { // TI (c: 22-29), Secretaria (10-20), Diretoria (50-60), Brechó (41-48)
-            if (c >= 22 && c <= 29) { // Sala de TI: Servidores e computadores
-                if (r === 18 && c % 2 === 0) {
-                    ctx.fillStyle = "#334155"; ctx.fillRect(tx + 5, ty + 5, 30, 25);
-                    ctx.fillStyle = "#10b981"; ctx.fillRect(tx + 8, ty + 10, 4, 4); // Leds ativos
-                    ctx.fillStyle = "#38bdf8"; ctx.fillRect(tx + 18, ty + 20, 12, 6); // Monitor
-                }
-            } else if (c >= 10 && c <= 20) { // Secretaria: Arquivos e guias
-                if (r === 18 && c % 3 === 0) {
-                    ctx.fillStyle = "#64748b"; ctx.fillRect(tx + 8, ty + 2, 24, 30);
-                    ctx.fillStyle = "#94a3b8"; ctx.fillRect(tx + 12, ty + 8, 16, 4); // Gavetas
-                    ctx.fillRect(tx + 12, ty + 16, 16, 4);
-                }
-            } else if (c >= 50 && c <= 60) { // Diretoria: Mesa executiva, plantas e quadros
-                if (r === 18 && c === 52) { // Vaso de planta
-                    ctx.fillStyle = "#b45309"; ctx.fillRect(tx + 12, ty + 20, 16, 16);
-                    ctx.fillStyle = "#047857"; ctx.beginPath(); ctx.arc(tx + 20, ty + 12, 10, 0, Math.PI * 2); ctx.fill();
-                }
-                if (r === 18 && c === 56) { // Quadro de honra na parede
-                    ctx.fillStyle = "#facc15"; ctx.fillRect(tx + 10, ty + 2, 20, 16);
-                    ctx.fillStyle = "#fff"; ctx.fillRect(tx + 12, ty + 4, 16, 12);
-                    ctx.fillStyle = "#000"; ctx.fillRect(tx + 15, ty + 8, 10, 2);
-                }
-            } else if (c >= 41 && c <= 48) { // Brechó: Roupas suspensas e caixas
-                if (r === 18 && c % 2 === 0) {
-                    ctx.fillStyle = "#475569"; ctx.fillRect(tx + 2, ty + 10, 36, 6); // Arara
-                    ctx.fillStyle = "#ec4899"; ctx.fillRect(tx + 8, ty + 16, 8, 18); // Cabides com roupas
-                    ctx.fillStyle = "#3b82f6"; ctx.fillRect(tx + 22, ty + 16, 8, 18);
-                }
-            }
-        } else if (r >= 29 && r <= 36) { // Cozinha (10-20), Reforço (50-60), Mkt (22-29), Refeitório (41-48)
-            if (c >= 10 && c <= 20) { // Cozinha: Fogões e pias
-                if (r === 30 && c % 3 === 0) {
-                    ctx.fillStyle = "#cbd5e1"; ctx.fillRect(tx + 4, ty + 6, 32, 28);
-                    ctx.fillStyle = "#ef4444"; ctx.fillRect(tx + 8, ty + 10, 8, 6); // Fogo simulado
-                }
-            } else if (c >= 50 && c <= 60) { // Reforço: Carteiras e Quadro Negro
-                if (r === 30 && c === 55) { // Quadro Negro gigante central
-                    ctx.fillStyle = "#0f172a"; ctx.fillRect(tx - 20, ty + 2, 80, 24);
-                    ctx.strokeStyle = "#b45309"; ctx.lineWidth = 3; ctx.strokeRect(tx - 20, ty + 2, 80, 24);
-                    ctx.fillStyle = "#fff"; ctx.font = "8px Arial"; ctx.fillText("2+2=4", tx + 5, ty + 15);
-                }
-            } else if (c >= 22 && c <= 29) { // Marketing: Painel criativo e banners
-                if (r === 30 && c % 2 === 0) {
-                    ctx.fillStyle = "#f97316"; ctx.fillRect(tx + 6, ty + 4, 28, 22); // Painel de post-it
-                    ctx.fillStyle = "#fef08a"; ctx.fillRect(tx + 10, ty + 8, 6, 6);
-                    ctx.fillStyle = "#67e8f9"; ctx.fillRect(tx + 20, ty + 14, 6, 6);
-                }
-            } else if (c >= 41 && c <= 48) { // Refeitório: Mesas de alimentação
-                if (r % 2 === 0 && c % 2 === 0) {
-                    ctx.fillStyle = "#f59e0b"; ctx.fillRect(tx + 5, ty + 5, 30, 20); // Mesa
-                    ctx.fillStyle = "#78350f"; ctx.fillRect(tx + 12, ty + 25, 16, 10); // Bancada
-                }
-            }
-        } else if (r >= 41 && r <= 48) { // Financeiro (10-20), Artes (50-60)
-            if (c >= 10 && c <= 20) { // Financeiro: Cofre e Calculadoras
-                if (r === 42 && c === 15) {
-                    ctx.fillStyle = "#475569"; ctx.fillRect(tx + 8, ty + 5, 24, 28); // Cofre
-                    ctx.fillStyle = "#94a3b8"; ctx.beginPath(); ctx.arc(tx + 20, ty + 18, 6, 0, Math.PI * 2); ctx.fill(); // Segredo
-                }
-            } else if (c >= 50 && c <= 60) { // Artes: Telas de pintura e pincéis
-                if (r === 42 && c % 3 === 0) {
-                    ctx.fillStyle = "#d97706"; ctx.fillRect(tx + 12, ty + 15, 16, 20); // Cavalete
-                    ctx.fillStyle = "#f8fafc"; ctx.fillRect(tx + 6, ty + 5, 28, 16); // Tela branca
-                    ctx.fillStyle = "#ec4899"; ctx.beginPath(); ctx.arc(tx + 15, ty + 12, 4, 0, Math.PI * 2); ctx.fill(); // Mancha artística
-                }
-            }
-        } else if (r >= 53 && r <= 60) { // Dança (20-30), Teatro (40-50), Saúde (5-15), Biblioteca (55-65)
-            if (c >= 20 && c <= 30) { // Dança: Espelhos e barras
-                if (r === 54) {
-                    ctx.fillStyle = "#e2e8f0"; ctx.fillRect(tx, ty + 2, TILE, 16); // Espelho corrido
-                    ctx.fillStyle = "#b45309"; ctx.fillRect(tx, ty + 22, TILE, 3); // Barra de madeira
-                }
-            } else if (c >= 40 && c <= 50) { // Teatro: Ribalta e Cortinas vermelhas
-                if (r === 54) {
-                    ctx.fillStyle = "#991b1b"; ctx.fillRect(tx, ty, TILE, 32); // Cortinado denso vermelho
-                    ctx.fillStyle = "#facc15"; ctx.beginPath(); ctx.arc(tx + 20, ty + 36, 4, 0, Math.PI*2); ctx.fill(); // Refletores
-                }
-            } else if (c >= 5 && c <= 15) { // Saúde: Maca médica acolhedora e divisórias
-                if (r === 54 && c === 10) {
-                    ctx.fillStyle = "#f1f5f9"; ctx.fillRect(tx + 4, ty + 10, 32, 16); // Maca
-                    ctx.fillStyle = "#38bdf8"; ctx.fillRect(tx + 4, ty + 6, 10, 4); // Travesseiro azul suave
-                }
-            } else if (c >= 55 && c <= 65) { // Biblioteca: Estantes de livros empilhados
-                if (r === 54 && c % 2 === 0) {
-                    ctx.fillStyle = "#78350f"; ctx.fillRect(tx + 4, ty + 2, 32, 36); // Estante
-                    ctx.fillStyle = "#3b82f6"; ctx.fillRect(tx + 8, ty + 6, 6, 8); // Livros coloridos
-                    ctx.fillStyle = "#ef4444"; ctx.fillRect(tx + 14, ty + 6, 6, 8);
-                    ctx.fillStyle = "#10b981"; ctx.fillRect(tx + 22, ty + 6, 6, 8);
-                }
-            }
-        }
-        ctx.restore();
-    }
-
-    // FUNÇÃO ORIGINAL DE DESENHO DE PERSONAGENS DO SEU CÓDIGO FONTE (Efeito Respiração adicionado de forma dinâmica e sutil)
     function drawCharacter(x, y, skin, shirt, pants, hair, hStyle, glasses, isHero) {
-        ctx.save();
-        // Adiciona um micro-bounce sutil de respiração para simular vida mesmo parado
-        let breathe = !isHero ? Math.sin(Date.now() / 350 + x) * 0.4 : 0;
-        
-        ctx.translate(0, breathe);
         ctx.fillStyle = "rgba(0,0,0,0.3)"; ctx.beginPath(); ctx.ellipse(x+12, y+36, 12, 4, 0, 0, Math.PI*2); ctx.fill();
         ctx.lineWidth = 2; ctx.strokeStyle = "#111";
 
@@ -959,6 +1237,7 @@
             ctx.fillStyle = "#fef08a"; ctx.fillRect(x+5, y+35, 6, 4); ctx.fillRect(x+13, y+35, 6, 4);
             ctx.fillStyle = skin; ctx.fillRect(x+2, y+15, 4, 12); ctx.strokeRect(x+2, y+15, 4, 12);
             ctx.fillRect(x+18, y+15, 4, 12); ctx.strokeRect(x+18, y+15, 4, 12);
+            ctx.fillStyle = "rgba(255,255,255,0.12)"; ctx.fillRect(x+6, y+14, 4, 14);
         } else {
             ctx.fillStyle = pants; ctx.fillRect(x+6, y+26, 4, 10); ctx.strokeRect(x+6, y+26, 4, 10);
             ctx.fillRect(x+14, y+26, 4, 10); ctx.strokeRect(x+14, y+26, 4, 10);
@@ -967,18 +1246,16 @@
             ctx.fillStyle = shirt; ctx.fillRect(x+1, y+14, 4, 6); ctx.fillRect(x+19, y+14, 4, 6);
             ctx.fillStyle = skin; ctx.fillRect(x+1, y+20, 4, 6); ctx.strokeRect(x+1, y+20, 4, 6);
             ctx.fillRect(x+19, y+20, 4, 6); ctx.strokeRect(x+19, y+20, 4, 6);
+            ctx.fillStyle = "rgba(255,255,255,0.14)"; ctx.fillRect(x+5, y+14, 14, 3);
         }
 
         ctx.fillStyle = skin; ctx.fillRect(x+6, y+2, 12, 12); ctx.strokeRect(x+6, y+2, 12, 12);
-        
-        // Simula efeito de piscar de olhos ocasionalmente para humanizar
-        let isBlinking = (Math.floor(Date.now() / 2000) % 2 === 0) && (Math.floor(Date.now() / 100) % 15 === 0);
-        if (isBlinking) {
-            ctx.fillStyle = "#111";
-            ctx.fillRect(x+8, y+8, 2, 1); ctx.fillRect(x+14, y+8, 2, 1);
-        } else {
-            ctx.fillStyle = "#000"; ctx.fillRect(x+8, y+7, 2, 3); ctx.fillRect(x+14, y+7, 2, 3);
-        }
+        ctx.fillStyle = "rgba(255,255,255,0.16)"; ctx.fillRect(x+7, y+3, 4, 3);
+
+        let blinking = ((Date.now() + x*37 + y*19) % 3200) < 120;
+        ctx.fillStyle = "#000";
+        if (blinking) { ctx.fillRect(x+8, y+8, 2, 1); ctx.fillRect(x+14, y+8, 2, 1); }
+        else { ctx.fillRect(x+8, y+7, 2, 3); ctx.fillRect(x+14, y+7, 2, 3); }
 
         if(glasses) {
             ctx.strokeStyle = "#4b5563"; ctx.lineWidth = 1;
@@ -997,94 +1274,145 @@
             ctx.fillRect(x+5, y, 14, 4);
             ctx.beginPath(); ctx.arc(x+12, y, 4, 0, Math.PI*2); ctx.fill(); 
         }
-        ctx.restore();
     }
 
     function draw() {
-        ctx.fillStyle = "#11141a"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+        const now = Date.now();
+        let skyGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+        skyGrad.addColorStop(0, "#bfead9"); skyGrad.addColorStop(1, "#eef7ea");
+        ctx.fillStyle = skyGrad; ctx.fillRect(0, 0, canvas.width, canvas.height);
+
         ctx.save();
         ctx.translate(Math.floor(-camX), Math.floor(-camY));
 
         const c1 = Math.max(0, Math.floor(camX / TILE)), c2 = Math.min(COLS - 1, Math.floor((camX + canvas.width) / TILE));
         const r1 = Math.max(0, Math.floor(camY / TILE)), r2 = Math.min(ROWS - 1, Math.floor((camY + canvas.height) / TILE));
 
-        // Efeito de ondulação da grama pelo vento de forma unificada
-        let windGrassOffset = Math.sin(Date.now() / 600) * 2;
-
         for (let r = r1; r <= r2; r++) {
             for (let c = c1; c <= c2; c++) {
                 let tx = c * TILE, ty = r * TILE, type = map[r][c];
-                
-                if (type === 0) { 
-                    // Gramado natural texturizado
-                    ctx.fillStyle = (r+c) % 2 === 0 ? "#558b2f" : "#689f38"; 
-                    ctx.fillRect(tx, ty, TILE, TILE); 
-                    
-                    // Pequenas flores e arbustos decorativos dispersos
-                    if ((r * c) % 17 === 0) {
-                        ctx.fillStyle = "#fef08a"; // Miolo da flor
-                        ctx.fillRect(tx + 12 + windGrassOffset, ty + 12, 3, 3);
-                        ctx.fillStyle = "#f87171"; // Pétala
-                        ctx.fillRect(tx + 10 + windGrassOffset, ty + 10, 2, 2);
-                        ctx.fillRect(tx + 15 + windGrassOffset, ty + 10, 2, 2);
-                    } else if ((r * c) % 23 === 0) {
-                        // Pequenas folhas secas ou ramos caídos
-                        ctx.fillStyle = "#2e7d32";
-                        ctx.fillRect(tx + 8 + windGrassOffset, ty + 20, 5, 2);
+                let above = (r > 0) ? map[r - 1][c] : -1;
+                let below = (r < ROWS - 1) ? map[r + 1][c] : -1;
+                let left = (c > 0) ? map[r][c - 1] : -1;
+                let right = (c < COLS - 1) ? map[r][c + 1] : -1;
+
+                if (type === 0) {
+                    // GRAMA viva: tonalidades variadas, sombra suave, fios ao vento, pedrinhas e folhas soltas
+                    let v = seededRand(r, c, 1);
+                    ctx.fillStyle = v < 0.55 ? "#5f9c2e" : (v < 0.8 ? "#6bab34" : "#568c29");
+                    ctx.fillRect(tx, ty, TILE, TILE);
+                    if (seededRand(r, c, 2) < 0.18) {
+                        ctx.fillStyle = "rgba(0,0,0,0.06)";
+                        ctx.beginPath(); ctx.ellipse(tx + TILE * 0.5, ty + TILE * 0.6, TILE * 0.4, TILE * 0.16, 0, 0, Math.PI * 2); ctx.fill();
+                    }
+                    let sw = Math.sin(now / 700 + r * 0.6 + c * 0.4) * 2;
+                    ctx.strokeStyle = "rgba(70,110,30,0.55)"; ctx.lineWidth = 1.3;
+                    for (let g = 0; g < 3; g++) {
+                        let gx = tx + 7 + g * 12 + seededRand(r, c, g + 3) * 6, gy = ty + TILE - 4;
+                        ctx.beginPath(); ctx.moveTo(gx, gy); ctx.lineTo(gx + sw, gy - 9); ctx.stroke();
+                    }
+                    if (seededRand(r, c, 7) < 0.05) {
+                        ctx.fillStyle = "#9ca39a"; ctx.beginPath(); ctx.ellipse(tx + TILE * 0.7, ty + TILE * 0.35, 3.2, 2, 0.3, 0, Math.PI * 2); ctx.fill();
+                        ctx.fillStyle = "rgba(255,255,255,0.3)"; ctx.beginPath(); ctx.ellipse(tx + TILE * 0.7 - 1, ty + TILE * 0.35 - 1, 1.1, 0.7, 0.3, 0, Math.PI * 2); ctx.fill();
+                    }
+                    if (seededRand(r, c, 8) < 0.045) {
+                        ctx.fillStyle = "#b45309"; ctx.save(); ctx.translate(tx + TILE * 0.28, ty + TILE * 0.75); ctx.rotate(seededRand(r, c, 9) * Math.PI);
+                        ctx.beginPath(); ctx.ellipse(0, 0, 2.6, 1.3, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
                     }
                 }
-                else if (type === 1) { 
-                    // Paredes e fachada exterior da escola com profundidade e telhado
-                    ctx.fillStyle = "#1e293b"; ctx.fillRect(tx, ty, TILE, TILE); 
-                    
-                    // Sombras de profundidade e beiral
-                    ctx.fillStyle = "#0f172a"; ctx.fillRect(tx, ty, TILE, 8); 
-                    
-                    // Beiral estético de telha no topo
-                    ctx.fillStyle = "#f87171"; ctx.fillRect(tx, ty - 6, TILE, 6);
-                    ctx.fillStyle = "#dc2626"; ctx.fillRect(tx, ty - 4, TILE, 2);
-                    
-                    // Janelas detalhadas
-                    if (c % 2 === 0) {
-                        ctx.fillStyle = "#38bdf8"; ctx.fillRect(tx + 10, ty + 12, 20, 16);
-                        ctx.fillStyle = "#e0f2fe"; ctx.fillRect(tx + 12, ty + 14, 6, 12); // Reflexo do sol nas janelas
+                else if (type === 1) {
+                    // FACHADA DA ESCOLA: telhado (topo), base (frente/porta) e paredes laterais com janelas
+                    let isRoof = (below === 3) && (above !== 1);
+                    let isFront = (above === 3) && (below !== 1);
+                    if (isRoof) {
+                        ctx.fillStyle = "rgba(0,0,0,0.22)"; ctx.fillRect(tx - 2, ty - 6, TILE + 4, 8);
+                        let roofGrad = ctx.createLinearGradient(tx, ty - 10, tx, ty + TILE * 0.6);
+                        roofGrad.addColorStop(0, "#c2540f"); roofGrad.addColorStop(1, "#7c2d12");
+                        ctx.fillStyle = roofGrad; ctx.fillRect(tx, ty - 10, TILE, TILE * 0.6);
+                        ctx.strokeStyle = "rgba(0,0,0,0.22)"; ctx.lineWidth = 1;
+                        for (let i = 1; i < 4; i++) { ctx.beginPath(); ctx.moveTo(tx, ty - 10 + i * 6); ctx.lineTo(tx + TILE, ty - 10 + i * 6); ctx.stroke(); }
+                        ctx.fillStyle = "#57534e"; ctx.fillRect(tx, ty + TILE * 0.5, TILE, TILE * 0.5);
+                    } else if (isFront) {
+                        ctx.fillStyle = "#eee7d8"; ctx.fillRect(tx, ty, TILE, TILE);
+                        ctx.fillStyle = "rgba(0,0,0,0.12)"; ctx.fillRect(tx, ty + TILE - 6, TILE, 6);
+                        ctx.strokeStyle = "rgba(0,0,0,0.1)"; ctx.strokeRect(tx, ty, TILE, TILE);
+                    } else {
+                        ctx.fillStyle = "#ded7c7"; ctx.fillRect(tx, ty, TILE, TILE);
+                        ctx.strokeStyle = "rgba(0,0,0,0.07)"; ctx.lineWidth = 1;
+                        for (let i = 1; i < 3; i++) { ctx.beginPath(); ctx.moveTo(tx, ty + i * (TILE / 3)); ctx.lineTo(tx + TILE, ty + i * (TILE / 3)); ctx.stroke(); }
+                        if (above === 1 && below === 1 && seededRand(r, c, 40) < 0.5) {
+                            ctx.fillStyle = "#38bdf8"; ctx.fillRect(tx + 10, ty + 12, TILE - 20, 16);
+                            ctx.strokeStyle = "#78350f"; ctx.lineWidth = 2; ctx.strokeRect(tx + 10, ty + 12, TILE - 20, 16);
+                            ctx.beginPath(); ctx.moveTo(tx + TILE / 2, ty + 12); ctx.lineTo(tx + TILE / 2, ty + 28); ctx.stroke();
+                            ctx.fillStyle = "rgba(255,255,255,0.35)"; ctx.fillRect(tx + 12, ty + 14, 6, 4);
+                        }
                     }
                 }
-                else if (type === 2) { 
-                    // Caminhos texturizados orgânicos com pequenas bordas de pedra
-                    ctx.fillStyle = "#c27829"; ctx.fillRect(tx, ty, TILE, TILE); 
-                    
-                    // Variações e imperfeições estéticas na estrada (terra e marcas de uso)
-                    ctx.fillStyle = "#a15c1b";
-                    if ((r+c)%3 === 0) ctx.fillRect(tx + 5, ty + 8, 4, 4);
-                    if ((r+c)%5 === 0) ctx.fillRect(tx + 22, ty + 18, 6, 3);
-                    
-                    // Pequenas pedrinhas cinzas integradas nas margens do caminho
-                    if ((r * c) % 19 === 0) {
-                        ctx.fillStyle = "#94a3b8";
-                        ctx.beginPath(); ctx.ellipse(tx + 15, ty + 15, 4, 2, 0, 0, Math.PI*2); ctx.fill();
+                else if (type === 2) {
+                    // CAMINHO: textura orgânica, pedrinhas, marcas de uso e borda com o gramado
+                    let v = seededRand(r, c, 50);
+                    ctx.fillStyle = v < 0.5 ? "#c98a4b" : (v < 0.8 ? "#bf7d3e" : "#ad7038");
+                    ctx.fillRect(tx, ty, TILE, TILE);
+                    if (seededRand(r, c, 51) < 0.35) {
+                        ctx.fillStyle = "rgba(0,0,0,0.08)";
+                        ctx.beginPath(); ctx.ellipse(tx + TILE * seededRand(r, c, 52), ty + TILE * seededRand(r, c, 53), 6, 3, 0, 0, Math.PI * 2); ctx.fill();
                     }
-                } 
-                else if (type === 3) { 
-                    // Interior das salas decoradas com objetos ricos
-                    drawIndoorDecor(tx, ty, r, c);
+                    if (seededRand(r, c, 54) < 0.22) { ctx.fillStyle = "#8a5a2b"; ctx.beginPath(); ctx.ellipse(tx + TILE * 0.3, ty + TILE * 0.6, 3, 2, 0.4, 0, Math.PI * 2); ctx.fill(); }
+                    ctx.fillStyle = "rgba(101,163,13,0.35)";
+                    if (above === 0) ctx.fillRect(tx, ty, TILE, 4);
+                    if (below === 0) ctx.fillRect(tx, ty + TILE - 4, TILE, 4);
+                    if (left === 0) ctx.fillRect(tx, ty, 4, TILE);
+                    if (right === 0) ctx.fillRect(tx + TILE - 4, ty, 4, TILE);
                 }
-                else if (type === 4) { 
-                    // Água com ondas e brilhos suaves
-                    ctx.fillStyle = "#0284c7"; ctx.fillRect(tx, ty, TILE, TILE); 
-                    let w = Math.sin(Date.now() / 400 + c) * 3; 
-                    ctx.fillStyle = "#38bdf8"; 
-                    ctx.fillRect(tx + 5, ty + 12 + w, 22, 3); 
+                else if (type === 3) {
+                    // PISO INTERNO: xadrez suave, e porta bonita nas aberturas para fora
+                    let isDoorway = (below === 0 || below === 2);
+                    if (isDoorway) {
+                        ctx.fillStyle = "#78350f"; ctx.fillRect(tx, ty, TILE, TILE);
+                        ctx.fillStyle = "#a16207"; ctx.fillRect(tx + 3, ty + 3, TILE - 6, TILE - 6);
+                        ctx.fillStyle = "#92400e";
+                        ctx.fillRect(tx + 3, ty + 3, (TILE - 6) / 2 - 1, TILE - 6);
+                        ctx.fillRect(tx + 3 + (TILE - 6) / 2 + 1, ty + 3, (TILE - 6) / 2 - 1, TILE - 6);
+                        ctx.fillStyle = "#fbbf24";
+                        ctx.beginPath(); ctx.arc(tx + TILE / 2 - 3, ty + TILE / 2, 1.6, 0, Math.PI * 2); ctx.arc(tx + TILE / 2 + 3, ty + TILE / 2, 1.6, 0, Math.PI * 2); ctx.fill();
+                    } else {
+                        let checker = (r + c) % 2 === 0;
+                        ctx.fillStyle = checker ? "#fef3c7" : "#fde9a8";
+                        ctx.fillRect(tx, ty, TILE, TILE);
+                        ctx.strokeStyle = "rgba(0,0,0,0.05)"; ctx.strokeRect(tx, ty, TILE, TILE);
+                    }
+                }
+                else if (type === 4) {
+                    // ÁGUA: ondas duplas + espuma na margem
+                    ctx.fillStyle = "#0ea5e9"; ctx.fillRect(tx, ty, TILE, TILE);
+                    let w = Math.sin(now / 300 + c + r * 0.3) * 2;
+                    ctx.fillStyle = "#38bdf8"; ctx.fillRect(tx + 5, ty + 10 + w, 20, 3);
+                    let w2 = Math.sin(now / 260 + c * 1.3 + r) * 2;
+                    ctx.fillStyle = "rgba(255,255,255,0.35)"; ctx.fillRect(tx + 10, ty + 26 + w2, 14, 2);
+                    if (above !== 4) { ctx.fillStyle = "rgba(255,255,255,0.5)"; ctx.fillRect(tx, ty, TILE, 3); }
                 }
             }
         }
 
-        // Desenho das placas de identificação com visualização aprimorada
-        for(let key in npcLocations) {
-            drawSign(npcLocations[key].x - 15, npcLocations[key].y - 32, questsData[key].room);
+        // Elementos naturais espalhados (árvores, arbustos, flores) — apenas dentro da área visível
+        const viewL = camX - 60, viewR = camX + canvas.width + 60, viewT = camY - 90, viewB = camY + canvas.height + 60;
+        for (const f of FLOWER_PATCHES) if (f.x > viewL && f.x < viewR && f.y > viewT && f.y < viewB) drawFlowerPatch(f, now);
+        for (const b of BUSHES) if (b.x > viewL && b.x < viewR && b.y > viewT && b.y < viewB) drawBush(b, now);
+        for (const t of TREES) if (!t.big && t.x > viewL && t.x < viewR && t.y > viewT && t.y < viewB) drawTree(t, now);
+        for (const t of TREES) if (t.big && t.x > viewL && t.x < viewR && t.y > viewT && t.y < viewB) drawTree(t, now);
+
+        // Decoração própria de cada sala visível
+        for (let key in ROOM_INFO) {
+            const room = ROOM_INFO[key];
+            const rx1 = room.c1 * TILE, rx2 = room.c2 * TILE, ry1 = room.r1 * TILE, ry2 = room.r2 * TILE;
+            if (rx2 > camX && rx1 < camX + canvas.width && ry2 > camY && ry1 < camY + canvas.height) drawRoomDecor(key);
         }
 
-        // Desenhar múltiplos NPCs preservando seus bounces e espaçamentos individuais originais
+        for(let key in npcLocations) {
+            drawSign(npcLocations[key].x - 15, npcLocations[key].y - 30, questsData[key].room, questsData[key].icon);
+        }
+
+        // Sistema Genérico e Robusto para desenhar múltiplos NPCs alinhados horizontalmente em qualquer quantidade
         for (let key in npcLocations) {
             let loc = npcLocations[key];
             let count = loc.npcs.length;
@@ -1105,35 +1433,17 @@
         let bob = (keys.up || keys.down || keys.left || keys.right) ? Math.sin(Date.now() / 80) * 3 : 0;
         drawCharacter(player.x, player.y + bob, "#ffdbac", "#18181b", "#18181b", "#292524", 3, false, true);
 
-        // Renderização dos elementos estéticos e partículas do ambiente
-        ctx.save();
-        leafParticles.forEach(p => {
-            ctx.fillStyle = p.color;
-            ctx.fillRect(p.x, p.y, p.size, p.size);
-        });
-
-        butterflyParticles.forEach(p => {
-            ctx.fillStyle = p.color;
-            let wing = Math.sin(p.wingCycle) * 3;
-            ctx.fillRect(p.x - wing, p.y, 3, 3);
-            ctx.fillRect(p.x + 1 + wing, p.y, 3, 3);
-        });
-
-        birdParticles.forEach(p => {
-            ctx.fillStyle = "#334155";
-            ctx.beginPath();
-            ctx.moveTo(p.x, p.y);
-            ctx.lineTo(p.x + 5, p.y - 3 + p.wing * 3);
-            ctx.lineTo(p.x + 10, p.y);
-            ctx.stroke();
-        });
-        ctx.restore();
+        // Fauna aérea por cima de tudo: folhas, borboletas e passarinhos ocasionais
+        for (const lf of LEAVES) if (lf.x > viewL && lf.x < viewR && lf.y > viewT && lf.y < viewB) drawLeaf(lf, now);
+        for (const bf of BUTTERFLIES) if (bf.x > viewL && bf.x < viewR && bf.y > viewT && bf.y < viewB) drawButterfly(bf, now);
+        for (const bd of BIRDS) if (bd.y > viewT && bd.y < viewB) drawBird(bd, now);
 
         ctx.restore();
     }
 
     function loop() {
         updatePhysics();
+        updateAmbient(Date.now());
         draw();
         requestAnimationFrame(loop);
     }
@@ -1152,7 +1462,7 @@
         }, 500);
 
         initMap();
-        initAmbientParticles();
+        generateAmbientDecor();
         setupInput();
         requestAnimationFrame(loop);
     }
