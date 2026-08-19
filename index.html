@@ -8,32 +8,31 @@
         body {
             font-family: Arial, sans-serif;
             
-            /* 1. CONFIGURAÇÃO DA FOTO DE FUNDO */
-            background-image: url('fundo-menu.jpg'); /* Nome exato do seu arquivo de imagem novo do menu */
-            background-size: cover;             /* Faz a imagem cobrir a tela toda */
-            background-position: center;        /* Centraliza a imagem */
-            background-repeat: no-repeat;       /* Impede que a imagem fique se repetindo */
-            background-attachment: fixed;       /* Deixa o fundo fixo ao rolar a página */
+            /* CONFIGURAÇÃO DA FOTO DE FUNDO */
+            background-image: url('fundo-menu.jpg'); 
+            background-size: cover;             
+            background-position: center;        
+            background-repeat: no-repeat;       
+            background-attachment: fixed;       
             
             color: #ffffff;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;                  /* CORRIGIDO: Altura mínima em vez de altura travada */
+            min-height: 100vh;                  
             margin: 0;
-            padding: 40px 20px;                 /* ADICIONADO: Margem de respira para o conteúdo não colar no topo/fundo do celular */
+            padding: 40px 20px;                 
             text-align: center;
             position: relative;
         }
 
-        /* 2. CAMADA ESCURA POR CIMA DA IMAGEM */
-        /* Garante que os fundos das fotos não misturem com as letras brancas */
+        /* CAMADA ESCURA POR CIMA DA IMAGEM */
         body::before {
             content: "";
-            position: fixed;                    /* CORRIGIDO: fixed garante que a camada cubra tudo mesmo ao rolar */
+            position: fixed;                    
             top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(44, 62, 80, 0.75); /* Tom escuro com 75% de transparência */
+            background-color: rgba(44, 62, 80, 0.75); 
             z-index: 1;
         }
 
@@ -48,18 +47,21 @@
             margin-bottom: 10px;
             color: #f1c40f;
         }
+        
         p {
             font-size: 1.2rem;
             margin-bottom: 40px;
-            max-width: 600px;                   /* ADICIONADO: Evita que o texto fique muito esticado em telas grandes */
+            max-width: 600px;                   
         }
+        
         .menu-container {
             display: flex;
             flex-direction: column;
             gap: 20px;
-            width: 100%;                        /* ALTERADO: Ocupa o limite disponível */
-            max-width: 400px;                   /* Mantém o limite bonito e centralizado */
+            width: 100%;                        
+            max-width: 400px;                   
         }
+        
         .btn-menu {
             color: white;
             text-decoration: none;
@@ -70,129 +72,134 @@
             transition: 0.3s;
             display: block;
         }
+        
         .btn-menu:hover {
             transform: scale(1.03);
         }
         
-        /* Cores customizadas para cada botão de jogo */
-        .btn-jogo1 {
-            background-color: #e74c3c;
+        /* =========================================
+           CORES CUSTOMIZADAS (UM PARA CADA JOGO)
+        ========================================= */
+
+        /* ENIGMAS UNIFICADOS */
+        .btn-lanchonete {
+            background-color: #e74c3c; /* Vermelho */
             border: 2px solid #c0392b;
         }
-        .btn-jogo1:hover {
-            background-color: #c0392b;
-        }
+        .btn-lanchonete:hover { background-color: #c0392b; }
 
-        .btn-jogo2 {
-            background-color: #2980b9;
-            border: 2px solid #1c5981;
+        /* GATO FRAÇÃO */
+        .btn-gato {
+            background-color: #f39c12; /* Laranja */
+            border: 2px solid #d68910;
         }
-        .btn-jogo2:hover {
-            background-color: #1c5981;
-        }
+        .btn-gato:hover { background-color: #d68910; }
 
-        .btn-jogo3 {
-            background-color: #2ecc71;
-            border: 2px solid #27ae60;
-        }
-        .btn-jogo3:hover {
-            background-color: #27ae60;
-        }
-
-        .btn-jogo4 {
-            background-color: #9b59b6;
-            border: 2px solid #8e44ad;
-        }
-        .btn-jogo4:hover {
-            background-color: #8e44ad;
-        }   
-
-        /* NOVO BOTÃO: ESTILO DO ENIGMA 5 */
-        .btn-jogo5 {
-            background-color: #e67e22;
-            border: 2px solid #d35400;
-        }
-        .btn-jogo5:hover {
-            background-color: #d35400;
-        }
-
-        /* ESTILO DO JOGO COZINHA */
-        .btn-cozinha {
-            background-color: #16a085;
-            border: 2px solid #117a65;
-        }
-        .btn-cozinha:hover {
-            background-color: #117a65;
-        }
-
-        /* ESTILO DO JOGO EDISCA */
+        /* EDISCA */
         .btn-edisca {
-            background-color: #ff6b6b;
+            background-color: #ff6b6b; /* Coral / Rosa Escuro */
             border: 2px solid #e05353;
         }
-        .btn-edisca:hover {
-            background-color: #e05353;
-        }
+        .btn-edisca:hover { background-color: #e05353; }
 
-        /* ESTILO EXCLUSIVO: DESAFIO ESCAPE ISLAND */
+        /* AVENTURA CRONO-LÓGICA */
+        .btn-crono {
+            background-color: #8e44ad; /* Roxo */
+            border: 2px solid #732d91;
+        }
+        .btn-crono:hover { background-color: #732d91; }
+
+        /* COZINHA */
+        .btn-cozinha {
+            background-color: #16a085; /* Verde Mar/Teal */
+            border: 2px solid #117a65;
+        }
+        .btn-cozinha:hover { background-color: #117a65; }
+
+        /* ESCAPE ISLAND */
         .btn-escape {
-            background-color: #8b5a2b; /* Marrom rústico temático de sobrevivência */
+            background-color: #8b5a2b; /* Marrom Rústico */
             border: 2px solid #5c3a1a;
         }
-        .btn-escape:hover {
-            background-color: #5c3a1a;
-        }
+        .btn-escape:hover { background-color: #5c3a1a; }
 
-        /* ESTILO DO JOGO SUDOKU */
+        /* SUDOKU */
         .btn-sudoku {
-            background-color: #34495e;
+            background-color: #34495e; /* Azul Marinho Escuro */
             border: 2px solid #2c3e50;
         }
-        .btn-sudoku:hover {
-            background-color: #2c3e50;
-        }
+        .btn-sudoku:hover { background-color: #2c3e50; }
 
-        /* ESTILO DO SHOW DA MATEMÁTICA */
+        /* SHOW DA MATEMÁTICA */
         .btn-show {
             background-color: #d4af37; /* Dourado */
             border: 2px solid #b8962e;
         }
-        .btn-show:hover {
-            background-color: #b8962e;
+        .btn-show:hover { background-color: #b8962e; }
+
+        /* JORNADA DAS RUNAS */
+        .btn-runas {
+            background-color: #27ae60; /* Verde Clássico */
+            border: 2px solid #1e8449;
         }
+        .btn-runas:hover { background-color: #1e8449; }
+
+        /* MAPA DOS REINOS */
+        .btn-reinos {
+            background-color: #2980b9; /* Azul Claro */
+            border: 2px solid #1f618d;
+        }
+        .btn-reinos:hover { background-color: #1f618d; }
 
     </style>
 </head>
 <body>
     <h1>Portal de Jogos</h1>
-    <p>Uma mistura de mistério, lógica e diversão. Desvende mistérios incríveis e prove que a matemática é o seu melhor jogo!"</p>
+    <p>Uma mistura de mistério, lógica e diversão. Desvende mistérios incríveis e prove que a matemática é o seu melhor jogo!</p>
     
     <div class="menu-container">
-        <!-- NOVO JOGO ADICIONADO NO TOPO/DESTAQUE -->
-        <!-- Botão para o novo jogo em React -->
-<a href="https://jogogatofracao.vercel.app/" target="_blank" class="btn-menu btn-jogo1">
-  🐱 Gato Fração
-</a>
-<a href="https://edisca.vercel.app/" target="_blank" class="btn-menu btn-jogo1">
-EDISCA </a>
-        <a href="https://aventura-crono-logica.vercel.app/" target="_blank" class="btn-menu btn-jogo1">
-Aventura Crono-Lógica </a>
-<a href="jogo1.html" class="btn-menu btn-jogo1">🧩 Enigma 1: O Mistério das Alunas</a>
-<a href="jogo2.html" class="btn-menu btn-jogo2">🩰 Enigma 2: Mostra Coreográfica</a>
-<a href="jogo3.html" class="btn-menu btn-jogo3">🍔 Enigma 3: Amigas na Lanchonete</a>
-<a href="jogo4.html" class="btn-menu btn-jogo4">🎤 Enigma 4: Show de Talentos</a>
-<a href="jogo6.html" class="btn-menu btn-jogo5">🪇 Enigma 5: Oficinas na EDISCA</a>
-<a href="jogo7.html" class="btn-menu btn-jogo5">👩🏼‍🎨 Enigma 6: O Atelier de Pintura na EDISCA</a>
-<a href="jogo5.html" class="btn-menu btn-jogo5">⚡ Quiz de Maracatu</a>
         
-        <a href="cozinha.html" class="btn-menu btn-cozinha">🍳 Enigma: Cozinha</a>
-        <a href="escape.html" class="btn-menu btn-escape">🏝️ Desafio Especial: Escape Island</a>
-        <a href="sudoku.html" class="btn-menu btn-sudoku">🔢 Desafio Lógico: Sudoku</a>
-        <a href="show.html" class="btn-menu btn-show">📐 Desafio: Show da Matemática</a>
-         <a href="https://runasalfabetiza-o.vercel.app/" target="_blank" class="btn-menu btn-jogo3">
-A Jornada Das Runas </a>
-        <a href="https://mapadosreinos.vercel.app/" target="_blank" class="btn-menu btn-jogo5">
-Mapa Dos Reinos </a>
+        <!-- JOGOS EXTERNOS (Vercel) -->
+        <a href="https://amigasnalanchonete.vercel.app/" target="_blank" rel="noopener noreferrer" class="btn-menu btn-lanchonete">
+            🍔 Enigmas Unificados
+        </a>
+
+        <a href="https://jogogatofracao.vercel.app/" target="_blank" rel="noopener noreferrer" class="btn-menu btn-gato">
+            🐱 Gato Fração
+        </a>
+
+        <a href="https://edisca.vercel.app/" target="_blank" rel="noopener noreferrer" class="btn-menu btn-edisca">
+            🩰 EDISCA
+        </a>
+
+        <a href="https://aventura-crono-logica.vercel.app/" target="_blank" rel="noopener noreferrer" class="btn-menu btn-crono">
+            ⏳ Aventura Crono-Lógica
+        </a>
+
+        <a href="https://runasalfabetiza-o.vercel.app/" target="_blank" rel="noopener noreferrer" class="btn-menu btn-runas">
+            🔮 A Jornada Das Runas
+        </a>
+
+        <a href="https://mapadosreinos.vercel.app/" target="_blank" rel="noopener noreferrer" class="btn-menu btn-reinos">
+            🗺️ Mapa Dos Reinos
+        </a>
+
+        <!-- JOGOS INTERNOS (Arquivos locais do repositório/pasta) -->
+        <a href="cozinha.html" class="btn-menu btn-cozinha">
+            🍳 Enigma: Cozinha
+        </a>
+        
+        <a href="escape.html" class="btn-menu btn-escape">
+            🏝️ Desafio Especial: Escape Island
+        </a>
+        
+        <a href="sudoku.html" class="btn-menu btn-sudoku">
+            🔢 Desafio Lógico: Sudoku
+        </a>
+        
+        <a href="show.html" class="btn-menu btn-show">
+            📐 Desafio: Show da Matemática
+        </a>
         
     </div>
 </body>
